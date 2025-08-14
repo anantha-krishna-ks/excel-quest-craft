@@ -171,9 +171,9 @@ export const QuizPreview = ({ quiz, onEdit, onSave }: QuizPreviewProps) => {
                             {question.options.map((option, optIndex) => (
                               <div
                                 key={optIndex}
-                                className={`p-3 rounded-lg border transition-colors ${
+                                className={`p-3 rounded-lg border transition-colors text-black ${
                                   optIndex === question.correct
-                                    ? 'bg-success/10 border-success text-success-foreground font-medium'
+                                    ? 'bg-success/10 border-success font-medium'
                                     : 'bg-secondary/50 border-border'
                                 }`}
                               >
