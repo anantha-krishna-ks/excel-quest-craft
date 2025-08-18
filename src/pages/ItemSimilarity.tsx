@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Upload, Download, FileText, Scan, Trash2, Clock, BarChart3, Target, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Upload, Download, FileText, Scan, Trash2, Clock, BarChart3, Target, AlertTriangle, Eye, Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface SimilarItem {
   id: string;
@@ -16,12 +20,38 @@ interface SimilarItem {
   status: 'similar' | 'enemy';
 }
 
+interface QuestionItem {
+  id: string;
+  sequenceNumber: number;
+  question: string;
+  type: string;
+  options?: string[];
+  correctAnswer?: string;
+}
+
+interface QuestionSet {
+  id: string;
+  name: string;
+  itemCount: number;
+}
+
 const ItemSimilarity = () => {
   const { toast } = useToast();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [similarItems, setSimilarItems] = useState<SimilarItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [selectedQuestionSet, setSelectedQuestionSet] = useState<string>("");
+  const [scoreThreshold, setScoreThreshold] = useState<number>(80);
+  const [questionItems, setQuestionItems] = useState<QuestionItem[]>([]);
+  const [enemyItems, setEnemyItems] = useState<SimilarItem[]>([]);
+
+  // Mock data
+  const questionSets: QuestionSet[] = [
+    { id: "1", name: "Chemistry - Organic Compounds", itemCount: 45 },
+    { id: "2", name: "Physics - Mechanics", itemCount: 32 },
+    { id: "3", name: "Mathematics - Algebra", itemCount: 28 },
+  ];
 
   const stats = [
     {
@@ -185,11 +215,40 @@ const ItemSimilarity = () => {
     ];
     
     setSimilarItems(mockSimilarItems);
+    
+    // Mock processed items data
+    const mockQuestionItems: QuestionItem[] = [
+      {
+        id: "1",
+        sequenceNumber: 1,
+        question: "Which functional group is present in an alcohol molecule?",
+        type: "MCQ",
+        options: ["Hydroxyl (-OH)", "Carboxyl (-COOH)", "Amino (-NH2)", "Carbonyl (C=O)"],
+        correctAnswer: "Hydroxyl (-OH)"
+      },
+      {
+        id: "2",
+        sequenceNumber: 2,
+        question: "What is the general formula of an alkane?",
+        type: "MCQ", 
+        options: ["CnH2n+2", "CnH2n", "CnH2n-2", "CnHn"],
+        correctAnswer: "CnH2n+2"
+      },
+      {
+        id: "3",
+        sequenceNumber: 3,
+        question: "Explain the mechanism of electrophilic addition.",
+        type: "Descriptive"
+      }
+    ];
+    
+    setQuestionItems(mockQuestionItems);
+    setEnemyItems(mockSimilarItems.filter(item => item.status === 'enemy'));
     setIsAnalyzing(false);
     
     toast({
       title: "Analysis Complete",
-      description: `Found ${mockSimilarItems.length} similar items`,
+      description: `Processed ${mockQuestionItems.length} items, found ${mockSimilarItems.length} similar items`,
     });
   };
 
@@ -266,266 +325,544 @@ const ItemSimilarity = () => {
             Item Similarity Analyzer
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload questions to find similar items and identify potential duplicates or enemy items
+            Manage question sets, find similar items, and identify enemy questions
           </p>
         </div>
 
-        {/* Statistics Cards */}
-        {similarItems.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
-            {stats.map((stat, index) => (
-              <Card key={index} className={`p-6 ${stat.bgColor} border ${stat.borderColor} shadow-sm`}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-8 h-8 ${stat.iconBg} rounded-lg flex items-center justify-center shadow-sm`}>
-                    <div className="text-white">
-                      {stat.icon}
-                    </div>
-                  </div>
-                  <span className="font-medium text-gray-700">{stat.title}</span>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className={`text-2xl font-bold ${stat.textColor}`}>{stat.total}</div>
-                  <div className="text-sm font-medium text-gray-600">{stat.subtitle}</div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Upload Section */}
-        <Card className="border-2 border-gray-200">
-          <div className="p-8">
-            <div className="text-center space-y-6">
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700 border-purple-200">
-                <Clock className="w-3 h-3 mr-1" />
-                Remaining Tokens: 4,651
-              </Badge>
-              
-              <div className="flex flex-col sm:flex-row items-center justify-between text-sm text-gray-500 gap-4">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">Format: .xlsx only</Badge>
-                  <Badge variant="outline" className="text-xs">Limit: 50 Questions</Badge>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  className="border-2 border-purple-400 text-purple-700 bg-white hover:bg-purple-50 hover:border-purple-500 hover:text-purple-800 transition-all duration-200"
-                  onClick={handleDownloadTemplate}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Template
-                </Button>
-              </div>
-              
-              {!uploadedFile ? (
-                <div 
-                  className={`border-2 border-dashed rounded-xl p-16 transition-all duration-300 cursor-pointer ${
-                    isDragOver 
-                      ? 'border-purple-500 bg-purple-50/50' 
-                      : 'border-gray-300 hover:border-purple-400 bg-gray-50/30'
-                  }`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => document.getElementById('file-upload')?.click()}
-                >
-                  <div className="text-center space-y-6">
-                    <div className={`w-16 h-16 rounded-lg flex items-center justify-center mx-auto transition-all duration-300 ${
-                      isDragOver 
-                        ? 'bg-purple-600' 
-                        : 'bg-gray-100 border-2 border-gray-300'
-                    }`}>
-                      <Upload className={`w-8 h-8 transition-all duration-300 ${
-                        isDragOver ? 'text-white' : 'text-gray-500'
-                      }`} />
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Drop your Excel file here
-                      </h3>
-                      <p className="text-gray-500">
-                        or click to browse for files
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Supported formats: XLSX (Max 50 Questions)
-                      </p>
-                    </div>
-                    
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      id="file-upload"
-                    />
-                    <Button 
-                      variant="outline" 
-                      className="border-2 border-purple-400 text-purple-700 bg-purple-50 hover:bg-purple-100 hover:border-purple-500 hover:text-purple-800 transition-all duration-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        document.getElementById('file-upload')?.click();
-                      }}
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Browse Files
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="border-2 border-green-200 rounded-xl p-12 bg-green-50/30">
-                  <div className="text-center space-y-6">
-                    <div className="w-16 h-16 rounded-lg bg-green-100 border-2 border-green-300 flex items-center justify-center mx-auto">
-                      <FileText className="w-8 h-8 text-green-600" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {uploadedFile.name}
-                      </h3>
-                      <p className="text-green-600 font-medium">
-                        File uploaded successfully!
-                      </p>
-                    </div>
-                    
-                    <div className="flex gap-4 justify-center">
-                      <Button 
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
-                        onClick={handleAnalyzeSimilarity}
-                        disabled={isAnalyzing}
-                      >
-                        {isAnalyzing ? (
-                          <>
-                            <Clock className="w-4 h-4 mr-2 animate-spin" />
-                            Analyzing...
-                          </>
-                        ) : (
-                          <>
-                            <Scan className="w-4 h-4 mr-2" />
-                            Analyze Similarity
-                          </>
-                        )}
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="border-2 border-red-400 text-red-600 bg-white hover:bg-red-50 hover:border-red-500 transition-all duration-200"
-                        onClick={handleRemoveFile}
-                      >
-                        Remove File
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
+        {/* Tabs */}
+        <Card className="border-gray-200">
+          <Tabs defaultValue="item-bank" className="w-full">
+            <div className="border-b border-gray-200 px-6 pt-6">
+              <TabsList className="grid w-full grid-cols-3 bg-gray-100">
+                <TabsTrigger value="item-bank" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  Item Bank
+                </TabsTrigger>
+                <TabsTrigger value="similar-items" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  Similar Items
+                </TabsTrigger>
+                <TabsTrigger value="enemy-items" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  Enemy Items
+                </TabsTrigger>
+              </TabsList>
             </div>
-          </div>
-        </Card>
 
-        {/* Analysis Progress */}
-        {isAnalyzing && (
-          <Card className="border-purple-200 animate-fade-in">
-            <div className="p-8 text-center space-y-6">
-              <div className="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto">
-                <Scan className="w-8 h-8 text-purple-600 animate-pulse" />
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-xl font-semibold text-gray-900">Analyzing Similarity...</h3>
-                <p className="text-gray-600">AI is processing your questions to find similar items</p>
-                <Progress value={75} className="w-full max-w-md mx-auto" />
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Similar Items Results */}
-        {similarItems.length > 0 && !isAnalyzing && (
-          <Card className="border-gray-200 animate-fade-in">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <Target className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Similar Items Found</h2>
-                    <p className="text-gray-600 mt-1">Review and mark items as similar or enemy</p>
-                  </div>
+            {/* Item Bank Tab */}
+            <TabsContent value="item-bank" className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Item Bank</h2>
+                  <p className="text-gray-600 mt-1">Manage your question sets and upload templates</p>
                 </div>
-                <div className="flex gap-2">
+                <Badge variant="secondary" className="bg-purple-100 text-purple-700 border-purple-200">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Tokens: 4,651
+                </Badge>
+              </div>
+
+              {/* Question Set Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <label className="text-sm font-medium text-gray-700">Select Question Set</label>
+                  <Select value={selectedQuestionSet} onValueChange={setSelectedQuestionSet}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a question set" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {questionSets.map((set) => (
+                        <SelectItem key={set.id} value={set.id}>
+                          {set.name} ({set.itemCount} items)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-4">
+                  <label className="text-sm font-medium text-gray-700">Actions</label>
                   <Button 
                     variant="outline" 
-                    className="border-2 border-blue-400 text-blue-700 hover:bg-blue-50"
+                    className="w-full border-2 border-purple-400 text-purple-700 hover:bg-purple-50"
+                    onClick={handleDownloadTemplate}
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    Export Results
+                    Download Template
                   </Button>
                 </div>
               </div>
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-16">#</TableHead>
-                    <TableHead>Question</TableHead>
-                    <TableHead className="w-24">Type</TableHead>
-                    <TableHead className="w-32">Similarity</TableHead>
-                    <TableHead className="w-32">Status</TableHead>
-                    <TableHead className="w-32">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {similarItems.map((item, index) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="max-w-md">
-                        <p className="truncate">{item.question}</p>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{item.type}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getSimilarityBg(item.similarity)}`}>
-                            <span className={getSimilarityColor(item.similarity)}>
-                              {item.similarity.toFixed(1)}%
-                            </span>
-                          </div>
+              {/* File Upload */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Upload Question Template</h3>
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                  <Badge variant="outline" className="text-xs">Format: .xlsx only</Badge>
+                  <Badge variant="outline" className="text-xs">Limit: 50 Questions</Badge>
+                </div>
+                
+                {!uploadedFile ? (
+                  <div 
+                    className={`border-2 border-dashed rounded-xl p-12 transition-all duration-300 cursor-pointer ${
+                      isDragOver 
+                        ? 'border-purple-500 bg-purple-50/50' 
+                        : 'border-gray-300 hover:border-purple-400 bg-gray-50/30'
+                    }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                  >
+                    <div className="text-center space-y-4">
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto transition-all duration-300 ${
+                        isDragOver 
+                          ? 'bg-purple-600' 
+                          : 'bg-gray-100 border-2 border-gray-300'
+                      }`}>
+                        <Upload className={`w-6 h-6 transition-all duration-300 ${
+                          isDragOver ? 'text-white' : 'text-gray-500'
+                        }`} />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-md font-semibold text-gray-900">
+                          Drop your Excel file here
+                        </h4>
+                        <p className="text-gray-500 text-sm">
+                          or click to browse for files
+                        </p>
+                      </div>
+                      
+                      <input
+                        type="file"
+                        accept=".xlsx,.xls"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <Button 
+                        variant="outline" 
+                        className="border-2 border-purple-400 text-purple-700 bg-purple-50 hover:bg-purple-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          document.getElementById('file-upload')?.click();
+                        }}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Browse Files
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-2 border-green-200 rounded-xl p-8 bg-green-50/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-green-100 border-2 border-green-300 flex items-center justify-center">
+                          <FileText className="w-6 h-6 text-green-600" />
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          className={
-                            item.status === 'enemy' 
-                              ? 'bg-red-100 text-red-800 hover:bg-red-100' 
-                              : 'bg-green-100 text-green-800 hover:bg-green-100'
-                          }
+                        <div>
+                          <h4 className="text-md font-semibold text-gray-900">{uploadedFile.name}</h4>
+                          <p className="text-green-600 font-medium text-sm">File uploaded successfully!</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                          onClick={handleAnalyzeSimilarity}
+                          disabled={isAnalyzing}
                         >
-                          {item.status === 'enemy' ? 'Enemy' : 'Similar'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => toggleEnemyStatus(item.id)}
-                          className={
-                            item.status === 'enemy'
-                              ? 'border-green-400 text-green-600 hover:bg-green-50'
-                              : 'border-red-400 text-red-600 hover:bg-red-50'
-                          }
-                        >
-                          {item.status === 'enemy' ? 'Mark Similar' : 'Mark Enemy'}
+                          {isAnalyzing ? (
+                            <>
+                              <Clock className="w-4 h-4 mr-2 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <Scan className="w-4 h-4 mr-2" />
+                              Process Items
+                            </>
+                          )}
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </Card>
-        )}
+                        <Button 
+                          variant="outline" 
+                          className="border-2 border-red-400 text-red-600 hover:bg-red-50"
+                          onClick={handleRemoveFile}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Processing Progress */}
+              {isAnalyzing && (
+                <Card className="border-purple-200 animate-fade-in">
+                  <div className="p-6 text-center space-y-4">
+                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto">
+                      <Scan className="w-6 h-6 text-purple-600 animate-pulse" />
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="text-lg font-semibold text-gray-900">Processing Items...</h4>
+                      <p className="text-gray-600">AI is analyzing your questions</p>
+                      <Progress value={75} className="w-full max-w-md mx-auto" />
+                    </div>
+                  </div>
+                </Card>
+              )}
+
+              {/* Processed Items Table */}
+              {questionItems.length > 0 && !isAnalyzing && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Processed Items</h3>
+                    <Button variant="outline" className="border-2 border-blue-400 text-blue-700 hover:bg-blue-50">
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Items
+                    </Button>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-16">#</TableHead>
+                        <TableHead>Question</TableHead>
+                        <TableHead className="w-24">Type</TableHead>
+                        <TableHead className="w-32">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {questionItems.map((item, index) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.sequenceNumber}</TableCell>
+                          <TableCell className="max-w-md">
+                            <p className="truncate">{item.question}</p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{item.type}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  Preview
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                  <DialogTitle>Question Preview</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div>
+                                    <label className="text-sm font-medium text-gray-700">Question</label>
+                                    <p className="text-gray-900 mt-1">{item.question}</p>
+                                  </div>
+                                  {item.options && (
+                                    <div>
+                                      <label className="text-sm font-medium text-gray-700">Options</label>
+                                      <div className="mt-2 space-y-2">
+                                        {item.options.map((option, idx) => (
+                                          <div key={idx} className="flex items-center gap-2">
+                                            <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium">
+                                              {String.fromCharCode(65 + idx)}
+                                            </span>
+                                            <span>{option}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Similar Items Tab */}
+            <TabsContent value="similar-items" className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Similar Items</h2>
+                  <p className="text-gray-600 mt-1">Find and analyze similar questions based on score threshold</p>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Question Set</label>
+                  <Select value={selectedQuestionSet} onValueChange={setSelectedQuestionSet}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a question set" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {questionSets.map((set) => (
+                        <SelectItem key={set.id} value={set.id}>
+                          {set.name} ({set.itemCount} items)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Score Threshold</label>
+                  <Input 
+                    type="number" 
+                    value={scoreThreshold} 
+                    onChange={(e) => setScoreThreshold(Number(e.target.value))}
+                    min="50" 
+                    max="100"
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Actions</label>
+                  <Button 
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    disabled={!selectedQuestionSet}
+                  >
+                    <Search className="w-4 h-4 mr-2" />
+                    Find Similar Items
+                  </Button>
+                </div>
+              </div>
+
+              {/* Similar Items Results */}
+              {similarItems.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Similar Items Found</h3>
+                    <Button variant="outline" className="border-2 border-blue-400 text-blue-700 hover:bg-blue-50">
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Results
+                    </Button>
+                  </div>
+
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-16">#</TableHead>
+                        <TableHead>Question</TableHead>
+                        <TableHead className="w-24">Type</TableHead>
+                        <TableHead className="w-32">Score</TableHead>
+                        <TableHead className="w-32">Status</TableHead>
+                        <TableHead className="w-32">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {similarItems.map((item, index) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="max-w-md">
+                            <p className="truncate">{item.question}</p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{item.type}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${getSimilarityBg(item.similarity)}`}>
+                                <span className={getSimilarityColor(item.similarity)}>
+                                  {item.similarity.toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              className={
+                                item.status === 'enemy' 
+                                  ? 'bg-red-100 text-red-800 hover:bg-red-100' 
+                                  : 'bg-green-100 text-green-800 hover:bg-green-100'
+                              }
+                            >
+                              {item.status === 'enemy' ? 'Enemy' : 'Similar'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="outline" size="sm">
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl">
+                                  <DialogHeader>
+                                    <DialogTitle>Similar Items Preview</DialogTitle>
+                                  </DialogHeader>
+                                  <div className="space-y-4">
+                                    <div className="bg-blue-50 p-4 rounded-lg">
+                                      <h4 className="font-medium text-blue-900 mb-2">Original Question</h4>
+                                      <p className="text-blue-800">{item.question}</p>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-medium text-gray-900 mb-3">5 Similar Items Found</h4>
+                                      <div className="space-y-3">
+                                        {[1,2,3,4,5].map((idx) => (
+                                          <div key={idx} className="border rounded-lg p-3 bg-gray-50">
+                                            <div className="flex items-center justify-between mb-2">
+                                              <span className="text-sm font-medium text-gray-600">Question #{idx}</span>
+                                              <span className="text-sm font-medium text-green-600">92.{idx}% Match</span>
+                                            </div>
+                                            <p className="text-gray-800">Similar question content would appear here...</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => toggleEnemyStatus(item.id)}
+                                className={
+                                  item.status === 'enemy'
+                                    ? 'border-green-400 text-green-600 hover:bg-green-50'
+                                    : 'border-red-400 text-red-600 hover:bg-red-50'
+                                }
+                              >
+                                {item.status === 'enemy' ? 'Mark Similar' : 'Mark Enemy'}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Enemy Items Tab */}
+            <TabsContent value="enemy-items" className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Enemy Items</h2>
+                  <p className="text-gray-600 mt-1">Manage and export enemy questions</p>
+                </div>
+                <Button variant="outline" className="border-2 border-red-400 text-red-700 hover:bg-red-50">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Enemy Items
+                </Button>
+              </div>
+
+              {/* Question Set Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Question Set</label>
+                  <Select value={selectedQuestionSet} onValueChange={setSelectedQuestionSet}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a question set" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {questionSets.map((set) => (
+                        <SelectItem key={set.id} value={set.id}>
+                          {set.name} ({set.itemCount} items)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Actions</label>
+                  <Button 
+                    className="w-full bg-red-600 hover:bg-red-700 text-white"
+                    disabled={!selectedQuestionSet}
+                  >
+                    <AlertTriangle className="w-4 h-4 mr-2" />
+                    Find Enemy Items
+                  </Button>
+                </div>
+              </div>
+
+              {/* Enemy Items Table */}
+              {enemyItems.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Enemy Questions ({enemyItems.length})</h3>
+                  </div>
+
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-16">#</TableHead>
+                        <TableHead>Question</TableHead>
+                        <TableHead className="w-24">Type</TableHead>
+                        <TableHead className="w-32">Score</TableHead>
+                        <TableHead className="w-32">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {enemyItems.map((item, index) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="max-w-md">
+                            <p className="truncate">{item.question}</p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{item.type}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${getSimilarityBg(item.similarity)} inline-block`}>
+                              <span className={getSimilarityColor(item.similarity)}>
+                                {item.similarity.toFixed(1)}%
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  View
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                  <DialogTitle>Enemy Item Details</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <h4 className="font-medium text-red-900 mb-2">Enemy Question</h4>
+                                    <p className="text-red-800">{item.question}</p>
+                                  </div>
+                                  <div>
+                                    <h4 className="font-medium text-gray-900 mb-2">Details</h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <span className="text-sm text-gray-600">Type:</span>
+                                        <p className="font-medium">{item.type}</p>
+                                      </div>
+                                      <div>
+                                        <span className="text-sm text-gray-600">Similarity Score:</span>
+                                        <p className="font-medium">{item.similarity.toFixed(1)}%</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <AlertTriangle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Enemy Items Found</h3>
+                  <p className="text-gray-600">Select a question set and click "Find Enemy Items" to start analysis</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </Card>
 
         {/* Footer */}
         <div className="mt-12 text-center">
