@@ -329,18 +329,30 @@ const ItemSimilarity = () => {
           </p>
         </div>
 
-        {/* Tabs */}
-        <Card className="border-gray-200">
+        {/* Enhanced Tabs */}
+        <Card className="border-gray-200 shadow-xl bg-white/90 backdrop-blur-sm">
           <Tabs defaultValue="item-bank" className="w-full">
-            <div className="border-b border-gray-200 px-6 pt-6">
-              <TabsList className="grid w-full grid-cols-3 bg-gray-100">
-                <TabsTrigger value="item-bank" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <div className="bg-gradient-to-r from-purple-50 via-blue-50 to-purple-50 border-b border-purple-200/50 px-6 pt-6 pb-2">
+              <TabsList className="grid w-full grid-cols-3 bg-white/60 backdrop-blur-sm border border-purple-200 shadow-lg h-14">
+                <TabsTrigger 
+                  value="item-bank" 
+                  className="relative flex items-center gap-3 text-gray-700 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-[1.02] hover:bg-purple-50"
+                >
+                  <FileText className="w-4 h-4" />
                   Item Bank
                 </TabsTrigger>
-                <TabsTrigger value="similar-items" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                <TabsTrigger 
+                  value="similar-items" 
+                  className="relative flex items-center gap-3 text-gray-700 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-[1.02] hover:bg-blue-50"
+                >
+                  <Target className="w-4 h-4" />
                   Similar Items
                 </TabsTrigger>
-                <TabsTrigger value="enemy-items" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                <TabsTrigger 
+                  value="enemy-items" 
+                  className="relative flex items-center gap-3 text-gray-700 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-red-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-[1.02] hover:bg-red-50"
+                >
+                  <AlertTriangle className="w-4 h-4" />
                   Enemy Items
                 </TabsTrigger>
               </TabsList>
@@ -545,25 +557,60 @@ const ItemSimilarity = () => {
                                   Preview
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent className="max-w-2xl">
+                              <DialogContent className="max-w-4xl">
                                 <DialogHeader>
-                                  <DialogTitle>Question Preview</DialogTitle>
+                                  <DialogTitle className="flex items-center gap-2 text-xl">
+                                    <Eye className="w-5 h-5 text-purple-600" />
+                                    Question Preview
+                                  </DialogTitle>
                                 </DialogHeader>
-                                <div className="space-y-4">
-                                  <div>
-                                    <label className="text-sm font-medium text-gray-700">Question</label>
-                                    <p className="text-gray-900 mt-1">{item.question}</p>
+                                <div className="space-y-6">
+                                  {/* Question Header */}
+                                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border border-purple-200">
+                                    <div className="flex items-center gap-3 mb-3">
+                                      <Badge className="bg-purple-100 text-purple-800">
+                                        Question #{item.sequenceNumber}
+                                      </Badge>
+                                      <Badge variant="outline" className="border-purple-300 text-purple-700">
+                                        {item.type}
+                                      </Badge>
+                                    </div>
+                                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Question Statement</h3>
+                                      <p className="text-gray-800 leading-relaxed">{item.question}</p>
+                                    </div>
                                   </div>
+
+                                  {/* Options Section */}
                                   {item.options && (
-                                    <div>
-                                      <label className="text-sm font-medium text-gray-700">Options</label>
-                                      <div className="mt-2 space-y-2">
+                                    <div className="space-y-4">
+                                      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                                        Answer Options
+                                      </h3>
+                                      <div className="grid gap-3">
                                         {item.options.map((option, idx) => (
-                                          <div key={idx} className="flex items-center gap-2">
-                                            <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium">
+                                          <div 
+                                            key={idx} 
+                                            className={`flex items-center gap-4 p-4 rounded-lg transition-all duration-200 ${
+                                              item.correctAnswer === option 
+                                                ? 'bg-green-50 border-2 border-green-300 shadow-md' 
+                                                : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                                            }`}
+                                          >
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                              item.correctAnswer === option 
+                                                ? 'bg-green-500 text-white' 
+                                                : 'bg-gray-300 text-gray-700'
+                                            }`}>
                                               {String.fromCharCode(65 + idx)}
-                                            </span>
-                                            <span>{option}</span>
+                                            </div>
+                                            <span className="flex-1 text-gray-800">{option}</span>
+                                            {item.correctAnswer === option && (
+                                              <Badge className="bg-green-500 text-white">
+                                                Correct Answer
+                                              </Badge>
+                                            )}
                                           </div>
                                         ))}
                                       </div>
@@ -607,16 +654,45 @@ const ItemSimilarity = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Score Threshold</label>
-                  <Input 
-                    type="number" 
-                    value={scoreThreshold} 
-                    onChange={(e) => setScoreThreshold(Number(e.target.value))}
-                    min="50" 
-                    max="100"
-                    className="w-full"
-                  />
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Filter className="w-4 h-4" />
+                    Score Threshold
+                  </label>
+                  <div className="relative">
+                    <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+                      <div className="flex-1">
+                        <input
+                          type="range"
+                          min="50"
+                          max="100"
+                          value={scoreThreshold}
+                          onChange={(e) => setScoreThreshold(Number(e.target.value))}
+                          className="w-full h-2 bg-gradient-to-r from-red-300 via-yellow-300 to-green-300 rounded-lg appearance-none cursor-pointer slider"
+                          style={{
+                            background: `linear-gradient(to right, #fca5a5 0%, #fde047 50%, #86efac 100%)`
+                          }}
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                          <span>50%</span>
+                          <span>75%</span>
+                          <span>100%</span>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className={`px-4 py-2 rounded-lg text-lg font-bold text-white ${
+                          scoreThreshold >= 90 ? 'bg-green-500' : 
+                          scoreThreshold >= 75 ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}>
+                          {scoreThreshold}%
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {scoreThreshold >= 90 ? 'Excellent' : 
+                           scoreThreshold >= 75 ? 'Good' : 'Moderate'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Actions</label>
@@ -690,25 +766,76 @@ const ItemSimilarity = () => {
                                     <Eye className="w-4 h-4" />
                                   </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-4xl">
+                                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
                                   <DialogHeader>
-                                    <DialogTitle>Similar Items Preview</DialogTitle>
+                                    <DialogTitle className="flex items-center gap-2 text-xl">
+                                      <Target className="w-5 h-5 text-blue-600" />
+                                      Similar Items Analysis
+                                    </DialogTitle>
                                   </DialogHeader>
-                                  <div className="space-y-4">
-                                    <div className="bg-blue-50 p-4 rounded-lg">
-                                      <h4 className="font-medium text-blue-900 mb-2">Original Question</h4>
-                                      <p className="text-blue-800">{item.question}</p>
+                                  <div className="space-y-6">
+                                    {/* Original Question */}
+                                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <Badge className="bg-blue-600 text-white">Original Question</Badge>
+                                        <Badge variant="outline" className="border-blue-300">{item.type}</Badge>
+                                      </div>
+                                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                                        <p className="text-gray-900 font-medium">{item.question}</p>
+                                      </div>
                                     </div>
+
+                                    {/* Similarity Stats */}
+                                    <div className="grid grid-cols-3 gap-4">
+                                      <div className="bg-green-50 p-4 rounded-lg border border-green-200 text-center">
+                                        <div className="text-2xl font-bold text-green-600">5</div>
+                                        <div className="text-sm text-green-700">Similar Items</div>
+                                      </div>
+                                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center">
+                                        <div className="text-2xl font-bold text-blue-600">{item.similarity.toFixed(1)}%</div>
+                                        <div className="text-sm text-blue-700">Avg Similarity</div>
+                                      </div>
+                                      <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 text-center">
+                                        <div className="text-2xl font-bold text-purple-600">98.2%</div>
+                                        <div className="text-sm text-purple-700">Highest Match</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Similar Items List */}
                                     <div>
-                                      <h4 className="font-medium text-gray-900 mb-3">5 Similar Items Found</h4>
-                                      <div className="space-y-3">
-                                        {[1,2,3,4,5].map((idx) => (
-                                          <div key={idx} className="border rounded-lg p-3 bg-gray-50">
-                                            <div className="flex items-center justify-between mb-2">
-                                              <span className="text-sm font-medium text-gray-600">Question #{idx}</span>
-                                              <span className="text-sm font-medium text-green-600">92.{idx}% Match</span>
+                                      <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                        Similar Items Found
+                                      </h4>
+                                      <div className="space-y-4">
+                                        {[
+                                          { id: 1, question: "Which functional group is present in alcohols?", similarity: 98.2, type: "MCQ" },
+                                          { id: 2, question: "Identify the functional group in alcohol compounds", similarity: 95.8, type: "MCQ" },
+                                          { id: 3, question: "What functional group characterizes alcohol molecules?", similarity: 93.4, type: "MCQ" },
+                                          { id: 4, question: "The functional group found in alcohols is called?", similarity: 91.7, type: "Short Answer" },
+                                          { id: 5, question: "Name the functional group present in ethanol", similarity: 89.3, type: "MCQ" }
+                                        ].map((similarItem) => (
+                                          <div key={similarItem.id} className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-all duration-200 hover:shadow-md">
+                                            <div className="flex items-start justify-between mb-3">
+                                              <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                  <span className="text-blue-600 font-bold text-sm">{similarItem.id}</span>
+                                                </div>
+                                                <Badge variant="outline" className="border-gray-300">
+                                                  {similarItem.type}
+                                                </Badge>
+                                              </div>
+                                              <div className={`px-3 py-1 rounded-full text-sm font-bold ${
+                                                similarItem.similarity >= 95 ? 'bg-green-100 text-green-700' :
+                                                similarItem.similarity >= 90 ? 'bg-yellow-100 text-yellow-700' :
+                                                'bg-orange-100 text-orange-700'
+                                              }`}>
+                                                {similarItem.similarity}% Match
+                                              </div>
                                             </div>
-                                            <p className="text-gray-800">Similar question content would appear here...</p>
+                                            <div className="bg-gray-50 p-3 rounded-lg">
+                                              <p className="text-gray-800">{similarItem.question}</p>
+                                            </div>
                                           </div>
                                         ))}
                                       </div>
