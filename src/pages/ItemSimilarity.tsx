@@ -333,26 +333,26 @@ const ItemSimilarity = () => {
         <Card className="border-gray-200 shadow-xl bg-white/90 backdrop-blur-sm">
           <Tabs defaultValue="item-bank" className="w-full">
             <div className="bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 border-b border-purple-300/70 px-8 pt-8 pb-4">
-              <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm border-2 border-purple-300 shadow-2xl h-16 rounded-xl p-1">
+              <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm border-2 border-purple-300 shadow-2xl h-20 rounded-xl p-2">
                 <TabsTrigger 
                   value="item-bank" 
-                  className="relative flex items-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-purple-100 hover:scale-102 rounded-lg m-1"
+                  className="relative flex items-center justify-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-purple-100 hover:scale-102 rounded-lg mx-1 h-full px-4 py-2"
                 >
                   <FileText className="w-5 h-5" />
                   <span className="font-bold">Item Bank</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="similar-items" 
-                  className="relative flex items-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-blue-100 hover:scale-102 rounded-lg m-1"
+                  className="relative flex items-center justify-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-blue-100 hover:scale-102 rounded-lg mx-1 h-full px-4 py-2"
                 >
                   <Target className="w-5 h-5" />
                   <span className="font-bold">Similar Items</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="enemy-items" 
-                  className="relative flex items-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-red-100 hover:scale-102 rounded-lg m-1"
+                  className="relative flex items-center justify-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-red-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-red-100 hover:scale-102 rounded-lg mx-1 h-full px-4 py-2"
                 >
-                  <AlertTriangle className="w-5 h-5" />
+                  <Filter className="w-5 h-5" />
                   <span className="font-bold">Enemy Items</span>
                 </TabsTrigger>
               </TabsList>
