@@ -786,6 +786,8 @@ const ItemSimilarity = () => {
                           <TableHead className="w-16">#</TableHead>
                           <TableHead>Question</TableHead>
                           <TableHead className="w-24">Type</TableHead>
+                          <TableHead className="w-32">Score</TableHead>
+                          <TableHead className="w-32">Status</TableHead>
                           <TableHead className="w-32">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -801,6 +803,16 @@ const ItemSimilarity = () => {
                             <TableCell>
                               <Badge variant="outline" className="text-xs">
                                 {question.type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge className="bg-blue-100 text-blue-700 border-0">
+                                {(85 + Math.random() * 10).toFixed(1)}%
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge className="bg-green-100 text-green-700 border-0">
+                                Similar
                               </Badge>
                             </TableCell>
                             <TableCell>
