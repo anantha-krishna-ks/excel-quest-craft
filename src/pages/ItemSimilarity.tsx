@@ -775,6 +775,91 @@ const ItemSimilarity = () => {
                 </Select>
               </div>
 
+              {/* Questions List for Similar Items */}
+              {selectedQuestionSet && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Questions in {questionSets.find(s => s.id === selectedQuestionSet)?.name}</h3>
+                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead className="w-16">#</TableHead>
+                          <TableHead>Question</TableHead>
+                          <TableHead className="w-24">Type</TableHead>
+                          <TableHead className="w-32">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {getQuestionsForSet(selectedQuestionSet).map((question) => (
+                          <TableRow key={question.id} className="hover:bg-gray-50">
+                            <TableCell className="font-medium">{question.sequenceNumber}</TableCell>
+                            <TableCell className="max-w-md">
+                              <div className="truncate" title={question.question}>
+                                {question.question}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-xs">
+                                {question.type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl">
+                                  <DialogHeader>
+                                    <DialogTitle>Question Details</DialogTitle>
+                                  </DialogHeader>
+                                  <div className="space-y-4">
+                                    <div>
+                                      <h4 className="font-medium text-gray-900 mb-2">Question:</h4>
+                                      <p className="text-gray-700">{question.question}</p>
+                                    </div>
+                                    <div className="flex gap-4">
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-500">Type:</span>
+                                        <Badge variant="outline" className="ml-2">{question.type}</Badge>
+                                      </div>
+                                      <div>
+                                        <span className="text-sm font-medium text-gray-500">ID:</span>
+                                        <span className="ml-2 text-sm text-gray-700">{question.id}</span>
+                                      </div>
+                                    </div>
+                                    {question.options && (
+                                      <div>
+                                        <h4 className="font-medium text-gray-900 mb-2">Options:</h4>
+                                        <ul className="space-y-1">
+                                          {question.options.map((option, index) => (
+                                            <li key={index} className={`p-2 rounded text-sm ${
+                                              option === question.correctAnswer 
+                                                ? 'bg-green-100 text-green-800 font-medium' 
+                                                : 'bg-gray-50 text-gray-700'
+                                            }`}>
+                                              {String.fromCharCode(65 + index)}. {option}
+                                              {option === question.correctAnswer && (
+                                                <span className="ml-2 text-green-600">✓ Correct</span>
+                                              )}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
+
               {/* Score Threshold in separate row */}
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
                 <div className="space-y-4">
@@ -1007,34 +1092,119 @@ const ItemSimilarity = () => {
                 </Button>
               </div>
 
-              {/* Question Set Selection */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Question Set</label>
-                  <Select value={selectedQuestionSet} onValueChange={setSelectedQuestionSet}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose a question set" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {questionSets.map((set) => (
-                        <SelectItem key={set.id} value={set.id}>
-                          {set.name} ({set.itemCount} items)
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Actions</label>
-                   <Button 
-                     className="w-full bg-red-600 hover:bg-red-700 text-white"
-                     disabled={!selectedQuestionSet}
-                   >
-                     <Search className="w-4 h-4 mr-2" />
-                     Find Enemy Items
-                   </Button>
-                </div>
-              </div>
+               {/* Question Set Selection */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-gray-700">Question Set</label>
+                   <Select value={selectedQuestionSet} onValueChange={setSelectedQuestionSet}>
+                     <SelectTrigger>
+                       <SelectValue placeholder="Choose a question set" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {questionSets.map((set) => (
+                         <SelectItem key={set.id} value={set.id}>
+                           {set.name} ({set.itemCount} items)
+                         </SelectItem>
+                       ))}
+                     </SelectContent>
+                   </Select>
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-gray-700">Actions</label>
+                    <Button 
+                      className="w-full bg-red-600 hover:bg-red-700 text-white"
+                      disabled={!selectedQuestionSet}
+                    >
+                      <Search className="w-4 h-4 mr-2" />
+                      Find Enemy Items
+                    </Button>
+                 </div>
+               </div>
+
+               {/* Questions List for Enemy Items */}
+               {selectedQuestionSet && (
+                 <div className="space-y-4">
+                   <h3 className="text-lg font-semibold text-gray-900">Questions in {questionSets.find(s => s.id === selectedQuestionSet)?.name}</h3>
+                   <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                     <Table>
+                       <TableHeader>
+                         <TableRow className="bg-gray-50">
+                           <TableHead className="w-16">#</TableHead>
+                           <TableHead>Question</TableHead>
+                           <TableHead className="w-24">Type</TableHead>
+                           <TableHead className="w-32">Actions</TableHead>
+                         </TableRow>
+                       </TableHeader>
+                       <TableBody>
+                         {getQuestionsForSet(selectedQuestionSet).map((question) => (
+                           <TableRow key={question.id} className="hover:bg-gray-50">
+                             <TableCell className="font-medium">{question.sequenceNumber}</TableCell>
+                             <TableCell className="max-w-md">
+                               <div className="truncate" title={question.question}>
+                                 {question.question}
+                               </div>
+                             </TableCell>
+                             <TableCell>
+                               <Badge variant="outline" className="text-xs">
+                                 {question.type}
+                               </Badge>
+                             </TableCell>
+                             <TableCell>
+                               <Dialog>
+                                 <DialogTrigger asChild>
+                                   <Button variant="ghost" size="sm">
+                                     <Eye className="w-4 h-4" />
+                                   </Button>
+                                 </DialogTrigger>
+                                 <DialogContent className="max-w-2xl">
+                                   <DialogHeader>
+                                     <DialogTitle>Question Details</DialogTitle>
+                                   </DialogHeader>
+                                   <div className="space-y-4">
+                                     <div>
+                                       <h4 className="font-medium text-gray-900 mb-2">Question:</h4>
+                                       <p className="text-gray-700">{question.question}</p>
+                                     </div>
+                                     <div className="flex gap-4">
+                                       <div>
+                                         <span className="text-sm font-medium text-gray-500">Type:</span>
+                                         <Badge variant="outline" className="ml-2">{question.type}</Badge>
+                                       </div>
+                                       <div>
+                                         <span className="text-sm font-medium text-gray-500">ID:</span>
+                                         <span className="ml-2 text-sm text-gray-700">{question.id}</span>
+                                       </div>
+                                     </div>
+                                     {question.options && (
+                                       <div>
+                                         <h4 className="font-medium text-gray-900 mb-2">Options:</h4>
+                                         <ul className="space-y-1">
+                                           {question.options.map((option, index) => (
+                                             <li key={index} className={`p-2 rounded text-sm ${
+                                               option === question.correctAnswer 
+                                                 ? 'bg-green-100 text-green-800 font-medium' 
+                                                 : 'bg-gray-50 text-gray-700'
+                                             }`}>
+                                               {String.fromCharCode(65 + index)}. {option}
+                                               {option === question.correctAnswer && (
+                                                 <span className="ml-2 text-green-600">✓ Correct</span>
+                                               )}
+                                             </li>
+                                           ))}
+                                         </ul>
+                                       </div>
+                                     )}
+                                   </div>
+                                 </DialogContent>
+                               </Dialog>
+                             </TableCell>
+                           </TableRow>
+                         ))}
+                       </TableBody>
+                     </Table>
+                   </div>
+                 </div>
+               )}
 
               {/* Enemy Items Table */}
               {enemyItems.length > 0 ? (
