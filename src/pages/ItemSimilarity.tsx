@@ -47,10 +47,22 @@ const ItemSimilarity = () => {
   const [enemyItems, setEnemyItems] = useState<SimilarItem[]>([]);
 
   // Mock data
+  // Mock questions for each set
+  const getQuestionsForSet = (setId: string) => {
+    const baseQuestions = [
+      { id: "q1", question: "Which functional group is present in an alcohol molecule?", type: "MCQ", options: ["Hydroxyl (-OH)", "Carboxyl (-COOH)", "Amino (-NH2)", "Carbonyl (C=O)"], correctAnswer: "Hydroxyl (-OH)" },
+      { id: "q2", question: "What is the general formula of an alkane?", type: "MCQ", options: ["CnH2n+2", "CnH2n", "CnH2n-2", "CnHn"], correctAnswer: "CnH2n+2" },
+      { id: "q3", question: "Explain the mechanism of electrophilic addition.", type: "Descriptive" },
+      { id: "q4", question: "Calculate the molarity of the solution.", type: "Numerical" },
+      { id: "q5", question: "Identify the product of the following reaction.", type: "MCQ", options: ["Product A", "Product B", "Product C", "Product D"], correctAnswer: "Product A" }
+    ];
+    return baseQuestions.map((q, index) => ({ ...q, id: `${setId}_${q.id}`, sequenceNumber: index + 1 }));
+  };
+
   const questionSets: QuestionSet[] = [
-    { id: "1", name: "Chemistry - Organic Compounds", itemCount: 45 },
-    { id: "2", name: "Physics - Mechanics", itemCount: 32 },
-    { id: "3", name: "Mathematics - Algebra", itemCount: 28 },
+    { id: "1", name: "Question Set 1", itemCount: 45 },
+    { id: "2", name: "Question Set 2", itemCount: 32 },
+    { id: "3", name: "Question Set 3", itemCount: 28 },
   ];
 
   const stats = [
@@ -518,6 +530,115 @@ const ItemSimilarity = () => {
                     </div>
                   </div>
                 </Card>
+              )}
+
+              {/* Questions from Selected Set */}
+              {selectedQuestionSet && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Questions ({getQuestionsForSet(selectedQuestionSet).length} items)
+                    </h3>
+                    <Button variant="outline" className="border-2 border-blue-400 text-blue-700 hover:bg-blue-50">
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Questions
+                    </Button>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-16">#</TableHead>
+                        <TableHead>Question</TableHead>
+                        <TableHead className="w-24">Type</TableHead>
+                        <TableHead className="w-32">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getQuestionsForSet(selectedQuestionSet).map((item, index) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.sequenceNumber}</TableCell>
+                          <TableCell className="max-w-md">
+                            <p className="truncate">{item.question}</p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{item.type}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  Preview
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl">
+                                <DialogHeader>
+                                  <DialogTitle className="flex items-center gap-2 text-xl">
+                                    <Eye className="w-5 h-5 text-purple-600" />
+                                    Question Preview
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-6">
+                                  {/* Question Header */}
+                                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border border-purple-200">
+                                    <div className="flex items-center gap-3 mb-3">
+                                      <Badge className="bg-purple-100 text-purple-800">
+                                        Question #{item.sequenceNumber}
+                                      </Badge>
+                                      <Badge variant="outline" className="border-purple-300 text-purple-700">
+                                        {item.type}
+                                      </Badge>
+                                    </div>
+                                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Question Statement</h3>
+                                      <p className="text-gray-800 leading-relaxed">{item.question}</p>
+                                    </div>
+                                  </div>
+
+                                  {/* Options Section */}
+                                  {item.options && (
+                                    <div className="space-y-4">
+                                      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                                        Answer Options
+                                      </h3>
+                                      <div className="grid gap-3">
+                                        {item.options.map((option, idx) => (
+                                          <div 
+                                            key={idx} 
+                                            className={`flex items-center gap-4 p-4 rounded-lg transition-all duration-200 ${
+                                              item.correctAnswer === option 
+                                                ? 'bg-green-50 border-2 border-green-300 shadow-md' 
+                                                : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                                            }`}
+                                          >
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                              item.correctAnswer === option 
+                                                ? 'bg-green-500 text-white' 
+                                                : 'bg-gray-300 text-gray-700'
+                                            }`}>
+                                              {String.fromCharCode(65 + idx)}
+                                            </div>
+                                            <span className="flex-1 text-gray-800">{option}</span>
+                                            {item.correctAnswer === option && (
+                                              <Badge className="bg-green-500 text-white">
+                                                Correct Answer
+                                              </Badge>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
 
               {/* Processed Items Table */}
