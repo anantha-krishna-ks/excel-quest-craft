@@ -1139,29 +1139,35 @@ const ItemSimilarity = () => {
                    <h3 className="text-lg font-semibold text-gray-900">Questions in {questionSets.find(s => s.id === selectedQuestionSet)?.name}</h3>
                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                      <Table>
-                       <TableHeader>
-                         <TableRow className="bg-gray-50">
-                           <TableHead className="w-16">#</TableHead>
-                           <TableHead>Question</TableHead>
-                           <TableHead className="w-24">Type</TableHead>
-                           <TableHead className="w-32">Actions</TableHead>
-                         </TableRow>
-                       </TableHeader>
-                       <TableBody>
-                         {getQuestionsForSet(selectedQuestionSet).map((question) => (
-                           <TableRow key={question.id} className="hover:bg-gray-50">
-                             <TableCell className="font-medium">{question.sequenceNumber}</TableCell>
-                             <TableCell className="max-w-md">
-                               <div className="truncate" title={question.question}>
-                                 {question.question}
-                               </div>
-                             </TableCell>
-                             <TableCell>
-                               <Badge variant="outline" className="text-xs">
-                                 {question.type}
-                               </Badge>
-                             </TableCell>
-                             <TableCell>
+                        <TableHeader>
+                          <TableRow className="bg-gray-50">
+                            <TableHead className="w-16">#</TableHead>
+                            <TableHead>Question</TableHead>
+                            <TableHead className="w-24">Type</TableHead>
+                            <TableHead className="w-32">Score</TableHead>
+                            <TableHead className="w-32">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getQuestionsForSet(selectedQuestionSet).map((question) => (
+                            <TableRow key={question.id} className="hover:bg-gray-50">
+                              <TableCell className="font-medium">{question.sequenceNumber}</TableCell>
+                              <TableCell className="max-w-md">
+                                <div className="truncate" title={question.question}>
+                                  {question.question}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="text-xs">
+                                  {question.type}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className="bg-red-100 text-red-700 border-0">
+                                  {(65 + Math.random() * 20).toFixed(1)}%
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
                                <Dialog>
                                  <DialogTrigger asChild>
                                    <Button variant="ghost" size="sm">
