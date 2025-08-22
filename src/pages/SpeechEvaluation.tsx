@@ -626,7 +626,7 @@ const SpeechEvaluation = () => {
                           <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md flex items-center justify-center shadow-sm">
                             <Headphones className="w-3 h-3 text-white" />
                           </div>
-                          <h3 className="text-sm font-semibold text-gray-900">Audio Analysis</h3>
+                          <h3 className="text-lg font-semibold text-gray-900">Audio Analysis</h3>
                         </div>
                         <div className="flex items-center gap-3">
                           <Button
@@ -673,9 +673,9 @@ const SpeechEvaluation = () => {
                       <div className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 border border-gray-200">
                         <div className="flex items-center gap-2 mb-2">
                           <Volume2 className="w-4 h-4 text-indigo-600" />
-                          <span className="text-sm font-medium text-gray-800">Speech Transcript</span>
+                          <span className="font-semibold text-gray-800">Speech Transcript</span>
                         </div>
-                        <p className="text-sm leading-relaxed">
+                        <p className="text-base leading-relaxed">
                           <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">We </span>
                           <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">had </span>
                           <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">a </span>
@@ -701,7 +701,7 @@ const SpeechEvaluation = () => {
                           <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-md flex items-center justify-center shadow-sm">
                             <Target className="w-3 h-3 text-white" />
                           </div>
-                          <h3 className="text-sm font-semibold text-gray-900">Error Analysis</h3>
+                          <h3 className="text-lg font-semibold text-gray-900">Error Analysis</h3>
                         </div>
                         <div className="space-y-2">
                           {[
@@ -715,16 +715,16 @@ const SpeechEvaluation = () => {
                             <div key={index} className={`flex items-center justify-between p-2 ${error.bgColor} border border-gray-200 rounded-lg hover:bg-gray-100/50 transition-all`}>
                               <div className="flex items-center gap-2">
                                 <div className={`w-1.5 h-1.5 rounded-full ${error.count > 0 ? 'bg-orange-500' : 'bg-gray-400'}`}></div>
-                                <span className="text-xs font-medium text-gray-800">{error.type}</span>
+                                <span className="text-sm font-medium text-gray-800">{error.type}</span>
                               </div>
-                              <Badge className={`${error.color} text-xs px-2 py-0.5`}>
+                              <Badge className={`${error.color} text-sm px-2 py-0.5`}>
                                 {error.count}
                               </Badge>
                             </div>
                           ))}
                         </div>
 
-                        {/* Compact Pronunciation Score Circle */}
+                        {/* Pronunciation Score Meter */}
                         <div className="bg-white/90 backdrop-blur-sm border border-green-200 rounded-lg p-4 shadow-sm">
                           <div className="flex items-center gap-2 mb-3">
                             <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-md flex items-center justify-center shadow-sm">
@@ -732,54 +732,36 @@ const SpeechEvaluation = () => {
                             </div>
                             <h4 className="text-sm font-semibold text-gray-900">Pronunciation Score</h4>
                           </div>
-                          <div className="flex items-center justify-center mb-3">
-                            <div className="relative w-20 h-20">
-                              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 120 120">
-                                <circle
-                                  cx="60"
-                                  cy="60"
-                                  r="50"
-                                  fill="none"
-                                  stroke="#e5e7eb"
-                                  strokeWidth="8"
-                                />
-                                <circle
-                                  cx="60"
-                                  cy="60"
-                                  r="50"
-                                  fill="none"
-                                  stroke="url(#gradient)"
-                                  strokeWidth="8"
-                                  strokeDasharray={314}
-                                  strokeDashoffset={314 - (314 * 93) / 100}
-                                  strokeLinecap="round"
-                                  className="transition-all duration-2000 ease-out"
-                                />
-                                <defs>
-                                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#10b981" />
-                                    <stop offset="100%" stopColor="#059669" />
-                                  </linearGradient>
-                                </defs>
-                              </svg>
-                              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-lg font-bold text-gray-900">93%</span>
-                                <span className="text-xs text-gray-600">Score</span>
-                              </div>
-                            </div>
+                          
+                          {/* Score Display */}
+                          <div className="text-center mb-4">
+                            <span className="text-2xl font-bold text-green-600">93%</span>
+                            <p className="text-xs text-gray-600">Overall Pronunciation</p>
                           </div>
-                          <div className="flex items-center justify-center gap-3 text-xs">
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                              <span className="text-gray-600">0-59</span>
+                          
+                          {/* Meter Visualization */}
+                          <div className="space-y-3">
+                            <div className="relative h-6 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="absolute inset-0 flex">
+                                <div className="w-[59%] bg-red-400"></div>
+                                <div className="w-[20%] bg-yellow-400"></div>
+                                <div className="w-[21%] bg-green-400"></div>
+                              </div>
+                              <div 
+                                className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-2000 ease-out"
+                                style={{ width: '93%' }}
+                              ></div>
+                              <div 
+                                className="absolute top-1/2 -translate-y-1/2 w-1 h-8 bg-white border-2 border-gray-800 rounded-full shadow-md transition-all duration-2000 ease-out"
+                                style={{ left: '93%', transform: 'translateX(-50%) translateY(-50%)' }}
+                              ></div>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                              <span className="text-gray-600">60-79</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="text-gray-600">80-100</span>
+                            
+                            {/* Scale Labels */}
+                            <div className="flex justify-between text-xs text-gray-600">
+                              <span>Poor (0-59)</span>
+                              <span>Good (60-79)</span>
+                              <span>Excellent (80-100)</span>
                             </div>
                           </div>
                         </div>
@@ -791,7 +773,7 @@ const SpeechEvaluation = () => {
                           <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-md flex items-center justify-center shadow-sm">
                             <Sparkles className="w-3 h-3 text-white" />
                           </div>
-                          <h3 className="text-sm font-semibold text-gray-900">Performance Breakdown</h3>
+                          <h3 className="text-lg font-semibold text-gray-900">Performance Breakdown</h3>
                         </div>
                         <div className="space-y-3">
                           {[
@@ -804,9 +786,9 @@ const SpeechEvaluation = () => {
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                   <div className={`w-2 h-2 bg-gradient-to-r ${item.color} rounded-full`}></div>
-                                  <span className="text-xs font-medium text-gray-800">{item.label}</span>
+                                  <span className="text-sm font-medium text-gray-800">{item.label}</span>
                                 </div>
-                                <span className={`text-xs font-semibold ${item.textColor} bg-white px-2 py-1 rounded`}>
+                                <span className={`text-sm font-semibold ${item.textColor} bg-white px-2 py-1 rounded`}>
                                   {item.score}/{item.maxScore}
                                 </span>
                               </div>
@@ -817,7 +799,7 @@ const SpeechEvaluation = () => {
                                 ></div>
                               </div>
                               <div className="mt-1 text-right">
-                                <span className={`text-xs ${item.textColor}`}>
+                                <span className={`text-sm ${item.textColor}`}>
                                   {((item.score / item.maxScore) * 100).toFixed(1)}%
                                 </span>
                               </div>
