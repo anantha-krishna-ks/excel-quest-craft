@@ -1406,10 +1406,41 @@ const SpeechEvaluation = () => {
                             <h4 className="text-sm font-semibold text-gray-900">Content Score</h4>
                           </div>
                           
-                          {/* Score Display */}
-                          <div className="text-center mb-4">
-                            <span className="text-2xl font-bold text-orange-600">31%</span>
-                            <p className="text-xs text-gray-600">Overall Score</p>
+                          {/* Score Display with Circular Chart */}
+                          <div className="flex items-center justify-center mb-4">
+                            <div className="relative w-24 h-24">
+                              {/* Background Circle */}
+                              <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                                <circle
+                                  cx="50"
+                                  cy="50"
+                                  r="40"
+                                  stroke="currentColor"
+                                  strokeWidth="8"
+                                  fill="transparent"
+                                  className="text-gray-200"
+                                />
+                                {/* Progress Circle */}
+                                <circle
+                                  cx="50"
+                                  cy="50"
+                                  r="40"
+                                  stroke="currentColor"
+                                  strokeWidth="8"
+                                  fill="transparent"
+                                  strokeDasharray={`${31 * 2.51} 251`}
+                                  className="text-orange-500 transition-all duration-1000 ease-out"
+                                  strokeLinecap="round"
+                                />
+                              </svg>
+                              {/* Center Text */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-center">
+                                  <span className="text-xl font-bold text-orange-600">31%</span>
+                                  <p className="text-xs text-gray-600">Content</p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
 
                           {/* Score Breakdown */}
