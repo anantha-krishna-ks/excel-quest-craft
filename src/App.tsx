@@ -12,6 +12,7 @@ import ItemGenerator from "./pages/ItemGenerator";
 import ItemGeneration from "./pages/ItemGeneration";
 import ItemRewriter from "./pages/ItemRewriter";
 import ItemSimilarity from "./pages/ItemSimilarity";
+import SpeechEvaluation from "./pages/SpeechEvaluation";
 import QuestionGenerator from "./pages/QuestionGenerator";
 import QuestionGenerationLoading from "./pages/QuestionGenerationLoading";
 import QuestionResults from "./pages/QuestionResults";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/item-generation" element={<ItemGeneration />} />
           <Route path="/item-rewriter" element={<ItemRewriter />} />
           <Route path="/item-similarity" element={<ItemSimilarity />} />
+          <Route path="/speech-evaluation" element={<SpeechEvaluation />} />
           <Route path="/question-generator/:bookCode" element={<QuestionGenerator />} />
           <Route path="/question-generation-loading" element={<QuestionGenerationLoading />} />
           <Route path="/question-results" element={<QuestionResults />} />

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search, Sparkles, ArrowRight, BarChart, Clock, Star, Users, FileText, Brain, Database, BookOpen, RefreshCw, GitCompare, Image, MessageSquare, ScanLine, PenTool, BarChart3, Bot } from "lucide-react"
+import { Search, Sparkles, ArrowRight, BarChart, Clock, Star, Users, FileText, Brain, Database, BookOpen, RefreshCw, GitCompare, Image, MessageSquare, ScanLine, PenTool, BarChart3, Bot, Mic } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -46,7 +46,8 @@ const Dashboard = () => {
       "essay-evaluation-zero": BarChart3,
       "test-forensics": BarChart,
       "image-generator": Image,
-      "ai-persona": Bot
+      "ai-persona": Bot,
+      "speech-evaluation": Mic
     }
     return iconMap[toolId] || Sparkles
   }
@@ -221,6 +222,18 @@ const Dashboard = () => {
       category: "AI Interaction",
       icon: Bot,
       subscriptionStatus: "pending"
+    },
+    {
+      id: "speech-evaluation",
+      title: "Speech Evaluation",
+      description: "AI-powered speech assessment tool for reading and speaking evaluation...",
+      path: "/speech-evaluation",
+      image: comingSoonImage,
+      category: "Assessment",
+      badge: "New",
+      badgeColor: "bg-blue-500",
+      icon: Mic,
+      subscriptionStatus: "active"
     }
   ]
 
