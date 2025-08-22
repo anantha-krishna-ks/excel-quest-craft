@@ -17,6 +17,7 @@ import itemSimilarityImage from "@/assets/item-similarity.png"
 import docChatImage from "@/assets/doc-chat-ncert.png"
 import ocrImage from "@/assets/ocr.png"
 import comingSoonImage from "@/assets/coming-soon.png"
+import speechEvaluationImage from "@/assets/speech-evaluation-hero.jpg"
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("All")
@@ -228,7 +229,7 @@ const Dashboard = () => {
       title: "Speech Evaluation",
       description: "AI-powered speech assessment tool for reading and speaking evaluation...",
       path: "/speech-evaluation",
-      image: comingSoonImage,
+      image: speechEvaluationImage,
       category: "Assessment",
       badge: "New",
       badgeColor: "bg-blue-500",
