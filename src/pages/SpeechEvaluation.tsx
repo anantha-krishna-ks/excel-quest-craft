@@ -1377,16 +1377,23 @@ const SpeechEvaluation = () => {
                           {/* Score Breakdown */}
                           <div className="mt-4 space-y-2 border-t border-gray-200 pt-3">
                             <h5 className="text-sm font-semibold text-gray-800 mb-2">Score Breakdown</h5>
-                            {[
-                              { label: "Accuracy Score", score: 95, maxScore: 100, color: "from-green-500 to-emerald-600" },
-                              { label: "Fluency Score", score: 79, maxScore: 100, color: "from-blue-500 to-indigo-600" },
-                              { label: "Prosody Score", score: 82.8, maxScore: 100, color: "from-purple-500 to-violet-600" }
-                            ].map((item, index) => (
-                              <div key={index} className="flex items-center justify-between text-sm">
-                                <span className="text-gray-700">{item.label}</span>
-                                <span className="font-medium text-gray-900">{item.score}/{item.maxScore}</span>
-                              </div>
-                            ))}
+                             {[
+                               { label: "Accuracy Score", score: 95, maxScore: 100, color: "from-green-500 to-emerald-600" },
+                               { label: "Fluency Score", score: 79, maxScore: 100, color: "from-blue-500 to-indigo-600" },
+                               { label: "Prosody Score", score: 82.8, maxScore: 100, color: "from-purple-500 to-violet-600" }
+                             ].map((item, index) => (
+                               <div key={index} className="space-y-2">
+                                 <div className="flex items-center justify-between text-sm">
+                                   <span className="text-gray-700 font-medium">{item.label}</span>
+                                   <span className="font-bold text-gray-900">{item.score}/{item.maxScore}</span>
+                                 </div>
+                                 <div className="relative">
+                                   <Progress value={item.score} className="h-2" />
+                                   <div className={`absolute top-0 left-0 h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-1000`} 
+                                        style={{ width: `${item.score}%` }}></div>
+                                 </div>
+                               </div>
+                             ))}
                           </div>
                         </div>
 
@@ -1408,16 +1415,23 @@ const SpeechEvaluation = () => {
                           {/* Score Breakdown */}
                           <div className="space-y-2 border-t border-gray-200 pt-3">
                             <h5 className="text-sm font-semibold text-gray-800 mb-2">Score Breakdown</h5>
-                            {[
-                              { label: "Vocabulary Score", score: 50, maxScore: 100, color: "from-blue-500 to-indigo-600" },
-                              { label: "Grammar Score", score: 44, maxScore: 100, color: "from-green-500 to-emerald-600" },
-                              { label: "Topic Score", score: 0, maxScore: 100, color: "from-red-500 to-orange-600" }
-                            ].map((item, index) => (
-                              <div key={index} className="flex items-center justify-between text-sm">
-                                <span className="text-gray-700">{item.label}</span>
-                                <span className="font-medium text-gray-900">{item.score}/{item.maxScore}</span>
-                              </div>
-                            ))}
+                             {[
+                               { label: "Vocabulary Score", score: 50, maxScore: 100, color: "from-orange-500 to-yellow-600" },
+                               { label: "Grammar Score", score: 44, maxScore: 100, color: "from-red-500 to-pink-600" },
+                               { label: "Topic Score", score: 0, maxScore: 100, color: "from-gray-400 to-gray-600" }
+                             ].map((item, index) => (
+                               <div key={index} className="space-y-2">
+                                 <div className="flex items-center justify-between text-sm">
+                                   <span className="text-gray-700 font-medium">{item.label}</span>
+                                   <span className="font-bold text-gray-900">{item.score}/{item.maxScore}</span>
+                                 </div>
+                                 <div className="relative">
+                                   <Progress value={item.score} className="h-2" />
+                                   <div className={`absolute top-0 left-0 h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-1000`} 
+                                        style={{ width: `${item.score}%` }}></div>
+                                 </div>
+                               </div>
+                             ))}
                           </div>
                         </div>
                       </div>
