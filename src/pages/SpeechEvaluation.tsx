@@ -405,16 +405,16 @@ const SpeechEvaluation = () => {
                   </CardHeader>
                   <CardContent className="space-y-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Enhanced Option A: Record Audio */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            A
-                          </div>
-                          <h4 className="font-semibold text-gray-800">Record Audio</h4>
-                        </div>
-                        
-                        <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6">
+                       {/* Enhanced Option A: Record Audio */}
+                       <div className="space-y-4">
+                         <div className="flex items-center gap-2 mb-4">
+                           <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                             A
+                           </div>
+                           <h4 className="font-semibold text-gray-800">Record Audio</h4>
+                         </div>
+                         
+                         <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6 min-h-[480px] flex flex-col">
                           <ul className="text-sm text-gray-600 space-y-2 mb-6">
                             <li className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
@@ -430,7 +430,7 @@ const SpeechEvaluation = () => {
                             </li>
                           </ul>
                           
-                          <div className="flex flex-col items-center gap-6">
+                           <div className="flex flex-col items-center gap-6 flex-1 justify-center">
                             {/* Enhanced Recording Controls */}
                             <div className="relative">
                               <div className={`absolute -inset-4 rounded-full transition-all duration-1000 ${
@@ -530,16 +530,16 @@ const SpeechEvaluation = () => {
                         </div>
                       </div>
 
-                      {/* Enhanced Option B: Upload Audio */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            B
-                          </div>
-                          <h4 className="font-semibold text-gray-800">Upload Audio File</h4>
-                        </div>
+                       {/* Enhanced Option B: Upload Audio */}
+                       <div className="space-y-4">
+                         <div className="flex items-center gap-2 mb-4">
+                           <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                             B
+                           </div>
+                           <h4 className="font-semibold text-gray-800">Upload Audio File</h4>
+                         </div>
 
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 min-h-[480px] flex flex-col">
                           <ul className="text-sm text-gray-600 space-y-2 mb-6">
                             <li className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -555,7 +555,7 @@ const SpeechEvaluation = () => {
                             </li>
                           </ul>
 
-                          <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer group">
+                           <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer group flex-1 flex items-center justify-center">
                             <div className="flex flex-col items-center gap-4">
                               <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center group-hover:from-blue-200 group-hover:to-indigo-200 transition-all">
                                 <Upload className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
@@ -953,16 +953,16 @@ const SpeechEvaluation = () => {
                   </CardHeader>
                   <CardContent className="space-y-8">
                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Enhanced Option A: Record Audio */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            A
-                          </div>
-                          <h4 className="font-semibold text-gray-800">Record Audio</h4>
-                        </div>
-                        
-                        <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6">
+                       {/* Enhanced Option A: Record Audio */}
+                       <div className="space-y-4">
+                         <div className="flex items-center gap-2 mb-4">
+                           <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                             A
+                           </div>
+                           <h4 className="font-semibold text-gray-800">Record Audio</h4>
+                         </div>
+                         
+                         <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6 min-h-[480px] flex flex-col">
                           <ul className="text-sm text-gray-600 space-y-2 mb-6">
                             <li className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
@@ -978,7 +978,7 @@ const SpeechEvaluation = () => {
                             </li>
                           </ul>
                           
-                          <div className="flex flex-col items-center gap-6">
+                          <div className="flex flex-col items-center gap-6 flex-1 justify-center">
                             {/* Enhanced Recording Controls */}
                             <div className="relative">
                               <div className={`absolute -inset-4 rounded-full transition-all duration-1000 ${
@@ -1078,16 +1078,16 @@ const SpeechEvaluation = () => {
                         </div>
                       </div>
 
-                      {/* Enhanced Option B: Upload Audio */}
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            B
-                          </div>
-                          <h4 className="font-semibold text-gray-800">Upload Audio File</h4>
-                        </div>
+                       {/* Enhanced Option B: Upload Audio */}
+                       <div className="space-y-4">
+                         <div className="flex items-center gap-2 mb-4">
+                           <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                             B
+                           </div>
+                           <h4 className="font-semibold text-gray-800">Upload Audio File</h4>
+                         </div>
 
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 min-h-[480px] flex flex-col">
                           <ul className="text-sm text-gray-600 space-y-2 mb-6">
                             <li className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -1103,7 +1103,7 @@ const SpeechEvaluation = () => {
                             </li>
                           </ul>
 
-                          <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer group">
+                          <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer group flex-1 flex items-center justify-center">
                             <div className="flex flex-col items-center gap-4">
                               <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center group-hover:from-blue-200 group-hover:to-indigo-200 transition-all">
                                 <Upload className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
