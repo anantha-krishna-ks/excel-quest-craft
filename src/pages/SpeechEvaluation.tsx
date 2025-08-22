@@ -18,7 +18,9 @@ import {
   Headphones,
   Waves,
   Radio,
-  Sparkles
+  Sparkles,
+  Download,
+  X
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,8 +40,12 @@ const SpeechEvaluation = () => {
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [audioLevel, setAudioLevel] = useState(0)
+  const [showResultDetail, setShowResultDetail] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [playbackTime, setPlaybackTime] = useState(0)
   const recordingInterval = useRef<NodeJS.Timeout | null>(null)
   const audioLevelInterval = useRef<NodeJS.Timeout | null>(null)
+  const playbackInterval = useRef<NodeJS.Timeout | null>(null)
 
   const languages = [
     { value: "english-india", label: "English (India)" },
@@ -367,7 +373,7 @@ const SpeechEvaluation = () => {
                               <span className={`text-sm font-medium transition-colors duration-200 ${
                                 isRecording ? "text-red-600" : "text-gray-700"
                               }`}>
-                                {isRecording ? "🔴 Recording..." : "🎤 Click to Record"}
+                                {isRecording ? "Recording..." : "Click to Record"}
                               </span>
                               
                               {isRecording && (
@@ -497,7 +503,12 @@ const SpeechEvaluation = () => {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                                onClick={() => setShowResultDetail(true)}
+                              >
                                 <Eye className="h-4 w-4 mr-1" />
                                 {attempt.result}
                               </Button>
@@ -509,6 +520,199 @@ const SpeechEvaluation = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Assessment Result Modal */}
+              {showResultDetail && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                  <Card className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl">
+                    <CardHeader className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-xl font-semibold text-gray-900">Assessment Result</CardTitle>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setShowResultDetail(false)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <X className="w-5 h-5" />
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="self-end border-blue-200 text-blue-700 hover:bg-blue-50"
+                      >
+                        Hide Result
+                      </Button>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      {/* Audio Player with Transcript */}
+                      <div className="bg-gray-50 rounded-lg p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-semibold text-gray-900">Audio Analysis</h3>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (isPlaying) {
+                                  setIsPlaying(false)
+                                  if (playbackInterval.current) {
+                                    clearInterval(playbackInterval.current)
+                                  }
+                                } else {
+                                  setIsPlaying(true)
+                                  setPlaybackTime(0)
+                                  playbackInterval.current = setInterval(() => {
+                                    setPlaybackTime(prev => {
+                                      if (prev >= 50) {
+                                        setIsPlaying(false)
+                                        return 0
+                                      }
+                                      return prev + 1
+                                    })
+                                  }, 100)
+                                }
+                              }}
+                              className="text-gray-600 hover:text-gray-900"
+                            >
+                              <Play className="w-4 h-4" />
+                            </Button>
+                            <span className="text-sm text-gray-600 font-mono">00:00</span>
+                            <Progress 
+                              value={(playbackTime / 50) * 100} 
+                              className="w-32 h-2 bg-gray-200"
+                            />
+                            <span className="text-sm text-gray-600 font-mono">00:05</span>
+                            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                              <Download className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        {/* Transcript with highlighting */}
+                        <div className="bg-white rounded-lg p-4 border border-gray-200">
+                          <p className="text-sm leading-relaxed">
+                            <span className="text-gray-900">We </span>
+                            <span className="text-gray-900">had </span>
+                            <span className="text-gray-900">a </span>
+                            <span className="text-gray-900">great </span>
+                            <span className="text-gray-900">time </span>
+                            <span className="text-gray-900">taking </span>
+                            <span className="text-gray-900">a </span>
+                            <span className="text-gray-900">long </span>
+                            <span className="text-gray-900">walk </span>
+                            <span className="text-gray-900">outside </span>
+                            <span className="text-gray-900">in </span>
+                            <span className="text-gray-900">the </span>
+                            <span className="bg-yellow-200 text-gray-900 px-1 rounded">morning</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Two Column Layout */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Types of Errors */}
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-semibold text-gray-900">Types of Errors</h3>
+                          <div className="space-y-3">
+                            {[
+                              { type: "Mispronunciations", count: 1, color: "bg-orange-100 text-orange-800 border-orange-200" },
+                              { type: "Omissions", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
+                              { type: "Insertions", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
+                              { type: "Unexpected break", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
+                              { type: "Missing break", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
+                              { type: "Monotone", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" }
+                            ].map((error, index) => (
+                              <div key={index} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
+                                <span className="text-sm font-medium text-gray-700">{error.type}</span>
+                                <Badge className={`${error.color} font-medium`}>
+                                  {error.count}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Pronunciation Score Circle */}
+                          <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
+                            <h4 className="text-base font-semibold text-gray-900 mb-4">Pronunciation score</h4>
+                            <div className="flex items-center justify-center">
+                              <div className="relative w-32 h-32">
+                                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                                  <circle
+                                    cx="60"
+                                    cy="60"
+                                    r="50"
+                                    fill="none"
+                                    stroke="#e5e7eb"
+                                    strokeWidth="8"
+                                  />
+                                  <circle
+                                    cx="60"
+                                    cy="60"
+                                    r="50"
+                                    fill="none"
+                                    stroke="#10b981"
+                                    strokeWidth="8"
+                                    strokeDasharray={314}
+                                    strokeDashoffset={314 - (314 * 93) / 100}
+                                    strokeLinecap="round"
+                                    className="transition-all duration-1000 ease-out"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                  <span className="text-2xl font-bold text-gray-900">93%</span>
+                                  <span className="text-xs text-gray-600">Overall Score</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-center gap-6 mt-4 text-xs">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-red-500 rounded"></div>
+                                <span className="text-gray-600">0 – 59</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                                <span className="text-gray-600">60 – 79</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 bg-green-500 rounded"></div>
+                                <span className="text-gray-600">80 – 100</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Score Breakdown */}
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-semibold text-gray-900">Score breakdown</h3>
+                          <div className="space-y-6">
+                            {[
+                              { label: "Accuracy score", score: 92, maxScore: 100, color: "bg-green-500" },
+                              { label: "Fluency score", score: 100, maxScore: 100, color: "bg-green-500" },
+                              { label: "Completeness score", score: 92, maxScore: 100, color: "bg-green-500" },
+                              { label: "Prosody score", score: 89.6, maxScore: 100, color: "bg-green-500" }
+                            ].map((item, index) => (
+                              <div key={index} className="space-y-2">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="font-medium text-gray-700">{item.label}</span>
+                                  <span className="font-semibold text-gray-900">{item.score}/{item.maxScore}</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                  <div 
+                                    className={`h-3 rounded-full transition-all duration-1000 ease-out ${item.color}`}
+                                    style={{ width: `${(item.score / item.maxScore) * 100}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="speaking" className="p-6">
