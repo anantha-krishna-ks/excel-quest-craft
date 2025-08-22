@@ -929,113 +929,177 @@ const SpeechEvaluation = () => {
                 </CardContent>
               </Card>
 
-              {/* Step 2: Instructions */}
+              {/* Step 2: Enhanced Record or Upload Audio */}
               {selectedTopic && (
                 <Card className="bg-white/90 backdrop-blur-sm border border-gray-200/60 shadow-xl">
-                  <CardContent className="p-8 text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                      {sampleTopics.find(topic => topic.value === selectedTopic)?.label || "Talk about your day today"}
-                    </h2>
-                    <p className="text-gray-600 text-lg mb-2">
-                      Prepare and start recording or upload your discussion on this topic when you are ready.
-                    </p>
-                    <p className="text-sm text-gray-500 font-medium">
-                      [You can try up to 5 attempts.]
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Step 3: Recording Options */}
-              {selectedTopic && (
-                <Card className="bg-white/90 backdrop-blur-sm border border-gray-200/60 shadow-xl">
-                  <CardContent className="p-8">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                        2
+                      </div>
+                      <span className="text-lg font-semibold text-gray-900">Record or Upload Audio</span>
+                    </CardTitle>
+                    <div className="flex items-center gap-4 mt-3">
+                      <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                        <Clock className="w-3 h-3 mr-1" />
+                        Attempts: {speakingAttemptCount}/5
+                      </Badge>
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                        <Target className="w-3 h-3 mr-1" />
+                        Max 20 seconds each
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Record Audio Option */}
+                      {/* Enhanced Option A: Record Audio */}
                       <div className="space-y-4">
-                        <div className="text-center space-y-4">
-                          <div className="relative">
-                            <div className={`absolute -inset-4 rounded-full transition-all duration-1000 ${
-                              isRecording && !isPaused
-                                ? "bg-gradient-to-r from-blue-400/30 to-purple-400/30 animate-pulse" 
-                                : "bg-transparent"
-                            }`}></div>
-                            <Button
-                              size="lg"
-                              onClick={startSpeakingRecording}
-                              disabled={speakingAttemptCount >= 5 || isRecording}
-                              className={`w-24 h-24 rounded-full transition-all duration-300 shadow-2xl ${
-                                isRecording && !isPaused
-                                  ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 scale-110"
-                                  : "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
-                              }`}
-                            >
-                              <Mic className={`h-8 w-8 text-white ${isRecording && !isPaused ? 'animate-pulse' : ''}`} />
-                            </Button>
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            A
                           </div>
-                          
-                          <div className="space-y-2">
-                            <p className="font-semibold text-gray-900">Click here to</p>
-                            <p className="text-gray-700">Record audio with a microphone</p>
-                            <p className="text-sm text-gray-600">Start speaking once the mic turns red</p>
-                            <p className="text-xs text-gray-500 font-medium">[Time limit is 20 seconds]</p>
+                          <h4 className="font-semibold text-gray-800">Record Audio</h4>
+                        </div>
+                        
+                        {/* Recording Status Card */}
+                        <div className={`bg-gradient-to-br p-6 rounded-xl border-2 transition-all duration-500 ${
+                          isRecording && !isPaused
+                            ? "from-red-50 via-orange-50 to-red-50 border-red-300 shadow-xl"
+                            : isPaused
+                            ? "from-yellow-50 via-amber-50 to-yellow-50 border-yellow-300 shadow-lg"
+                            : "from-blue-50 via-indigo-50 to-blue-50 border-blue-200 shadow-md"
+                        }`}>
+                          <div className="text-center space-y-4">
+                            {/* Enhanced Recording Button */}
+                            <div className="relative">
+                              <div className={`absolute -inset-4 rounded-full transition-all duration-1000 ${
+                                isRecording && !isPaused
+                                  ? "bg-gradient-to-r from-red-400/30 to-orange-400/30 animate-pulse scale-110" 
+                                  : "bg-transparent"
+                              }`}></div>
+                              <Button
+                                size="lg"
+                                onClick={startSpeakingRecording}
+                                disabled={speakingAttemptCount >= 5 || isRecording}
+                                className={`w-20 h-20 rounded-full transition-all duration-300 shadow-2xl hover:scale-105 ${
+                                  isRecording && !isPaused
+                                    ? "bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700"
+                                    : isPaused
+                                    ? "bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700"
+                                    : "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+                                } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
+                              >
+                                <Mic className={`h-7 w-7 text-white ${isRecording && !isPaused ? 'animate-pulse' : ''}`} />
+                              </Button>
+                            </div>
+
+                            {/* Status Display */}
+                            <div className="space-y-2">
+                              <p className="font-bold text-base text-gray-800">
+                                {isRecording && !isPaused 
+                                  ? "🔴 Recording..." 
+                                  : isPaused 
+                                  ? "⏸️ Paused" 
+                                  : "Ready to Record"
+                                }
+                              </p>
+                              {!isRecording && (
+                                <div className="space-y-1 text-sm text-gray-600">
+                                  <p className="font-medium">Click to start recording with smart controls</p>
+                                  <p>Use pause/resume for better control</p>
+                                  <p>Recording stops automatically after 20 seconds</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Enhanced Recording Controls */}
+                            {isRecording && (
+                              <div className="space-y-4">
+                                <div className="flex justify-center gap-3">
+                                  <Button
+                                    size="sm"
+                                    onClick={isPaused ? resumeRecording : pauseRecording}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+                                  >
+                                    {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={stopRecording}
+                                    className="bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                                  >
+                                    <Square className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                                
+                                {/* Timer Display */}
+                                <div className="bg-white/80 rounded-lg p-2 backdrop-blur-sm">
+                                  <p className="text-sm font-mono font-bold text-gray-700">
+                                    {Math.floor(recordingTime / 10)}:{(recordingTime % 10).toString().padStart(2, '0')} / 0:20
+                                  </p>
+                                </div>
+
+                                {/* Audio Level Visualization */}
+                                <div className="flex justify-center gap-1">
+                                  {[...Array(8)].map((_, i) => (
+                                    <div 
+                                      key={i}
+                                      className={`w-1 rounded-full transition-all duration-100 ${
+                                        isRecording && !isPaused && Math.random() * 100 < audioLevel
+                                          ? 'bg-gradient-to-t from-red-500 to-orange-400 h-6' 
+                                          : 'bg-gray-300 h-2'
+                                      }`}
+                                    ></div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
-
-                        {/* Recording Controls */}
-                        {isRecording && (
-                          <div className="flex justify-center gap-3 mt-6">
-                            <Button
-                              size="sm"
-                              onClick={isPaused ? resumeRecording : pauseRecording}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                              {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={stopRecording}
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                              <Square className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
-
-                        {/* Recording Timer */}
-                        {isRecording && (
-                          <div className="text-center">
-                            <p className="text-sm font-medium text-gray-600">
-                              {Math.floor(recordingTime / 10)}:{(recordingTime % 10).toString().padStart(2, '0')} / 0:20
-                            </p>
-                          </div>
-                        )}
                       </div>
 
-                        {/* Upload Audio Option */}
-                        <div className="space-y-4">
-                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors">
-                            <div className="space-y-4">
-                              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
-                                <Upload className="w-8 h-8 text-gray-500" />
+                      {/* Enhanced Option B: Upload Audio File */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            B
+                          </div>
+                          <h4 className="font-semibold text-gray-800">Upload Audio File</h4>
+                        </div>
+                        
+                        {/* Enhanced Upload Area */}
+                        <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 p-6 rounded-xl border-2 border-dashed border-gray-300 hover:border-indigo-400 hover:bg-indigo-50/30 transition-all duration-300 cursor-pointer group">
+                          <div className="text-center space-y-4">
+                            <div className="relative">
+                              <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-110 group-hover:from-indigo-200 group-hover:to-purple-200">
+                                <Upload className="w-8 h-8 text-indigo-600 group-hover:text-purple-600 transition-colors" />
                               </div>
-                              <div className="space-y-2">
-                                <p className="font-semibold text-gray-900">Or Upload Audio:</p>
-                                <p className="text-gray-700">Drag and drop audio file here, or</p>
-                                <Button 
-                                  variant="link" 
-                                  className="text-blue-600 hover:text-blue-700 p-0 h-auto font-normal underline"
-                                  onClick={() => setSpeakingHasAudio(true)} // Simulate file upload
-                                >
-                                  browse for a file
-                                </Button>
-                                <p className="text-xs text-gray-500 font-medium">[Time limit: 20 seconds]</p>
-                                <p className="text-xs text-gray-500">[Allowed formats: .mp3, .wav]</p>
-                                <p className="text-xs text-gray-400">Example: sample-2.mp3</p>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <p className="font-bold text-gray-800 text-base">Drag & drop audio files or click to browse</p>
+                              <div className="space-y-1 text-sm text-gray-600">
+                                <p>Supported formats: <span className="font-medium">.mp3, .wav, .m4a</span></p>
+                                <p>Maximum duration: <span className="font-medium">20 seconds</span></p>
+                              </div>
+                              
+                              <Button 
+                                variant="outline" 
+                                className="border-indigo-200 text-indigo-700 hover:bg-indigo-100/50 shadow-sm"
+                                onClick={() => setSpeakingHasAudio(true)}
+                              >
+                                <Upload className="w-4 h-4 mr-2" />
+                                Choose File
+                              </Button>
+                              
+                              <div className="pt-2 border-t border-gray-200">
+                                <p className="text-xs text-gray-400">Drop audio files here</p>
+                                <p className="text-xs text-gray-400 mt-1">or click to browse your computer</p>
                               </div>
                             </div>
                           </div>
                         </div>
+                      </div>
                     </div>
 
                     {/* Audio Player (only show when audio exists) */}
@@ -1065,6 +1129,19 @@ const SpeechEvaluation = () => {
                               <Download className="w-4 h-4" />
                             </Button>
                           </div>
+                        </div>
+                        
+                        {/* Show Result Button */}
+                        <div className="mt-4 text-center">
+                          <Button
+                            onClick={() => {
+                              setSpeakingHasAudio(true)
+                              setShowSpeakingResult(true)
+                            }}
+                            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium px-6 py-2 shadow-lg"
+                          >
+                            Show Result
+                          </Button>
                         </div>
                       </div>
                     )}
