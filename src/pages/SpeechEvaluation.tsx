@@ -46,6 +46,11 @@ const SpeechEvaluation = () => {
   const [showResultDetail, setShowResultDetail] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [playbackTime, setPlaybackTime] = useState(0)
+  
+  // Speaking tab states
+  const [selectedSpeakingLanguage, setSelectedSpeakingLanguage] = useState("")
+  const [selectedTopic, setSelectedTopic] = useState("")
+  const [speakingAttemptCount, setSpeakingAttemptCount] = useState(0)
   const recordingInterval = useRef<NodeJS.Timeout | null>(null)
   const audioLevelInterval = useRef<NodeJS.Timeout | null>(null)
   const playbackInterval = useRef<NodeJS.Timeout | null>(null)
@@ -66,12 +71,30 @@ const SpeechEvaluation = () => {
     "The quick brown fox jumps over the lazy dog."
   ]
 
+  const sampleTopics = [
+    { value: "talk-about-day", label: "Talk about your day today" },
+    { value: "describe-hobby", label: "Describe your favorite hobby" },
+    { value: "travel-experience", label: "Share a memorable travel experience" },
+    { value: "future-goals", label: "Discuss your future goals" }
+  ]
+
   const attempts = [
     {
       id: 1,
       text: "We had a great time taking a long walk outside in the morning.",
       language: "English (India)",
       createdDate: "22 Jan 2025 – 14:53",
+      status: "Completed",
+      result: "Show Result"
+    }
+  ]
+
+  const speakingAttempts = [
+    {
+      id: 1,
+      text: "Talk about your day today",
+      language: "English (United States)",
+      createdDate: "20 Feb 2024 15:26",
       status: "Completed",
       result: "Show Result"
     }
@@ -95,12 +118,37 @@ const SpeechEvaluation = () => {
       setAttemptCount(prev => prev + 1)
       setRecordingTime(0)
       
-      // Recording timer
+      // Recording timer - 20 seconds for speaking mode
       recordingInterval.current = setInterval(() => {
         setRecordingTime(prev => {
-          if (prev >= 49) { // Stop at 5 seconds (50 * 100ms = 5000ms)
+          if (prev >= 199) { // Stop at 20 seconds (200 * 100ms = 20000ms)
             stopRecording()
-            return 50
+            return 200
+          }
+          return prev + 1
+        })
+      }, 100)
+      
+      // Audio level animation
+      audioLevelInterval.current = setInterval(() => {
+        setAudioLevel(Math.random() * 100)
+      }, 100)
+    }
+  }
+
+  const startSpeakingRecording = () => {
+    if (speakingAttemptCount < 5) {
+      setIsRecording(true)
+      setIsPaused(false)
+      setSpeakingAttemptCount(prev => prev + 1)
+      setRecordingTime(0)
+      
+      // Recording timer - 20 seconds for speaking mode
+      recordingInterval.current = setInterval(() => {
+        setRecordingTime(prev => {
+          if (prev >= 199) { // Stop at 20 seconds (200 * 100ms = 20000ms)
+            stopRecording()
+            return 200
           }
           return prev + 1
         })
@@ -130,14 +178,14 @@ const SpeechEvaluation = () => {
     
     // Resume recording timer
     recordingInterval.current = setInterval(() => {
-      setRecordingTime(prev => {
-        if (prev >= 49) {
-          stopRecording()
-          return 50
-        }
-        return prev + 1
-      })
-    }, 100)
+        setRecordingTime(prev => {
+          if (prev >= 199) {
+            stopRecording()
+            return 200
+          }
+          return prev + 1
+        })
+      }, 100)
     
     // Resume audio level animation
     audioLevelInterval.current = setInterval(() => {
@@ -813,28 +861,249 @@ const SpeechEvaluation = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="speaking" className="p-6">
+            <TabsContent value="speaking" className="p-6 space-y-6">
+              {/* Step 1: Choose Language and Topic */}
               <Card className="bg-white/90 backdrop-blur-sm border border-gray-200/60 shadow-xl">
-                <CardContent className="p-12 text-center">
-                  <div className="space-y-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                      <Mic className="h-10 w-10 text-purple-600" />
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                      1
                     </div>
-                    <div className="space-y-3">
-                      <h3 className="text-2xl font-bold text-gray-900">Speaking Feature</h3>
-                      <p className="text-gray-600 max-w-md mx-auto leading-relaxed">
-                        Advanced speaking evaluation functionality will be available soon. This feature will provide comprehensive speech analysis and real-time feedback.
-                      </p>
+                    <span className="text-lg font-semibold text-gray-900">Choose Language & Topic</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-end">
+                    {/* Choose Language */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Choose a language</label>
+                      <Select value={selectedSpeakingLanguage} onValueChange={setSelectedSpeakingLanguage}>
+                        <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                          <SelectValue placeholder="English (United States)" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-gray-200">
+                          {languages.map((lang) => (
+                            <SelectItem key={lang.value} value={lang.value} className="hover:bg-purple-50">
+                              {lang.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <Sparkles className="w-4 h-4 text-purple-600" />
-                      <Badge variant="secondary" className="bg-purple-100 text-purple-700 border-purple-200">
-                        Coming Soon
-                      </Badge>
+
+                    {/* Select Sample Topic */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Select a sample topic</label>
+                      <Select value={selectedTopic} onValueChange={setSelectedTopic}>
+                        <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                          <SelectValue placeholder="Talk about your day t..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-gray-200">
+                          {sampleTopics.map((topic) => (
+                            <SelectItem key={topic.value} value={topic.value} className="hover:bg-purple-50">
+                              {topic.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3">
+                      <Button 
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                      >
+                        Reset
+                      </Button>
+                      <Button 
+                        disabled={!selectedSpeakingLanguage || !selectedTopic}
+                        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium px-6 shadow-lg disabled:opacity-50"
+                      >
+                        Submit
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Step 2: Instructions */}
+              {selectedTopic && (
+                <Card className="bg-white/90 backdrop-blur-sm border border-gray-200/60 shadow-xl">
+                  <CardContent className="p-8 text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                      {sampleTopics.find(topic => topic.value === selectedTopic)?.label || "Talk about your day today"}
+                    </h2>
+                    <p className="text-gray-600 text-lg mb-2">
+                      Prepare and start recording or upload your discussion on this topic when you are ready.
+                    </p>
+                    <p className="text-sm text-gray-500 font-medium">
+                      [You can try up to 5 attempts.]
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Step 3: Recording Options */}
+              {selectedTopic && (
+                <Card className="bg-white/90 backdrop-blur-sm border border-gray-200/60 shadow-xl">
+                  <CardContent className="p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Record Audio Option */}
+                      <div className="space-y-4">
+                        <div className="text-center space-y-4">
+                          <div className="relative">
+                            <div className={`absolute -inset-4 rounded-full transition-all duration-1000 ${
+                              isRecording && !isPaused
+                                ? "bg-gradient-to-r from-blue-400/30 to-purple-400/30 animate-pulse" 
+                                : "bg-transparent"
+                            }`}></div>
+                            <Button
+                              size="lg"
+                              onClick={startSpeakingRecording}
+                              disabled={speakingAttemptCount >= 5 || isRecording}
+                              className={`w-24 h-24 rounded-full transition-all duration-300 shadow-2xl ${
+                                isRecording && !isPaused
+                                  ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 scale-110"
+                                  : "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
+                              }`}
+                            >
+                              <Mic className={`h-8 w-8 text-white ${isRecording && !isPaused ? 'animate-pulse' : ''}`} />
+                            </Button>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <p className="font-semibold text-gray-900">Click here to</p>
+                            <p className="text-gray-700">Record audio with a microphone</p>
+                            <p className="text-sm text-gray-600">Start speaking once the mic turns red</p>
+                            <p className="text-xs text-gray-500 font-medium">[Time limit is 20 seconds]</p>
+                          </div>
+                        </div>
+
+                        {/* Recording Controls */}
+                        {isRecording && (
+                          <div className="flex justify-center gap-3 mt-6">
+                            <Button
+                              size="sm"
+                              onClick={isPaused ? resumeRecording : pauseRecording}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={stopRecording}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              <Square className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Recording Timer */}
+                        {isRecording && (
+                          <div className="text-center">
+                            <p className="text-sm font-medium text-gray-600">
+                              {Math.floor(recordingTime / 10)}:{(recordingTime % 10).toString().padStart(2, '0')} / 0:20
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Upload Audio Option */}
+                      <div className="space-y-4">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                          <div className="space-y-4">
+                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
+                              <Upload className="w-8 h-8 text-gray-500" />
+                            </div>
+                            <div className="space-y-2">
+                              <p className="font-semibold text-gray-900">Drag and drop audio file here or</p>
+                              <Button variant="link" className="text-blue-600 hover:text-blue-700 p-0 h-auto font-normal underline">
+                                Browse for a file
+                              </Button>
+                              <p className="text-xs text-gray-500 font-medium">[Time limit is 20 seconds]</p>
+                              <p className="text-xs text-gray-500">[only .mp3, .wav files are allowed]</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Audio Player (when audio exists) */}
+                    <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <Button
+                          size="sm"
+                          onClick={() => setIsPlaying(!isPlaying)}
+                          className="bg-gray-600 hover:bg-gray-700 text-white w-10 h-10 rounded-full p-0"
+                        >
+                          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        </Button>
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <span>00:03</span>
+                            <div className="flex-1 bg-blue-200 rounded-full h-2 relative">
+                              <div className="absolute left-0 top-0 h-full bg-blue-600 rounded-full w-[15%]"></div>
+                              <div className="absolute left-[15%] top-1/2 -translate-y-1/2 w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-md"></div>
+                            </div>
+                            <span>00:20</span>
+                            <Button size="sm" variant="ghost" className="text-gray-600 hover:text-gray-800">
+                              <Download className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Step 4: Attempts and Results */}
+              {selectedTopic && (
+                <Card className="bg-white/90 backdrop-blur-sm border border-gray-200/60 shadow-xl">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-gray-900">Attempts & Results</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-gray-200">
+                          <TableHead className="text-blue-600 font-semibold">QUESTION TEXT</TableHead>
+                          <TableHead className="text-blue-600 font-semibold">LANGUAGE</TableHead>
+                          <TableHead className="text-blue-600 font-semibold">CREATED DATE</TableHead>
+                          <TableHead className="text-blue-600 font-semibold">STATUS</TableHead>
+                          <TableHead className="text-blue-600 font-semibold">RESULT</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {speakingAttempts.map((attempt) => (
+                          <TableRow key={attempt.id} className="border-gray-200 hover:bg-gray-50/50">
+                            <TableCell className="text-gray-700">{attempt.text}</TableCell>
+                            <TableCell className="text-gray-600">{attempt.language}</TableCell>
+                            <TableCell className="text-gray-600">{attempt.createdDate}</TableCell>
+                            <TableCell>
+                              <Badge className="bg-green-100 text-green-800 border-green-200">
+                                {attempt.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                              >
+                                {attempt.result}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
           </Tabs>
         </Card>
