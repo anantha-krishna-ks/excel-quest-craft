@@ -22,7 +22,8 @@ import {
   Download,
   X,
   Pause,
-  Square
+  Square,
+  TrendingUp
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -1247,6 +1248,81 @@ const SpeechEvaluation = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 space-y-4">
+                    {/* Score Dashboard */}
+                    <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-indigo-100 shadow-sm">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-md flex items-center justify-center shadow-sm">
+                          <TrendingUp className="w-3 h-3 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Performance Scores</h3>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Accuracy Score */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">Accuracy Score</span>
+                            <span className="text-sm font-bold text-green-600">95/100</span>
+                          </div>
+                          <Progress value={95} className="h-2" />
+                        </div>
+
+                        {/* Fluency Score */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">Fluency Score</span>
+                            <span className="text-sm font-bold text-blue-600">79/100</span>
+                          </div>
+                          <Progress value={79} className="h-2" />
+                        </div>
+
+                        {/* Prosody Score */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">Prosody Score</span>
+                            <span className="text-sm font-bold text-purple-600">82/100</span>
+                          </div>
+                          <Progress value={82} className="h-2" />
+                        </div>
+
+                        {/* Content Score */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">Content Score</span>
+                            <span className="text-sm font-bold text-indigo-600">88/100</span>
+                          </div>
+                          <Progress value={88} className="h-2" />
+                        </div>
+
+                        {/* Vocabulary Score */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">Vocabulary Score</span>
+                            <span className="text-sm font-bold text-orange-600">50/100</span>
+                          </div>
+                          <Progress value={50} className="h-2" />
+                        </div>
+
+                        {/* Grammar Score */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">Grammar Score</span>
+                            <span className="text-sm font-bold text-red-600">44/100</span>
+                          </div>
+                          <Progress value={44} className="h-2" />
+                        </div>
+
+                        {/* Topic Score */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium text-gray-700">Topic Score</span>
+                            <span className="text-sm font-bold text-teal-600">75/100</span>
+                          </div>
+                          <Progress value={75} className="h-2" />
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Audio Player with Enhanced Transcript */}
                     <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-indigo-100 shadow-sm">
                       <div className="flex items-center justify-between mb-4">
