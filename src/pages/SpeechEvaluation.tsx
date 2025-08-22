@@ -951,7 +951,7 @@ const SpeechEvaluation = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                       {/* Enhanced Option A: Record Audio */}
                       <div className="space-y-4">
                         <div className="flex items-center gap-2 mb-4">
@@ -961,141 +961,165 @@ const SpeechEvaluation = () => {
                           <h4 className="font-semibold text-gray-800">Record Audio</h4>
                         </div>
                         
-                        {/* Recording Status Card */}
-                        <div className={`bg-gradient-to-br p-6 rounded-xl border-2 transition-all duration-500 ${
-                          isRecording && !isPaused
-                            ? "from-red-50 via-orange-50 to-red-50 border-red-300 shadow-xl"
-                            : isPaused
-                            ? "from-yellow-50 via-amber-50 to-yellow-50 border-yellow-300 shadow-lg"
-                            : "from-blue-50 via-indigo-50 to-blue-50 border-blue-200 shadow-md"
-                        }`}>
-                          <div className="text-center space-y-4">
-                            {/* Enhanced Recording Button */}
+                        <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6">
+                          <ul className="text-sm text-gray-600 space-y-2 mb-6">
+                            <li className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                              Click to start recording with smart controls
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                              Use pause/resume for better control
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                              Recording stops automatically after 20 seconds
+                            </li>
+                          </ul>
+                          
+                          <div className="flex flex-col items-center gap-6">
+                            {/* Enhanced Recording Controls */}
                             <div className="relative">
                               <div className={`absolute -inset-4 rounded-full transition-all duration-1000 ${
                                 isRecording && !isPaused
-                                  ? "bg-gradient-to-r from-red-400/30 to-orange-400/30 animate-pulse scale-110" 
+                                  ? "bg-gradient-to-r from-blue-400/30 to-emerald-400/30 animate-pulse" 
                                   : "bg-transparent"
                               }`}></div>
                               <Button
                                 size="lg"
                                 onClick={startSpeakingRecording}
                                 disabled={speakingAttemptCount >= 5 || isRecording}
-                                className={`w-20 h-20 rounded-full transition-all duration-300 shadow-2xl hover:scale-105 ${
-                                  isRecording && !isPaused
-                                    ? "bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700"
-                                    : isPaused
-                                    ? "bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700"
-                                    : "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+                                className={`relative w-20 h-20 rounded-full transition-all duration-500 border-4 ${
+                                  isRecording 
+                                    ? "bg-gradient-to-br from-blue-500 to-emerald-500 border-blue-300 shadow-lg" 
+                                    : "bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 border-emerald-300 shadow-lg hover:scale-105"
                                 } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                               >
-                                <Mic className={`h-7 w-7 text-white ${isRecording && !isPaused ? 'animate-pulse' : ''}`} />
+                                <Mic className="h-8 w-8 text-white" />
                               </Button>
                             </div>
 
-                            {/* Status Display */}
-                            <div className="space-y-2">
-                              <p className="font-bold text-base text-gray-800">
-                                {isRecording && !isPaused 
-                                  ? "🔴 Recording..." 
-                                  : isPaused 
-                                  ? "⏸️ Paused" 
+                            {/* Recording Controls */}
+                            {isRecording && (
+                              <div className="flex items-center gap-3">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={isPaused ? resumeRecording : pauseRecording}
+                                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                                >
+                                  {isPaused ? (
+                                    <>
+                                      <Play className="h-4 w-4 mr-1" />
+                                      Resume
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Pause className="h-4 w-4 mr-1" />
+                                      Pause
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={stopRecording}
+                                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                >
+                                  <Square className="h-4 w-4 mr-1" />
+                                  Stop
+                                </Button>
+                              </div>
+                            )}
+
+                            {/* Recording Status */}
+                            <div className="text-center space-y-2">
+                              <span className={`text-sm font-medium transition-colors duration-200 ${
+                                isRecording 
+                                  ? isPaused ? "text-amber-600" : "text-blue-600"
+                                  : "text-gray-700"
+                              }`}>
+                                {isRecording 
+                                  ? isPaused ? "Recording Paused" : "Recording..." 
                                   : "Ready to Record"
                                 }
-                              </p>
-                              {!isRecording && (
-                                <div className="space-y-1 text-sm text-gray-600">
-                                  <p className="font-medium">Click to start recording with smart controls</p>
-                                  <p>Use pause/resume for better control</p>
-                                  <p>Recording stops automatically after 20 seconds</p>
+                              </span>
+                              
+                              {isRecording && (
+                                <div className="flex flex-col items-center gap-2">
+                                  <Progress 
+                                    value={(recordingTime / 200) * 100} 
+                                    className="w-32 h-2 bg-blue-100"
+                                  />
+                                  <span className="text-xs text-blue-600 font-mono">
+                                    {isPaused ? "Paused" : `${Math.max(0, 20 - Math.floor(recordingTime / 10))}s remaining`}
+                                  </span>
                                 </div>
                               )}
                             </div>
 
-                            {/* Enhanced Recording Controls */}
-                            {isRecording && (
-                              <div className="space-y-4">
-                                <div className="flex justify-center gap-3">
-                                  <Button
-                                    size="sm"
-                                    onClick={isPaused ? resumeRecording : pauseRecording}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-                                  >
-                                    {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={stopRecording}
-                                    className="bg-red-600 hover:bg-red-700 text-white shadow-lg"
-                                  >
-                                    <Square className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                                
-                                {/* Timer Display */}
-                                <div className="bg-white/80 rounded-lg p-2 backdrop-blur-sm">
-                                  <p className="text-sm font-mono font-bold text-gray-700">
-                                    {Math.floor(recordingTime / 10)}:{(recordingTime % 10).toString().padStart(2, '0')} / 0:20
-                                  </p>
-                                </div>
-
-                                {/* Audio Level Visualization */}
-                                <div className="flex justify-center gap-1">
-                                  {[...Array(8)].map((_, i) => (
-                                    <div 
-                                      key={i}
-                                      className={`w-1 rounded-full transition-all duration-100 ${
-                                        isRecording && !isPaused && Math.random() * 100 < audioLevel
-                                          ? 'bg-gradient-to-t from-red-500 to-orange-400 h-6' 
-                                          : 'bg-gray-300 h-2'
-                                      }`}
-                                    ></div>
-                                  ))}
-                                </div>
+                            {/* Calmer Audio Visualization */}
+                            {isRecording && !isPaused && (
+                              <div className="flex items-center justify-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-2 bg-gradient-to-t from-blue-400 to-emerald-400 rounded-full transition-all duration-300"
+                                    style={{
+                                      height: `${8 + Math.sin((Date.now() / 200) + i) * 6}px`,
+                                      opacity: 0.7 + Math.sin((Date.now() / 300) + i) * 0.3
+                                    }}
+                                  />
+                                ))}
                               </div>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Enhanced Option B: Upload Audio File */}
+                      {/* Enhanced Option B: Upload Audio */}
                       <div className="space-y-4">
                         <div className="flex items-center gap-2 mb-4">
-                          <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                             B
                           </div>
                           <h4 className="font-semibold text-gray-800">Upload Audio File</h4>
                         </div>
-                        
-                        {/* Enhanced Upload Area */}
-                        <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 p-6 rounded-xl border-2 border-dashed border-gray-300 hover:border-indigo-400 hover:bg-indigo-50/30 transition-all duration-300 cursor-pointer group">
-                          <div className="text-center space-y-4">
-                            <div className="relative">
-                              <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto transition-all duration-300 group-hover:scale-110 group-hover:from-indigo-200 group-hover:to-purple-200">
-                                <Upload className="w-8 h-8 text-indigo-600 group-hover:text-purple-600 transition-colors" />
+
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                          <ul className="text-sm text-gray-600 space-y-2 mb-6">
+                            <li className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              Drag & drop audio files or click to browse
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              Supported formats: .mp3, .wav, .m4a
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              Maximum duration: 20 seconds
+                            </li>
+                          </ul>
+
+                          <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer group">
+                            <div className="flex flex-col items-center gap-4">
+                              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center group-hover:from-blue-200 group-hover:to-indigo-200 transition-all">
+                                <Upload className="h-8 w-8 text-blue-600 group-hover:scale-110 transition-transform" />
                               </div>
-                            </div>
-                            
-                            <div className="space-y-3">
-                              <p className="font-bold text-gray-800 text-base">Drag & drop audio files or click to browse</p>
-                              <div className="space-y-1 text-sm text-gray-600">
-                                <p>Supported formats: <span className="font-medium">.mp3, .wav, .m4a</span></p>
-                                <p>Maximum duration: <span className="font-medium">20 seconds</span></p>
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-800">Drop audio files here</p>
+                                <p className="text-xs text-gray-500">or click to browse your computer</p>
                               </div>
-                              
                               <Button 
                                 variant="outline" 
-                                className="border-indigo-200 text-indigo-700 hover:bg-indigo-100/50 shadow-sm"
+                                size="sm"
                                 onClick={() => setSpeakingHasAudio(true)}
+                                className="border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300"
                               >
                                 <Upload className="w-4 h-4 mr-2" />
-                                Choose File
+                                Browse Files
                               </Button>
-                              
-                              <div className="pt-2 border-t border-gray-200">
-                                <p className="text-xs text-gray-400">Drop audio files here</p>
-                                <p className="text-xs text-gray-400 mt-1">or click to browse your computer</p>
-                              </div>
                             </div>
                           </div>
                         </div>
@@ -1397,44 +1421,170 @@ const SpeechEvaluation = () => {
                         </div>
                       </div>
 
-                      {/* Right Column - Performance Breakdown */}
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-md flex items-center justify-center shadow-sm">
-                            <Sparkles className="w-3 h-3 text-white" />
+                      {/* Right Column - Score Visualization */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-md flex items-center justify-center shadow-sm">
+                            <BarChart3 className="w-3 h-3 text-white" />
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900">Performance Breakdown</h3>
+                          <h3 className="text-lg font-semibold text-gray-900">Score Visualization</h3>
                         </div>
-                        <div className="space-y-3">
-                          {[
-                            { label: "Accuracy Score", score: 92, maxScore: 100, color: "from-green-500 to-emerald-600", bgColor: "bg-green-50", textColor: "text-green-700" },
-                            { label: "Fluency Score", score: 100, maxScore: 100, color: "from-blue-500 to-indigo-600", bgColor: "bg-blue-50", textColor: "text-blue-700" },
-                            { label: "Completeness Score", score: 92, maxScore: 100, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-50", textColor: "text-purple-700" },
-                            { label: "Prosody Score", score: 89.6, maxScore: 100, color: "from-orange-500 to-red-600", bgColor: "bg-orange-50", textColor: "text-orange-700" }
-                          ].map((item, index) => (
-                            <div key={index} className={`${item.bgColor} border border-gray-200 rounded-lg p-3 hover:bg-gray-100/30 transition-all`}>
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  <div className={`w-2 h-2 bg-gradient-to-r ${item.color} rounded-full`}></div>
-                                  <span className="text-sm font-medium text-gray-800">{item.label}</span>
-                                </div>
-                                <span className={`text-sm font-semibold ${item.textColor} bg-white px-2 py-1 rounded`}>
-                                  {item.score}/{item.maxScore}
-                                </span>
+                        
+                        {/* Individual Score Charts */}
+                        <div className="space-y-4">
+                          {/* Accuracy Score */}
+                          <div className="bg-white/90 backdrop-blur-sm border border-green-200 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full"></div>
+                                <span className="text-sm font-semibold text-gray-800">Accuracy Score</span>
                               </div>
-                              <div className="w-full bg-white/80 rounded-full h-2">
+                              <span className="text-lg font-bold text-green-600">95/100</span>
+                            </div>
+                            <div className="relative">
+                              <div className="w-full bg-gray-200 rounded-full h-3">
                                 <div 
-                                  className={`h-2 rounded-full bg-gradient-to-r ${item.color} transition-all duration-2000 ease-out`}
-                                  style={{ width: `${(item.score / item.maxScore) * 100}%` }}
+                                  className="h-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-2000 ease-out"
+                                  style={{ width: '95%' }}
                                 ></div>
                               </div>
-                              <div className="mt-1 text-right">
-                                <span className={`text-sm ${item.textColor}`}>
-                                  {((item.score / item.maxScore) * 100).toFixed(1)}%
-                                </span>
+                              <div className="text-center mt-2">
+                                <span className="text-sm font-medium text-green-700">95%</span>
                               </div>
                             </div>
-                          ))}
+                          </div>
+
+                          {/* Fluency Score */}
+                          <div className="bg-white/90 backdrop-blur-sm border border-blue-200 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full"></div>
+                                <span className="text-sm font-semibold text-gray-800">Fluency Score</span>
+                              </div>
+                              <span className="text-lg font-bold text-blue-600">79/100</span>
+                            </div>
+                            <div className="relative">
+                              <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div 
+                                  className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-2000 ease-out"
+                                  style={{ width: '79%' }}
+                                ></div>
+                              </div>
+                              <div className="text-center mt-2">
+                                <span className="text-sm font-medium text-blue-700">79%</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Prosody Score */}
+                          <div className="bg-white/90 backdrop-blur-sm border border-purple-200 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full"></div>
+                                <span className="text-sm font-semibold text-gray-800">Prosody Score</span>
+                              </div>
+                              <span className="text-lg font-bold text-purple-600">82.8/100</span>
+                            </div>
+                            <div className="relative">
+                              <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div 
+                                  className="h-3 rounded-full bg-gradient-to-r from-purple-500 to-violet-600 transition-all duration-2000 ease-out"
+                                  style={{ width: '82.8%' }}
+                                ></div>
+                              </div>
+                              <div className="text-center mt-2">
+                                <span className="text-sm font-medium text-purple-700">82.8%</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Content Score (from earlier section) */}
+                          <div className="bg-white/90 backdrop-blur-sm border border-orange-200 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-orange-500 to-red-600 rounded-full"></div>
+                                <span className="text-sm font-semibold text-gray-800">Content Score</span>
+                              </div>
+                              <span className="text-lg font-bold text-orange-600">31/100</span>
+                            </div>
+                            <div className="relative">
+                              <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div 
+                                  className="h-3 rounded-full bg-gradient-to-r from-orange-500 to-red-600 transition-all duration-2000 ease-out"
+                                  style={{ width: '31%' }}
+                                ></div>
+                              </div>
+                              <div className="text-center mt-2">
+                                <span className="text-sm font-medium text-orange-700">31%</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Vocabulary Score */}
+                          <div className="bg-white/90 backdrop-blur-sm border border-indigo-200 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full"></div>
+                                <span className="text-sm font-semibold text-gray-800">Vocabulary Score</span>
+                              </div>
+                              <span className="text-lg font-bold text-indigo-600">50/100</span>
+                            </div>
+                            <div className="relative">
+                              <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div 
+                                  className="h-3 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 transition-all duration-2000 ease-out"
+                                  style={{ width: '50%' }}
+                                ></div>
+                              </div>
+                              <div className="text-center mt-2">
+                                <span className="text-sm font-medium text-indigo-700">50%</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Grammar Score */}
+                          <div className="bg-white/90 backdrop-blur-sm border border-emerald-200 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full"></div>
+                                <span className="text-sm font-semibold text-gray-800">Grammar Score</span>
+                              </div>
+                              <span className="text-lg font-bold text-emerald-600">44/100</span>
+                            </div>
+                            <div className="relative">
+                              <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div 
+                                  className="h-3 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 transition-all duration-2000 ease-out"
+                                  style={{ width: '44%' }}
+                                ></div>
+                              </div>
+                              <div className="text-center mt-2">
+                                <span className="text-sm font-medium text-emerald-700">44%</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Topic Score */}
+                          <div className="bg-white/90 backdrop-blur-sm border border-gray-300 rounded-lg p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-gradient-to-br from-gray-500 to-slate-600 rounded-full"></div>
+                                <span className="text-sm font-semibold text-gray-800">Topic Score</span>
+                              </div>
+                              <span className="text-lg font-bold text-gray-600">0/100</span>
+                            </div>
+                            <div className="relative">
+                              <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div 
+                                  className="h-3 rounded-full bg-gradient-to-r from-gray-500 to-slate-600 transition-all duration-2000 ease-out"
+                                  style={{ width: '0%' }}
+                                ></div>
+                              </div>
+                              <div className="text-center mt-2">
+                                <span className="text-sm font-medium text-gray-700">0%</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
