@@ -51,6 +51,8 @@ const SpeechEvaluation = () => {
   const [selectedSpeakingLanguage, setSelectedSpeakingLanguage] = useState("")
   const [selectedTopic, setSelectedTopic] = useState("")
   const [speakingAttemptCount, setSpeakingAttemptCount] = useState(0)
+  const [speakingHasAudio, setSpeakingHasAudio] = useState(false)
+  const [showSpeakingResult, setShowSpeakingResult] = useState(false)
   const recordingInterval = useRef<NodeJS.Timeout | null>(null)
   const audioLevelInterval = useRef<NodeJS.Timeout | null>(null)
   const playbackInterval = useRef<NodeJS.Timeout | null>(null)
@@ -1010,52 +1012,62 @@ const SpeechEvaluation = () => {
                         )}
                       </div>
 
-                      {/* Upload Audio Option */}
-                      <div className="space-y-4">
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors">
-                          <div className="space-y-4">
-                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
-                              <Upload className="w-8 h-8 text-gray-500" />
-                            </div>
-                            <div className="space-y-2">
-                              <p className="font-semibold text-gray-900">Drag and drop audio file here or</p>
-                              <Button variant="link" className="text-blue-600 hover:text-blue-700 p-0 h-auto font-normal underline">
-                                Browse for a file
-                              </Button>
-                              <p className="text-xs text-gray-500 font-medium">[Time limit is 20 seconds]</p>
-                              <p className="text-xs text-gray-500">[only .mp3, .wav files are allowed]</p>
+                        {/* Upload Audio Option */}
+                        <div className="space-y-4">
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <div className="space-y-4">
+                              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
+                                <Upload className="w-8 h-8 text-gray-500" />
+                              </div>
+                              <div className="space-y-2">
+                                <p className="font-semibold text-gray-900">Or Upload Audio:</p>
+                                <p className="text-gray-700">Drag and drop audio file here, or</p>
+                                <Button 
+                                  variant="link" 
+                                  className="text-blue-600 hover:text-blue-700 p-0 h-auto font-normal underline"
+                                  onClick={() => setSpeakingHasAudio(true)} // Simulate file upload
+                                >
+                                  browse for a file
+                                </Button>
+                                <p className="text-xs text-gray-500 font-medium">[Time limit: 20 seconds]</p>
+                                <p className="text-xs text-gray-500">[Allowed formats: .mp3, .wav]</p>
+                                <p className="text-xs text-gray-400">Example: sample-2.mp3</p>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
                     </div>
 
-                    {/* Audio Player (when audio exists) */}
-                    <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <Button
-                          size="sm"
-                          onClick={() => setIsPlaying(!isPlaying)}
-                          className="bg-gray-600 hover:bg-gray-700 text-white w-10 h-10 rounded-full p-0"
-                        >
-                          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                        </Button>
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>00:03</span>
-                            <div className="flex-1 bg-blue-200 rounded-full h-2 relative">
-                              <div className="absolute left-0 top-0 h-full bg-blue-600 rounded-full w-[15%]"></div>
-                              <div className="absolute left-[15%] top-1/2 -translate-y-1/2 w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-md"></div>
+                    {/* Audio Player (only show when audio exists) */}
+                    {speakingHasAudio && (
+                      <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-indigo-100 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md flex items-center justify-center shadow-sm">
+                              <Headphones className="w-3 h-3 text-white" />
                             </div>
-                            <span>00:20</span>
-                            <Button size="sm" variant="ghost" className="text-gray-600 hover:text-gray-800">
+                            <h3 className="text-lg font-semibold text-gray-900">Recorded Audio</h3>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setIsPlaying(!isPlaying)}
+                              className="border-indigo-200 text-indigo-700 hover:bg-indigo-100/50"
+                            >
+                              {isPlaying ? <Pause className="w-3 h-3 mr-1" /> : <Play className="w-3 h-3 mr-1" />}
+                              {isPlaying ? "Pause" : "Play"}
+                            </Button>
+                            <span className="text-xs text-gray-600 font-mono bg-gray-100 px-1.5 py-0.5 rounded">00:00</span>
+                            <Progress value={playbackTime * 2} className="w-24 h-1" />
+                            <span className="text-xs text-gray-600 font-mono bg-gray-100 px-1.5 py-0.5 rounded">00:20</span>
+                            <Button variant="outline" size="sm" className="border-gray-200 text-gray-600 hover:bg-gray-100/50">
                               <Download className="w-4 h-4" />
                             </Button>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -1090,10 +1102,12 @@ const SpeechEvaluation = () => {
                             </TableCell>
                             <TableCell>
                               <Button
-                                variant="outline"
-                                size="sm"
-                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                                onClick={() => setShowSpeakingResult(true)}
                               >
+                                <Eye className="h-4 w-4 mr-1" />
                                 {attempt.result}
                               </Button>
                             </TableCell>
@@ -1101,6 +1115,252 @@ const SpeechEvaluation = () => {
                         ))}
                       </TableBody>
                     </Table>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Speaking Assessment Result */}
+              {showSpeakingResult && (
+                <Card className="bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/20 border border-indigo-200 shadow-2xl">
+                  <CardHeader className="border-b border-indigo-200 bg-gradient-to-r from-indigo-100 via-purple-100 to-blue-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
+                          <BarChart3 className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-700 to-purple-800 bg-clip-text text-transparent">
+                            Assessment Result
+                          </CardTitle>
+                          <p className="text-sm text-gray-600 mt-1">Detailed analysis of your speech performance</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setShowSpeakingResult(false)}
+                        className="text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
+                      >
+                        <X className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-4">
+                    {/* Audio Player with Enhanced Transcript */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-indigo-100 shadow-sm">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md flex items-center justify-center shadow-sm">
+                            <Headphones className="w-3 h-3 text-white" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900">Audio Analysis</h3>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsPlaying(!isPlaying)}
+                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-100/50"
+                          >
+                            {isPlaying ? <Pause className="w-3 h-3 mr-1" /> : <Play className="w-3 h-3 mr-1" />}
+                            {isPlaying ? "Pause" : "Play"}
+                          </Button>
+                          <span className="text-xs text-gray-600 font-mono bg-gray-100 px-1.5 py-0.5 rounded">00:00</span>
+                          <Progress value={(playbackTime / 50) * 100} className="w-24 h-1" />
+                          <span className="text-xs text-gray-600 font-mono bg-gray-100 px-1.5 py-0.5 rounded">00:20</span>
+                          <Button variant="outline" size="sm" className="border-gray-200 text-gray-600 hover:bg-gray-100/50">
+                            <Download className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Enhanced Transcript with highlighting */}
+                      <div className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Volume2 className="w-4 h-4 text-indigo-600" />
+                          <span className="font-semibold text-gray-800">Speech Transcript</span>
+                        </div>
+                        <p className="text-base leading-relaxed">
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">Today </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">was </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">a </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">productive </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">day </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">at </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">work </span>
+                          <span className="bg-yellow-200 text-gray-900 px-1 py-0.5 rounded border-l-4 border-yellow-500">and</span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100"> I </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">enjoyed </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">the </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">evening </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Two Column Layout for Speaking Results */}
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                      {/* Left Column - Error Analysis & Pronunciation */}
+                      <div className="space-y-3">
+                        {/* Types of Errors - Compact */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-md flex items-center justify-center shadow-sm">
+                              <Target className="w-3 h-3 text-white" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">Error Analysis</h3>
+                          </div>
+                          <div className="space-y-2">
+                            {[
+                              { type: "Mispronunciations", count: 2, color: "bg-orange-100 text-orange-800 border-orange-300", bgColor: "bg-orange-50" },
+                              { type: "Omissions", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" },
+                              { type: "Insertions", count: 1, color: "bg-yellow-100 text-yellow-800 border-yellow-300", bgColor: "bg-yellow-50" },
+                              { type: "Unexpected break", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" },
+                              { type: "Missing break", count: 1, color: "bg-blue-100 text-blue-800 border-blue-300", bgColor: "bg-blue-50" },
+                              { type: "Monotone", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" }
+                            ].map((error, index) => (
+                              <div key={index} className={`flex items-center justify-between p-2 ${error.bgColor} border border-gray-200 rounded-lg hover:bg-gray-100/50 transition-all`}>
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-1.5 h-1.5 rounded-full ${error.count > 0 ? 'bg-orange-500' : 'bg-gray-400'}`}></div>
+                                  <span className="text-sm font-medium text-gray-800">{error.type}</span>
+                                </div>
+                                <Badge className={`${error.color} text-sm px-2 py-0.5`}>
+                                  {error.count}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Pronunciation Score Meter */}
+                        <div className="bg-white/90 backdrop-blur-sm border border-green-200 rounded-lg p-4 shadow-sm">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-md flex items-center justify-center shadow-sm">
+                              <CheckCircle className="w-3 h-3 text-white" />
+                            </div>
+                            <h4 className="text-sm font-semibold text-gray-900">Pronunciation Score</h4>
+                          </div>
+                          
+                          {/* Score Display */}
+                          <div className="text-center mb-4">
+                            <span className="text-2xl font-bold text-green-600">86%</span>
+                            <p className="text-xs text-gray-600">Overall Score</p>
+                          </div>
+                          
+                          {/* Meter Visualization */}
+                          <div className="space-y-3">
+                            <div className="relative h-6 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="absolute inset-0 flex">
+                                <div className="w-[59%] bg-red-400"></div>
+                                <div className="w-[20%] bg-yellow-400"></div>
+                                <div className="w-[21%] bg-green-400"></div>
+                              </div>
+                              <div 
+                                className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-2000 ease-out"
+                                style={{ width: '86%' }}
+                              ></div>
+                              <div 
+                                className="absolute top-1/2 -translate-y-1/2 w-1 h-8 bg-white border-2 border-gray-800 rounded-full shadow-md transition-all duration-2000 ease-out"
+                                style={{ left: '86%', transform: 'translateX(-50%) translateY(-50%)' }}
+                              ></div>
+                            </div>
+                            
+                            {/* Scale Labels */}
+                            <div className="flex justify-between text-xs text-gray-600">
+                              <span>Poor (0-59)</span>
+                              <span>Good (60-79)</span>
+                              <span>Excellent (80-100)</span>
+                            </div>
+                          </div>
+
+                          {/* Score Breakdown */}
+                          <div className="mt-4 space-y-2 border-t border-gray-200 pt-3">
+                            <h5 className="text-sm font-semibold text-gray-800 mb-2">Score Breakdown</h5>
+                            {[
+                              { label: "Accuracy Score", score: 95, maxScore: 100, color: "from-green-500 to-emerald-600" },
+                              { label: "Fluency Score", score: 79, maxScore: 100, color: "from-blue-500 to-indigo-600" },
+                              { label: "Prosody Score", score: 82.8, maxScore: 100, color: "from-purple-500 to-violet-600" }
+                            ].map((item, index) => (
+                              <div key={index} className="flex items-center justify-between text-sm">
+                                <span className="text-gray-700">{item.label}</span>
+                                <span className="font-medium text-gray-900">{item.score}/{item.maxScore}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Content Score */}
+                        <div className="bg-white/90 backdrop-blur-sm border border-orange-200 rounded-lg p-4 shadow-sm">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-md flex items-center justify-center shadow-sm">
+                              <FileText className="w-3 h-3 text-white" />
+                            </div>
+                            <h4 className="text-sm font-semibold text-gray-900">Content Score</h4>
+                          </div>
+                          
+                          {/* Score Display */}
+                          <div className="text-center mb-4">
+                            <span className="text-2xl font-bold text-orange-600">31%</span>
+                            <p className="text-xs text-gray-600">Overall Score</p>
+                          </div>
+
+                          {/* Score Breakdown */}
+                          <div className="space-y-2 border-t border-gray-200 pt-3">
+                            <h5 className="text-sm font-semibold text-gray-800 mb-2">Score Breakdown</h5>
+                            {[
+                              { label: "Vocabulary Score", score: 50, maxScore: 100, color: "from-blue-500 to-indigo-600" },
+                              { label: "Grammar Score", score: 44, maxScore: 100, color: "from-green-500 to-emerald-600" },
+                              { label: "Topic Score", score: 0, maxScore: 100, color: "from-red-500 to-orange-600" }
+                            ].map((item, index) => (
+                              <div key={index} className="flex items-center justify-between text-sm">
+                                <span className="text-gray-700">{item.label}</span>
+                                <span className="font-medium text-gray-900">{item.score}/{item.maxScore}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right Column - Performance Breakdown */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-md flex items-center justify-center shadow-sm">
+                            <Sparkles className="w-3 h-3 text-white" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900">Performance Breakdown</h3>
+                        </div>
+                        <div className="space-y-3">
+                          {[
+                            { label: "Accuracy Score", score: 92, maxScore: 100, color: "from-green-500 to-emerald-600", bgColor: "bg-green-50", textColor: "text-green-700" },
+                            { label: "Fluency Score", score: 100, maxScore: 100, color: "from-blue-500 to-indigo-600", bgColor: "bg-blue-50", textColor: "text-blue-700" },
+                            { label: "Completeness Score", score: 92, maxScore: 100, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-50", textColor: "text-purple-700" },
+                            { label: "Prosody Score", score: 89.6, maxScore: 100, color: "from-orange-500 to-red-600", bgColor: "bg-orange-50", textColor: "text-orange-700" }
+                          ].map((item, index) => (
+                            <div key={index} className={`${item.bgColor} border border-gray-200 rounded-lg p-3 hover:bg-gray-100/30 transition-all`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-2 h-2 bg-gradient-to-r ${item.color} rounded-full`}></div>
+                                  <span className="text-sm font-medium text-gray-800">{item.label}</span>
+                                </div>
+                                <span className={`text-sm font-semibold ${item.textColor} bg-white px-2 py-1 rounded`}>
+                                  {item.score}/{item.maxScore}
+                                </span>
+                              </div>
+                              <div className="w-full bg-white/80 rounded-full h-2">
+                                <div 
+                                  className={`h-2 rounded-full bg-gradient-to-r ${item.color} transition-all duration-2000 ease-out`}
+                                  style={{ width: `${(item.score / item.maxScore) * 100}%` }}
+                                ></div>
+                              </div>
+                              <div className="mt-1 text-right">
+                                <span className={`text-sm ${item.textColor}`}>
+                                  {((item.score / item.maxScore) * 100).toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               )}
