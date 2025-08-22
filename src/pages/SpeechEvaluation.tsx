@@ -20,7 +20,9 @@ import {
   Radio,
   Sparkles,
   Download,
-  X
+  X,
+  Pause,
+  Square
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,6 +40,7 @@ const SpeechEvaluation = () => {
   const [customText, setCustomText] = useState("")
   const [attemptCount, setAttemptCount] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [audioLevel, setAudioLevel] = useState(0)
   const [showResultDetail, setShowResultDetail] = useState(false)
@@ -88,6 +91,7 @@ const SpeechEvaluation = () => {
   const startRecording = () => {
     if (attemptCount < 5) {
       setIsRecording(true)
+      setIsPaused(false)
       setAttemptCount(prev => prev + 1)
       setRecordingTime(0)
       
@@ -109,8 +113,41 @@ const SpeechEvaluation = () => {
     }
   }
 
+  const pauseRecording = () => {
+    setIsPaused(true)
+    if (recordingInterval.current) {
+      clearInterval(recordingInterval.current)
+      recordingInterval.current = null
+    }
+    if (audioLevelInterval.current) {
+      clearInterval(audioLevelInterval.current)
+      audioLevelInterval.current = null
+    }
+  }
+
+  const resumeRecording = () => {
+    setIsPaused(false)
+    
+    // Resume recording timer
+    recordingInterval.current = setInterval(() => {
+      setRecordingTime(prev => {
+        if (prev >= 49) {
+          stopRecording()
+          return 50
+        }
+        return prev + 1
+      })
+    }, 100)
+    
+    // Resume audio level animation
+    audioLevelInterval.current = setInterval(() => {
+      setAudioLevel(Math.random() * 100)
+    }, 100)
+  }
+
   const stopRecording = () => {
     setIsRecording(false)
+    setIsPaused(false)
     setRecordingTime(0)
     setAudioLevel(0)
     
@@ -330,11 +367,11 @@ const SpeechEvaluation = () => {
                           <ul className="text-sm text-gray-600 space-y-2 mb-6">
                             <li className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                              Click the microphone to start recording
+                              Click to start recording with smart controls
                             </li>
                             <li className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                              Speak clearly when the mic glows red
+                              Use pause/resume for better control
                             </li>
                             <li className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
@@ -343,62 +380,96 @@ const SpeechEvaluation = () => {
                           </ul>
                           
                           <div className="flex flex-col items-center gap-6">
-                            {/* Enhanced Recording Button with Animations */}
+                            {/* Enhanced Recording Controls */}
                             <div className="relative">
-                              <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
-                                isRecording 
-                                  ? "bg-red-400 animate-ping opacity-75" 
+                              <div className={`absolute -inset-4 rounded-full transition-all duration-1000 ${
+                                isRecording && !isPaused
+                                  ? "bg-gradient-to-r from-blue-400/30 to-emerald-400/30 animate-pulse" 
                                   : "bg-transparent"
                               }`}></div>
                               <Button
                                 size="lg"
-                                onClick={isRecording ? stopRecording : startRecording}
-                                disabled={attemptCount >= 5}
-                                className={`relative w-24 h-24 rounded-full transition-all duration-300 border-4 ${
+                                onClick={startRecording}
+                                disabled={attemptCount >= 5 || isRecording}
+                                className={`relative w-20 h-20 rounded-full transition-all duration-500 border-4 ${
                                   isRecording 
-                                    ? "bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 border-red-300 shadow-2xl transform scale-105" 
-                                    : "bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 border-emerald-300 shadow-xl hover:scale-105"
+                                    ? "bg-gradient-to-br from-blue-500 to-emerald-500 border-blue-300 shadow-lg" 
+                                    : "bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 border-emerald-300 shadow-lg hover:scale-105"
                                 } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                               >
-                                {isRecording ? (
-                                  <StopCircle className="h-10 w-10 text-white animate-pulse" />
-                                ) : (
-                                  <Mic className="h-10 w-10 text-white" />
-                                )}
+                                <Mic className="h-8 w-8 text-white" />
                               </Button>
                             </div>
+
+                            {/* Recording Controls */}
+                            {isRecording && (
+                              <div className="flex items-center gap-3">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={isPaused ? resumeRecording : pauseRecording}
+                                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                                >
+                                  {isPaused ? (
+                                    <>
+                                      <Play className="h-4 w-4 mr-1" />
+                                      Resume
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Pause className="h-4 w-4 mr-1" />
+                                      Pause
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={stopRecording}
+                                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                >
+                                  <Square className="h-4 w-4 mr-1" />
+                                  Stop
+                                </Button>
+                              </div>
+                            )}
 
                             {/* Recording Status */}
                             <div className="text-center space-y-2">
                               <span className={`text-sm font-medium transition-colors duration-200 ${
-                                isRecording ? "text-red-600" : "text-gray-700"
+                                isRecording 
+                                  ? isPaused ? "text-amber-600" : "text-blue-600"
+                                  : "text-gray-700"
                               }`}>
-                                {isRecording ? "Recording..." : "Click to Record"}
+                                {isRecording 
+                                  ? isPaused ? "Recording Paused" : "Recording..." 
+                                  : "Ready to Record"
+                                }
                               </span>
                               
                               {isRecording && (
                                 <div className="flex flex-col items-center gap-2">
                                   <Progress 
                                     value={(recordingTime / 50) * 100} 
-                                    className="w-32 h-2 bg-red-100"
+                                    className="w-32 h-2 bg-blue-100"
                                   />
-                                  <span className="text-xs text-red-600 font-mono">
-                                    Auto-stop in {Math.max(0, 5 - Math.floor(recordingTime / 10))}s
+                                  <span className="text-xs text-blue-600 font-mono">
+                                    {isPaused ? "Paused" : `${Math.max(0, 5 - Math.floor(recordingTime / 10))}s remaining`}
                                   </span>
                                 </div>
                               )}
                             </div>
 
-                            {/* Audio Visualization */}
-                            {isRecording && (
-                              <div className="flex items-center gap-1">
-                                {[...Array(7)].map((_, i) => (
+                            {/* Calmer Audio Visualization */}
+                            {isRecording && !isPaused && (
+                              <div className="flex items-center justify-center gap-1">
+                                {[...Array(5)].map((_, i) => (
                                   <div
                                     key={i}
-                                    className="w-1 bg-red-500 rounded-full animate-pulse"
+                                    className="w-2 bg-gradient-to-t from-blue-400 to-emerald-400 rounded-full transition-all duration-300"
                                     style={{
-                                      height: `${Math.random() * 20 + 5}px`,
-                                      animationDelay: `${i * 0.1}s`
+                                      height: `${8 + Math.sin((Date.now() / 200) + i) * 6}px`,
+                                      opacity: 0.7 + Math.sin((Date.now() / 300) + i) * 0.3
                                     }}
                                   />
                                 ))}
@@ -521,197 +592,242 @@ const SpeechEvaluation = () => {
                 </CardContent>
               </Card>
 
-              {/* Assessment Result Modal */}
+              {/* Assessment Result - Inline Below Attempts Table */}
               {showResultDetail && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                  <Card className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl">
-                    <CardHeader className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl font-semibold text-gray-900">Assessment Result</CardTitle>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => setShowResultDetail(false)}
-                          className="text-gray-500 hover:text-gray-700"
-                        >
-                          <X className="w-5 h-5" />
-                        </Button>
+                <Card className="bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/20 border border-indigo-200 shadow-2xl">
+                  <CardHeader className="border-b border-indigo-200 bg-gradient-to-r from-indigo-100 via-purple-100 to-blue-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
+                          <BarChart3 className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-700 to-purple-800 bg-clip-text text-transparent">
+                            Assessment Result
+                          </CardTitle>
+                          <p className="text-sm text-gray-600 mt-1">Detailed analysis of your speech performance</p>
+                        </div>
                       </div>
                       <Button 
-                        variant="outline" 
+                        variant="ghost" 
                         size="sm" 
-                        className="self-end border-blue-200 text-blue-700 hover:bg-blue-50"
+                        onClick={() => setShowResultDetail(false)}
+                        className="text-gray-500 hover:text-gray-700 hover:bg-white/50"
                       >
-                        Hide Result
+                        <X className="w-5 h-5" />
                       </Button>
-                    </CardHeader>
-                    <CardContent className="p-6 space-y-6">
-                      {/* Audio Player with Transcript */}
-                      <div className="bg-gray-50 rounded-lg p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="font-semibold text-gray-900">Audio Analysis</h3>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                if (isPlaying) {
-                                  setIsPlaying(false)
-                                  if (playbackInterval.current) {
-                                    clearInterval(playbackInterval.current)
-                                  }
-                                } else {
-                                  setIsPlaying(true)
-                                  setPlaybackTime(0)
-                                  playbackInterval.current = setInterval(() => {
-                                    setPlaybackTime(prev => {
-                                      if (prev >= 50) {
-                                        setIsPlaying(false)
-                                        return 0
-                                      }
-                                      return prev + 1
-                                    })
-                                  }, 100)
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-8 space-y-8">
+                    {/* Audio Player with Enhanced Transcript */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-indigo-100 shadow-lg">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+                            <Headphones className="w-5 h-5 text-white" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900">Audio Analysis</h3>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (isPlaying) {
+                                setIsPlaying(false)
+                                if (playbackInterval.current) {
+                                  clearInterval(playbackInterval.current)
                                 }
-                              }}
-                              className="text-gray-600 hover:text-gray-900"
-                            >
-                              <Play className="w-4 h-4" />
-                            </Button>
-                            <span className="text-sm text-gray-600 font-mono">00:00</span>
-                            <Progress 
-                              value={(playbackTime / 50) * 100} 
-                              className="w-32 h-2 bg-gray-200"
-                            />
-                            <span className="text-sm text-gray-600 font-mono">00:05</span>
-                            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                              <Download className="w-4 h-4" />
-                            </Button>
-                          </div>
+                              } else {
+                                setIsPlaying(true)
+                                setPlaybackTime(0)
+                                playbackInterval.current = setInterval(() => {
+                                  setPlaybackTime(prev => {
+                                    if (prev >= 50) {
+                                      setIsPlaying(false)
+                                      return 0
+                                    }
+                                    return prev + 1
+                                  })
+                                }, 100)
+                              }
+                            }}
+                            className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                          >
+                            {isPlaying ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
+                            {isPlaying ? "Pause" : "Play"}
+                          </Button>
+                          <span className="text-sm text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded">00:00</span>
+                          <Progress 
+                            value={(playbackTime / 50) * 100} 
+                            className="w-40 h-2"
+                          />
+                          <span className="text-sm text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded">00:05</span>
+                          <Button variant="outline" size="sm" className="border-gray-200 text-gray-600 hover:bg-gray-50">
+                            <Download className="w-4 h-4" />
+                          </Button>
                         </div>
-                        
-                        {/* Transcript with highlighting */}
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                          <p className="text-sm leading-relaxed">
-                            <span className="text-gray-900">We </span>
-                            <span className="text-gray-900">had </span>
-                            <span className="text-gray-900">a </span>
-                            <span className="text-gray-900">great </span>
-                            <span className="text-gray-900">time </span>
-                            <span className="text-gray-900">taking </span>
-                            <span className="text-gray-900">a </span>
-                            <span className="text-gray-900">long </span>
-                            <span className="text-gray-900">walk </span>
-                            <span className="text-gray-900">outside </span>
-                            <span className="text-gray-900">in </span>
-                            <span className="text-gray-900">the </span>
-                            <span className="bg-yellow-200 text-gray-900 px-1 rounded">morning</span>
-                          </p>
+                      </div>
+                      
+                      {/* Enhanced Transcript with highlighting */}
+                      <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border-2 border-dashed border-gray-200">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Volume2 className="w-5 h-5 text-indigo-600" />
+                          <span className="font-semibold text-gray-800">Speech Transcript</span>
+                        </div>
+                        <p className="text-lg leading-relaxed">
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">We </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">had </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">a </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">great </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">time </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">taking </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">a </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">long </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">walk </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">outside </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">in </span>
+                          <span className="text-gray-900 px-1 py-0.5 rounded bg-green-100">the </span>
+                          <span className="bg-yellow-200 text-gray-900 px-1 py-0.5 rounded border-l-4 border-yellow-500">morning</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Enhanced Two Column Layout */}
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                      {/* Types of Errors - Enhanced */}
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center shadow-md">
+                            <Target className="w-5 h-5 text-white" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900">Error Analysis</h3>
+                        </div>
+                        <div className="space-y-4">
+                          {[
+                            { type: "Mispronunciations", count: 1, color: "bg-orange-100 text-orange-800 border-orange-300", bgColor: "bg-orange-50" },
+                            { type: "Omissions", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" },
+                            { type: "Insertions", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" },
+                            { type: "Unexpected break", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" },
+                            { type: "Missing break", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" },
+                            { type: "Monotone", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200", bgColor: "bg-gray-50" }
+                          ].map((error, index) => (
+                            <div key={index} className={`flex items-center justify-between p-4 ${error.bgColor} border-2 border-gray-200 rounded-xl hover:shadow-md transition-all`}>
+                              <div className="flex items-center gap-3">
+                                <div className={`w-2 h-2 rounded-full ${error.count > 0 ? 'bg-orange-500' : 'bg-gray-400'}`}></div>
+                                <span className="font-medium text-gray-800">{error.type}</span>
+                              </div>
+                              <Badge className={`${error.color} font-bold text-base px-3 py-1`}>
+                                {error.count}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Enhanced Pronunciation Score Circle */}
+                        <div className="bg-white/90 backdrop-blur-sm border-2 border-green-200 rounded-2xl p-8 shadow-lg">
+                          <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+                              <CheckCircle className="w-5 h-5 text-white" />
+                            </div>
+                            <h4 className="text-xl font-bold text-gray-900">Pronunciation Score</h4>
+                          </div>
+                          <div className="flex items-center justify-center mb-6">
+                            <div className="relative w-40 h-40">
+                              <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 120 120">
+                                <circle
+                                  cx="60"
+                                  cy="60"
+                                  r="50"
+                                  fill="none"
+                                  stroke="#e5e7eb"
+                                  strokeWidth="10"
+                                />
+                                <circle
+                                  cx="60"
+                                  cy="60"
+                                  r="50"
+                                  fill="none"
+                                  stroke="url(#gradient)"
+                                  strokeWidth="10"
+                                  strokeDasharray={314}
+                                  strokeDashoffset={314 - (314 * 93) / 100}
+                                  strokeLinecap="round"
+                                  className="transition-all duration-2000 ease-out"
+                                />
+                                <defs>
+                                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#10b981" />
+                                    <stop offset="100%" stopColor="#059669" />
+                                  </linearGradient>
+                                </defs>
+                              </svg>
+                              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="text-3xl font-bold text-gray-900">93%</span>
+                                <span className="text-sm text-gray-600 font-medium">Overall Score</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center gap-8 text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
+                              <span className="text-gray-700 font-medium">0 – 59</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 bg-yellow-500 rounded-full shadow-sm"></div>
+                              <span className="text-gray-700 font-medium">60 – 79</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 bg-green-500 rounded-full shadow-sm"></div>
+                              <span className="text-gray-700 font-medium">80 – 100</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Two Column Layout */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Types of Errors */}
-                        <div className="space-y-4">
-                          <h3 className="text-lg font-semibold text-gray-900">Types of Errors</h3>
-                          <div className="space-y-3">
-                            {[
-                              { type: "Mispronunciations", count: 1, color: "bg-orange-100 text-orange-800 border-orange-200" },
-                              { type: "Omissions", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
-                              { type: "Insertions", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
-                              { type: "Unexpected break", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
-                              { type: "Missing break", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" },
-                              { type: "Monotone", count: 0, color: "bg-gray-100 text-gray-600 border-gray-200" }
-                            ].map((error, index) => (
-                              <div key={index} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
-                                <span className="text-sm font-medium text-gray-700">{error.type}</span>
-                                <Badge className={`${error.color} font-medium`}>
-                                  {error.count}
-                                </Badge>
-                              </div>
-                            ))}
+                      {/* Enhanced Score Breakdown */}
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+                            <Sparkles className="w-5 h-5 text-white" />
                           </div>
-
-                          {/* Pronunciation Score Circle */}
-                          <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
-                            <h4 className="text-base font-semibold text-gray-900 mb-4">Pronunciation score</h4>
-                            <div className="flex items-center justify-center">
-                              <div className="relative w-32 h-32">
-                                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="50"
-                                    fill="none"
-                                    stroke="#e5e7eb"
-                                    strokeWidth="8"
-                                  />
-                                  <circle
-                                    cx="60"
-                                    cy="60"
-                                    r="50"
-                                    fill="none"
-                                    stroke="#10b981"
-                                    strokeWidth="8"
-                                    strokeDasharray={314}
-                                    strokeDashoffset={314 - (314 * 93) / 100}
-                                    strokeLinecap="round"
-                                    className="transition-all duration-1000 ease-out"
-                                  />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                  <span className="text-2xl font-bold text-gray-900">93%</span>
-                                  <span className="text-xs text-gray-600">Overall Score</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-center gap-6 mt-4 text-xs">
-                              <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-red-500 rounded"></div>
-                                <span className="text-gray-600">0 – 59</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                                <span className="text-gray-600">60 – 79</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 bg-green-500 rounded"></div>
-                                <span className="text-gray-600">80 – 100</span>
-                              </div>
-                            </div>
-                          </div>
+                          <h3 className="text-xl font-bold text-gray-900">Performance Breakdown</h3>
                         </div>
-
-                        {/* Score Breakdown */}
-                        <div className="space-y-4">
-                          <h3 className="text-lg font-semibold text-gray-900">Score breakdown</h3>
-                          <div className="space-y-6">
-                            {[
-                              { label: "Accuracy score", score: 92, maxScore: 100, color: "bg-green-500" },
-                              { label: "Fluency score", score: 100, maxScore: 100, color: "bg-green-500" },
-                              { label: "Completeness score", score: 92, maxScore: 100, color: "bg-green-500" },
-                              { label: "Prosody score", score: 89.6, maxScore: 100, color: "bg-green-500" }
-                            ].map((item, index) => (
-                              <div key={index} className="space-y-2">
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="font-medium text-gray-700">{item.label}</span>
-                                  <span className="font-semibold text-gray-900">{item.score}/{item.maxScore}</span>
+                        <div className="space-y-8">
+                          {[
+                            { label: "Accuracy Score", score: 92, maxScore: 100, color: "from-green-500 to-emerald-600", bgColor: "bg-green-50", textColor: "text-green-700" },
+                            { label: "Fluency Score", score: 100, maxScore: 100, color: "from-blue-500 to-indigo-600", bgColor: "bg-blue-50", textColor: "text-blue-700" },
+                            { label: "Completeness Score", score: 92, maxScore: 100, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-50", textColor: "text-purple-700" },
+                            { label: "Prosody Score", score: 89.6, maxScore: 100, color: "from-orange-500 to-red-600", bgColor: "bg-orange-50", textColor: "text-orange-700" }
+                          ].map((item, index) => (
+                            <div key={index} className={`${item.bgColor} border-2 border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all`}>
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-3 h-3 bg-gradient-to-r ${item.color} rounded-full shadow-sm`}></div>
+                                  <span className="font-bold text-gray-800 text-lg">{item.label}</span>
                                 </div>
-                                <div className="w-full bg-gray-200 rounded-full h-3">
-                                  <div 
-                                    className={`h-3 rounded-full transition-all duration-1000 ease-out ${item.color}`}
-                                    style={{ width: `${(item.score / item.maxScore) * 100}%` }}
-                                  ></div>
-                                </div>
+                                <span className={`font-bold text-xl ${item.textColor} bg-white px-3 py-1 rounded-lg shadow-sm`}>
+                                  {item.score}/{item.maxScore}
+                                </span>
                               </div>
-                            ))}
-                          </div>
+                              <div className="w-full bg-white/80 rounded-full h-4 shadow-inner">
+                                <div 
+                                  className={`h-4 rounded-full bg-gradient-to-r ${item.color} transition-all duration-2000 ease-out shadow-sm`}
+                                  style={{ width: `${(item.score / item.maxScore) * 100}%` }}
+                                ></div>
+                              </div>
+                              <div className="mt-3 text-right">
+                                <span className={`text-sm font-medium ${item.textColor}`}>
+                                  {((item.score / item.maxScore) * 100).toFixed(1)}% Complete
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </TabsContent>
 
