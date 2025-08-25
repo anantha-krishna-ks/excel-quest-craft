@@ -940,10 +940,6 @@ const SpeechEvaluation = () => {
                       <span className="text-lg font-semibold text-gray-900">Record or Upload Audio</span>
                     </CardTitle>
                     <div className="flex items-center gap-4 mt-3">
-                      <Badge className="bg-amber-100 text-amber-800 border-amber-200">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Attempts: {speakingAttemptCount}/5
-                      </Badge>
                       <Badge className="bg-blue-100 text-blue-800 border-blue-200">
                         <Target className="w-3 h-3 mr-1" />
                         Max 20 seconds each
