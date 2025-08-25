@@ -352,7 +352,10 @@ const SpeechEvaluation = () => {
                               <span className="text-sm font-medium text-gray-500 mt-0.5">
                                 {index + 1}.
                               </span>
-                              <span className="text-sm text-gray-700 leading-relaxed">{text}</span>
+                              <span className="text-sm text-gray-700 leading-relaxed flex-1">{text}</span>
+                              {selectedText === text && (
+                                <CheckCircle className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
+                              )}
                             </div>
                           </div>
                         ))}
