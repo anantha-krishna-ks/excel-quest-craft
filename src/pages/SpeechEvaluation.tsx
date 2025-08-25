@@ -267,17 +267,17 @@ const SpeechEvaluation = () => {
         <Card className="border-gray-200 shadow-xl bg-white/90 backdrop-blur-sm">
           <Tabs defaultValue="reading" className="w-full">
             <div className="bg-gradient-to-r from-indigo-100 via-purple-100 to-indigo-100 border-b border-indigo-300/70 px-8 pt-8 pb-4">
-              <TabsList className="grid w-full grid-cols-2 bg-white/80 backdrop-blur-sm border-2 border-indigo-300 shadow-2xl h-20 rounded-xl p-2">
+              <TabsList className="grid w-full grid-cols-2 bg-white/80 backdrop-blur-sm border-2 border-indigo-300 shadow-2xl h-20 rounded-xl p-3 gap-3">
                 <TabsTrigger 
                   value="reading" 
-                  className="relative flex items-center justify-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-indigo-100 hover:scale-102 rounded-lg mx-1 h-full px-4 py-2"
+                  className="relative flex items-center justify-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-indigo-100 hover:scale-102 rounded-lg h-full px-4 py-2"
                 >
                   <FileText className="w-5 h-5" />
                   <span className="font-bold">Reading</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="speaking" 
-                  className="relative flex items-center justify-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-purple-100 hover:scale-102 rounded-lg mx-1 h-full px-4 py-2"
+                  className="relative flex items-center justify-center gap-3 text-gray-800 font-bold text-base transition-all duration-500 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-800 data-[state=active]:text-white data-[state=active]:shadow-2xl data-[state=active]:scale-105 data-[state=active]:z-10 hover:bg-purple-100 hover:scale-102 rounded-lg h-full px-4 py-2"
                 >
                   <Mic className="w-5 h-5" />
                   <span className="font-bold">Speaking</span>
