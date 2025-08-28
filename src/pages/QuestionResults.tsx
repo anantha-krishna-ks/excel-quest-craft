@@ -1382,7 +1382,7 @@ const QuestionResults = () => {
                     <Label className="text-sm font-medium text-gray-700">User Name</Label>
                   </div>
                   <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                    <span className="text-gray-900 font-medium">Shivaraj M</span>
+                    <span className="text-gray-900 font-medium">Robert Jones</span>
                   </div>
                 </div>
 

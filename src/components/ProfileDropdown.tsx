@@ -29,7 +29,7 @@ export function ProfileDropdown() {
         <Button variant="ghost" className="h-10 w-10 rounded-full">
           <Avatar className="h-8 w-8 shadow-lg">
             <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-sm">
-              SM
+              RJ
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -37,9 +37,9 @@ export function ProfileDropdown() {
       <DropdownMenuContent className="w-56 mr-4 mt-2 bg-card/95 backdrop-blur-xl border border-border/20" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Shivaraj Mi</p>
+            <p className="text-sm font-medium leading-none">Robert Jones</p>
             <p className="text-xs leading-none text-muted-foreground">
-              shivaraj@excelsoftt.com
+              robert@excelsoftt.com
             </p>
           </div>
         </DropdownMenuLabel>

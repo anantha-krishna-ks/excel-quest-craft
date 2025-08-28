@@ -131,7 +131,7 @@ const ItemGenerator = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Welcome Back,</span>
-                <span className="font-semibold text-primary">Shivaraj Mi</span>
+                <span className="font-semibold text-primary">Robert Jones</span>
               </div>
               <Button variant="ghost" size="icon" className="hover:scale-110 transition-transform duration-200">
                 <Bell className="h-5 w-5" />

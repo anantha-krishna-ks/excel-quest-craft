@@ -257,7 +257,7 @@ const Dashboard = () => {
           <div className="flex h-16 items-center justify-between px-6">
             <div className="flex items-center gap-4">
               <div>
-                <h1 className="text-lg font-bold text-gray-900">Welcome Back, Shivaraj M!</h1>
+                <h1 className="text-lg font-bold text-gray-900">Welcome Back, Robert Jones!</h1>
                 <p className="text-xs text-gray-600">Explore AI-powered tools to enhance your educational content creation</p>
               </div>
             </div>
