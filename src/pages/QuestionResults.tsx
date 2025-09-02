@@ -1,11 +1,10 @@
 import { useState } from "react"
-const API_QUIZ_URL = import.meta.env.VITE_API_QUIZ_URL;
 import { Link, useNavigate } from "react-router-dom"
-import {
-  ArrowLeft,
-  Zap,
-  CheckCircle2,
-  Clock,
+import { 
+  ArrowLeft, 
+  Zap, 
+  CheckCircle2, 
+  Clock, 
   BookOpen,
   FileText,
   FileSpreadsheet,
@@ -39,155 +38,46 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-
-import { getFromDB } from "@/api";
-import { useEffect } from "react";
-import axios from "axios";
-import { saveAs } from "file-saver"
-import { Document, Packer, Paragraph, TextRun } from "docx"
-
-
+import { useToast } from "@/hooks/use-toast"
 
 const QuestionResults = () => {
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("generate")
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false)
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
   const [questionType, setQuestionType] = useState("multiple-choice")
   const [selectedQuestionType, setSelectedQuestionType] = useState("Multiple Choice")
   const [isRegenerating, setIsRegenerating] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  type Question = {
-    id: number;
-    questionid?: number;
-    text: string;
-    type: string;
-    marks: number;
-    options: { id: string; text: string; isCorrect: boolean }[];
-    answer: string;
-    createdat: string;
-    [key: string]: any; // for any extra fields from API
-  };
-
-
-  // --- Load generated questions from localStorage if present ---
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [genResults, setGenResults] = useState<any>(null);
-
-  useEffect(() => {
-    // Try to load questionGenResults from localStorage
-    const stored = localStorage.getItem("questionGenResults");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        // Support both array and object with array inside
-        let arr = Array.isArray(parsed) ? parsed : (parsed.data || parsed.questions || parsed.result || []);
-        // If the array is in the root, or in .data/.questions/.result
-        if (Array.isArray(arr) && arr.length > 0 && arr[0].label) {
-          // Map to Question[] shape for display
-          setQuestions(arr.map((q, idx) => ({
-            id: idx + 1,
-            text: q.label || q.Question || q.text || '',
-            type: q.type || (q.values ? 'multiple-choice' : 'written-response'),
-            marks: q.MaxMarks || q.marks || 1,
-            options: Array.isArray(q.values) ? q.values.map((v, i) => ({
-              id: String.fromCharCode(65 + i),
-              text: v,
-              isCorrect: (q.CorrectAnswer || '').startsWith(String.fromCharCode(65 + i))
-            })) : [],
-            answer: q.CorrectAnswer || q.answer || '',
-            createdat: '',
-            LearningObjective: q.LearningObjective,
-            ReferenceInfo: q.ReferenceInfo,
-            BookName: q.BookName,
-            Feedback: Object.keys(q).filter(k => k.startsWith('FeedbackOption')).map(k => ({
-              option: k.replace('FeedbackOption', ''),
-              feedback: q[k]
-            })),
-            raw: q
-          })));
-          setGenResults(parsed);
-          return;
-        }
-      } catch { }
+  const [questions, setQuestions] = useState([
+    {
+      id: 1,
+      text: "Why are speculative risks generally excluded from insurance coverage, and how does this differ from the treatment of pure risks?",
+      type: "multiple-choice",
+      marks: 5,
+      options: [
+        { id: "A", text: "Pure risk involves only the possibility of loss or no loss, making it insurable.", isCorrect: true },
+        { id: "B", text: "Speculative risk involves the possibility of gain, making it insurable.", isCorrect: false },
+        { id: "C", text: "Pure risk involves both gain and loss, making it uninsurable.", isCorrect: false },
+        { id: "D", text: "Speculative risk involves only loss, making it insurable.", isCorrect: false }
+      ],
+      answer: "Speculative risks involve the possibility of gain or loss, making them unsuitable for insurance coverage, which is designed for predictable and measurable risks like pure risks. Pure risks only involve the chance of loss or no loss, allowing insurers to calculate premiums and manage claims effectively."
+    },
+    {
+      id: 2,
+      text: "What role does statistical predictability play in the insurability of pure risks versus speculative risks?",
+      type: "multiple-choice",
+      marks: 5,
+      options: [
+        { id: "A", text: "Statistical predictability makes both pure and speculative risks equally insurable.", isCorrect: false },
+        { id: "B", text: "Pure risks are statistically predictable, allowing insurers to calculate accurate premiums.", isCorrect: true },
+        { id: "C", text: "Speculative risks are more predictable than pure risks.", isCorrect: false },
+        { id: "D", text: "Statistical predictability is irrelevant to insurance coverage.", isCorrect: false }
+      ],
+      answer: "Pure risks are statistically predictable because they follow established patterns of loss occurrence, enabling insurers to calculate accurate premiums and maintain financial stability. Speculative risks involve unpredictable outcomes that could result in gains or losses, making them unsuitable for traditional insurance models."
     }
-    // fallback: keep existing questions state
-  }, []);
-
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setLoading(true);
-      setError(null);
-
-      let userInfo: Record<string, any> = {};
-      try {
-        userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      } catch (e) {
-        userInfo = {};
-      }
-
-      const input = {
-        custcode: localStorage.getItem('custcode') || userInfo["customerCode"] || "ES",
-        orgcode: localStorage.getItem('orgcode') || userInfo["orgCode"] || "Exc195",
-        usercode: localStorage.getItem('usercode') || userInfo["userCode"] || "Adm488",
-        appcode: localStorage.getItem('appcode') || "IG",
-        booknameid: Number(localStorage.getItem('booknameid')) || 2,
-        chaptercode: localStorage.getItem('chaptercode') || "",
-        locode: localStorage.getItem('locode') || "",
-        questiontypeid: Number(localStorage.getItem('questiontypeid')) || 0,
-        taxonomyid: Number(localStorage.getItem('taxonomyid')) || 0,
-        difficultlevelid: Number(localStorage.getItem('difficultlevelid')) || 0,
-        questionrequestid: Number(localStorage.getItem('questionrequestid')) || 0,
-        questionid: Number(localStorage.getItem('questionid')) || 1,
-        sourcetype: Number(localStorage.getItem('sourcetype')) || 0,
-        pagesize: Number(localStorage.getItem('pagesize')) || 0,
-        pageno: Number(localStorage.getItem('pageno')) || 0,
-        usertypeid: Number(localStorage.getItem('usertypeid')) || 1,
-        searchtext: ""
-      };
-
-      try {
-        const data = await getFromDB(input);
-        let questionsArr = [];
-        // Defensive: handle both possible API shapes
-        if (data && Array.isArray(data.question_xml)) {
-          questionsArr = data.question_xml.map((item) => {
-            if (Array.isArray(item) && item.length === 3 && typeof item[2] === 'object') {
-              // Map to expected fields for table, fallback for missing fields
-              return {
-                id: item[0],
-                questionid: item[1],
-                text: item[2].Question || item[2].question || item[2].text || item[2].QuestionText || 'No question text',
-                type: item[2].QuestionType || item[2].type || item[2].questiontype || item[2].questiontypeid || 'N/A',
-                marks: item[2].Marks || item[2].marks || 1,
-                options: Array.isArray(item[2].Options) ? item[2].Options : Array.isArray(item[2].options) ? item[2].options : [],
-                answer: item[2].Answer || item[2].answer || '',
-                createdat: item[2].CreatedAt || item[2].createdat || item[2].created || item[2].date || item[2].created_date || item[2].createdDate || '',
-                Difficulty: item[2].Difficulty || item[2].difficulty || item[2].difficultylevel || 'N/A',
-                Topic: item[2].Topic || item[2].topic || item[2].topicname || item[2].subject || 'N/A',
-                QuestionID: item[2].QuestionID || item[2].questionid || item[2].id || '',
-                QuestionType: item[2].QuestionType || item[2].type || item[2].questiontype || item[2].questiontypeid || 'N/A',
-                ...item[2],
-              };
-            }
-            return null;
-          }).filter(Boolean);
-        } else if (Array.isArray(data)) {
-          questionsArr = data;
-        }
-        setQuestions(questionsArr);
-      } catch (err) {
-        setError("Failed to load questions");
-        setQuestions([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQuestions();
-  }, []);
-
-
+  ])
   const [keyPoints, setKeyPoints] = useState([
     "Speculative risks - Include the potential for financial gain, which is incompatible with insurance principles.",
     "Pure risks - Only involve loss or no loss, making them insurable and predictable.",
@@ -199,30 +89,13 @@ const QuestionResults = () => {
   const stats = [
     {
       title: "Remaining Tokens",
-      value: (() => {
-        // Try to get from localStorage first
-        let val = localStorage.getItem('remainingTokens');
-        if (val && !isNaN(Number(val)) && Number(val) > 0) return val;
-        // Try to get from usageStats (set by ItemGeneration)
-        try {
-          const usageStatsRaw = localStorage.getItem('usageStats');
-          if (usageStatsRaw) {
-            const usageStats = JSON.parse(usageStatsRaw);
-            // usageStats[2] is "Balance usage" as per ItemGeneration
-            if (Array.isArray(usageStats) && usageStats.length > 2 && !isNaN(Number(usageStats[2]))) {
-              return usageStats[2].toString();
-            }
-          }
-        } catch { }
-        // Fallback default
-        return "2200";
-      })(),
+      value: "2200",
       icon: <Zap className="w-5 h-5 text-blue-600" />,
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200"
     },
     {
-      title: "Questions Generated",
+      title: "Questions Generated", 
       value: questions.length.toString(),
       icon: <CheckCircle2 className="w-5 h-5 text-green-600" />,
       bgColor: "bg-green-50",
@@ -230,26 +103,26 @@ const QuestionResults = () => {
     },
     {
       title: "Generation Time",
-      value: "2.3 seconds",
+      value: "2.3 seconds", 
       icon: <Clock className="w-5 h-5 text-purple-600" />,
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200"
     },
     {
       title: "Knowledge Base",
-      value: localStorage.getItem('bookTitle') || "",
+      value: "Cyber Risk",
       icon: <BookOpen className="w-5 h-5 text-orange-600" />,
-      bgColor: "bg-orange-50",
+      bgColor: "bg-orange-50", 
       borderColor: "border-orange-200"
     }
   ]
 
   const generateNewQuestions = async () => {
     setIsRegenerating(true)
-
+    
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 2000))
-
+    
     // Generate new questions based on the current question type
     const newQuestions = questionType === "multiple-choice" ? [
       {
@@ -296,8 +169,8 @@ const QuestionResults = () => {
         answer: "The principle of indemnity ensures that insurance compensation restores the insured to their financial position before the loss, preventing profit from insurance claims. This works well with pure risks because the loss is measurable and the goal is restoration, not enrichment. With speculative risks, applying indemnity would be problematic because these risks involve potential gains that cannot be measured or predicted. If someone takes a speculative risk expecting profit but suffers a loss, compensating them would essentially guarantee the gain they hoped for while eliminating the risk they voluntarily assumed, creating moral hazard and transforming insurance into a gambling mechanism."
       }
     ]
-
-
+    
+    setQuestions(prevQuestions => [...prevQuestions, ...newQuestions])
     setIsRegenerating(false)
   }
 
@@ -311,45 +184,27 @@ const QuestionResults = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">AL</span>
               </div>
-              <img
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                alt="AI-Levate"
+              <img 
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                alt="AI-Levate" 
                 className="h-5 w-auto"
               />
-              <span className="text-sm text-gray-500">{localStorage.getItem('bookTitle') || ""}</span>
+              <span className="text-sm text-gray-500">Cyber Risk</span>
             </div>
           </div>
-
+          
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-purple-600 rounded flex items-center justify-center">
                 <span className="text-white text-xs">✦</span>
               </div>
-              <span className="text-sm text-purple-600 font-medium">{localStorage.getItem('bookTitle') || ''}</span>
+              <span className="text-sm text-purple-600 font-medium">Cyber Risk</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
                 <span className="text-white text-xs">⚡</span>
               </div>
-              <span className="text-sm text-blue-600 font-medium">
-                {(() => {
-                  // Try to get from localStorage first
-                  let val = localStorage.getItem('remainingTokens');
-                  if (val && !isNaN(Number(val)) && Number(val) > 0) return `${val} Tokens`;
-                  // Try to get from usageStats (set by ItemGeneration)
-                  try {
-                    const usageStatsRaw = localStorage.getItem('usageStats');
-                    if (usageStatsRaw) {
-                      const usageStats = JSON.parse(usageStatsRaw);
-                      if (Array.isArray(usageStats) && usageStats.length > 2 && !isNaN(Number(usageStats[2]))) {
-                        return `${usageStats[2]} Tokens`;
-                      }
-                    }
-                  } catch { }
-                  // Fallback default
-                  return '2200 Tokens';
-                })()}
-              </span>
+              <span className="text-sm text-blue-600 font-medium">7,762 Tokens</span>
             </div>
             <Link to="/item-generation">
               <Button variant="ghost" size="sm" className="text-gray-600">
@@ -357,9 +212,9 @@ const QuestionResults = () => {
                 Back to Knowledge Base
               </Button>
             </Link>
-            <Button
-              variant="ghost"
-              size="sm"
+            <Button 
+              variant="ghost" 
+              size="sm" 
               className="text-gray-600"
               onClick={() => {
                 localStorage.removeItem('authToken')
@@ -376,7 +231,35 @@ const QuestionResults = () => {
 
       {/* Main Content */}
       <div className="p-6 max-w-7xl mx-auto">
-        {/* No navigation tabs, only show results */}
+        {/* Navigation Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-2 max-w-lg">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setActiveTab("generate")}
+                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === "generate"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <Sparkles className="h-4 w-4" />
+                Generate Questions
+              </button>
+              <button
+                onClick={() => setActiveTab("repository")}
+                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                  activeTab === "repository"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <FileText className="h-4 w-4" />
+                Question Repository
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -391,410 +274,234 @@ const QuestionResults = () => {
           ))}
         </div>
 
+        {/* Question Generation Parameters */}
+        <Card className="p-6 bg-white border border-gray-200 shadow-sm mb-8">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm">?</span>
+            <h3 className="text-lg font-semibold text-gray-900">Question Generation Parameters</h3>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">Study</label>
+              <Select defaultValue="defining-risk">
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="defining-risk">1. Defining Risk and C...</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">Learning Outcomes</label>
+              <Select defaultValue="explain-pure">
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="explain-pure">1. Explain why pure ri...</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">Taxonomy</label>
+              <Select defaultValue="understand">
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="understand">Understand</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">Number of Questions</label>
+              <Select defaultValue="5">
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">Marks</label>
+              <Select defaultValue="1">
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm text-gray-600 block mb-2">Question Type</label>
+              <Select defaultValue="multiple-choice" onValueChange={(value) => {
+                setQuestionType(value)
+                setSelectedQuestionType(value === "multiple-choice" ? "Multiple Choice" : "Written Response")
+              }}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="multiple-choice">1. Multiple Choice</SelectItem>
+                  <SelectItem value="written-response">2. Written Response</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={generateNewQuestions}
+              disabled={isRegenerating}
+            >
+              <RotateCcw className={`w-4 h-4 mr-2 ${isRegenerating ? 'animate-spin' : ''}`} />
+              {isRegenerating ? 'Generating...' : 'Regenerate'}
+            </Button>
+            <Button 
+              variant="outline" 
+              className="text-gray-600"
+              onClick={() => navigate('/question-generator/cyber-risk')}
+            >
+              Back to Setup
+            </Button>
+          </div>
+        </Card>
 
-        {/* Generated Questions from localStorage (AI results) */}
+        {/* Generated Questions */}
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+          <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Generated Questions</h3>
-              <p className="text-sm text-gray-500">These are the latest AI-generated questions based on your request.</p>
+              <p className="text-sm text-gray-500">Review and manage your generated questions</p>
             </div>
-            <div className="flex gap-2 mt-2 md:mt-0">
-              <Button
-                className="bg-green-100 hover:bg-green-200 text-green-800 border border-green-300"
-                onClick={async () => {
-                  // Save all questions to external API in batch
-                  try {
-                    const raw = localStorage.getItem("questionGenResults");
-                    let data = JSON.parse(raw || "null");
-                    let results = [];
-                    if (Array.isArray(data)) {
-                      results = data;
-                    } else if (data && Array.isArray(data.data)) {
-                      results = data.data;
-                    } else if (data && Array.isArray(data.questions)) {
-                      results = data.questions;
-                    } else if (data && Array.isArray(data.result)) {
-                      results = data.result;
-                    } else if (data && typeof data === 'object') {
-                      const keys = Object.keys(data);
-                      if (keys.length > 1 && keys.every(k => !isNaN(Number(k)))) {
-                        const arrLike = keys.map(k => data[k]);
-                        if (arrLike.every(q => typeof q === 'object' && (q.label || q.Question || q.text))) {
-                          results = arrLike;
-                        }
-                      } else if (data.label || data.Question || data.text) {
-                        results = [data];
-                      }
-                    }
-                    if (!Array.isArray(results)) results = [];
-                    results = results.filter(Boolean);
-                    if (!results.length) {
-                      window.alert('No questions to save.');
-                      return;
-                    }
-                    // Prepare payload for API (get values from localStorage, fallback to defaults)
-                    const usercode = localStorage.getItem('usercode') || 'Adm488';
-                    const orgcode = localStorage.getItem('orgcode') || 'Exc195';
-                    const custcode = localStorage.getItem('custcode') || 'ES';
-                    const appcode = localStorage.getItem('appcode') || 'IG';
-                    const booknameid = Number(localStorage.getItem('booknameid')) || 2;
-                    const questiontypeid = Number(localStorage.getItem('questiontypeid')) || 1;
-                    const taxonomyid = Number(localStorage.getItem('taxonomyid')) || 0;
-                    const difficultlevelid = Number(localStorage.getItem('difficultlevelid')) || 1;
-                    const chaptercode = localStorage.getItem('chaptercode') || 'S11';
-                    const sourcetype = Number(localStorage.getItem('sourcetype')) || 1;
-                    // Map results to API payload structure
-                    const questionsPayload = results.map((q, idx) => ({
-                      usercode,
-                      orgcode,
-                      custcode,
-                      appcode,
-                      referenceinfo: q.ReferenceInfo || q.referenceinfo || '',
-                      booknameid,
-                      noofquestions: Number(localStorage.getItem('noofquestions')) || 1,
-                      questiontypeid,
-                      taxonomyid,
-                      questiondata: q,
-                      AIquestiondata: q,
-                      difficultlevelid,
-                      chaptercode,
-                      locode: localStorage.getItem('locode') || '',
-                      sourcetype: Number(localStorage.getItem('sourcetype')) || sourcetype,
-                      questionguid: q.questionguid || `Q${Date.now()}_${idx}`
-                    }));
-                    const payload = { questionsPayload };
-                    const res = await fetch('https://ai.excelsoftcorp.com/QuizApi/insert_to_db', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify(payload)
-                    });
-                    if (res.ok) {
-                      const result = await res.json();
-                      window.alert(result.message || 'Questions inserted successfully');
-                    } else {
-                      let errText = await res.text();
-                      window.alert('Failed to save questions: ' + errText);
-                    }
-                  } catch (e) {
-                    window.alert('Failed to save all questions.');
-                  }
-                }}
-              >
-                Save All
+            <div className="flex gap-3">
+              <Button variant="outline" className="text-gray-600">
+                <FileText className="w-4 h-4 mr-2" />
+                Export to Word
               </Button>
-              <Button
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-300"
-                onClick={async () => {
-                  // Export all questions to Word
-                  try {
-                    const raw = localStorage.getItem("questionGenResults");
-                    let data = JSON.parse(raw || "null");
-                    let results = [];
-                    if (Array.isArray(data)) {
-                      results = data;
-                    } else if (data && Array.isArray(data.data)) {
-                      results = data.data;
-                    } else if (data && Array.isArray(data.questions)) {
-                      results = data.questions;
-                    } else if (data && Array.isArray(data.result)) {
-                      results = data.result;
-                    } else if (data && typeof data === 'object') {
-                      const keys = Object.keys(data);
-                      if (keys.length > 1 && keys.every(k => !isNaN(Number(k)))) {
-                        const arrLike = keys.map(k => data[k]);
-                        if (arrLike.every(q => typeof q === 'object' && (q.label || q.Question || q.text))) {
-                          results = arrLike;
-                        }
-                      } else if (data.label || data.Question || data.text) {
-                        results = [data];
-                      }
-                    }
-                    if (!Array.isArray(results)) results = [];
-                    results = results.filter(Boolean);
-                    if (!results.length) {
-                      window.alert('No questions to export.');
-                      return;
-                    }
-                    // Get book title from localStorage, fallback to 'questions'
-                    let bookTitle = localStorage.getItem('bookTitle') || 'questions';
-                    // Clean filename: remove illegal characters
-                    bookTitle = bookTitle.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/\s+/g, '_');
-                    // Dynamically import docx
-                    const docx = await import('docx');
-                    const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
-                    const doc = new Document({
-                      sections: [
-                        {
-                          properties: {},
-                          children: [
-                            new Paragraph({
-                              text: 'Generated Questions',
-                              heading: HeadingLevel.HEADING_1
-                            }),
-                            ...results.map((q, idx) => [
-                              new Paragraph({
-                                text: `Question ${idx + 1}:`,
-                                heading: HeadingLevel.HEADING_2
-                              }),
-                              new Paragraph(q.label || q.Question || q.text || q.QuestionText || ''),
-                              ...(q.values && Array.isArray(q.values) && q.values.length > 0
-                                ? [
-                                  new Paragraph('Options:'),
-                                  ...q.values.map((opt, i) => new Paragraph(`${String.fromCharCode(65 + i)}. ${opt}`)),
-                                  new Paragraph(`Correct Answer: ${q.CorrectAnswer || ''}`)
-                                ]
-                                : [
-                                  new Paragraph(`Sample Answer: ${q.CorrectAnswer || q.answer || ''}`)
-                                ]),
-                              ...(q.LearningObjective ? [new Paragraph(`Learning Objective: ${q.LearningObjective}`)] : []),
-                              ...(q.ReferenceInfo ? [new Paragraph(`Reference Info: ${q.ReferenceInfo}`)] : []),
-                              ...(q.BookName ? [new Paragraph(`Book Name: ${q.BookName}`)] : []),
-                              new Paragraph('')
-                            ]).flat()
-                          ]
-                        }
-                      ]
-                    });
-                    const blob = await Packer.toBlob(doc);
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${bookTitle}.docx`;
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                      document.body.removeChild(a);
-                      window.URL.revokeObjectURL(url);
-                    }, 100);
-                  } catch (e) {
-                    window.alert('Failed to export to Word.');
-                  }
-                }}
-              >
-                Export All to Word
+              <Button variant="outline" className="text-gray-600">
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Export to Excel
               </Button>
-              <Button
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-300"
-                onClick={async () => {
-                  // Export all questions to Excel
-                  try {
-                    const raw = localStorage.getItem("questionGenResults");
-                    let data = JSON.parse(raw || "null");
-                    let results = [];
-                    if (Array.isArray(data)) {
-                      results = data;
-                    } else if (data && Array.isArray(data.data)) {
-                      results = data.data;
-                    } else if (data && Array.isArray(data.questions)) {
-                      results = data.questions;
-                    } else if (data && Array.isArray(data.result)) {
-                      results = data.result;
-                    } else if (data && typeof data === 'object') {
-                      const keys = Object.keys(data);
-                      if (keys.length > 1 && keys.every(k => !isNaN(Number(k)))) {
-                        const arrLike = keys.map(k => data[k]);
-                        if (arrLike.every(q => typeof q === 'object' && (q.label || q.Question || q.text))) {
-                          results = arrLike;
-                        }
-                      } else if (data.label || data.Question || data.text) {
-                        results = [data];
-                      }
-                    }
-                    if (!Array.isArray(results)) results = [];
-                    results = results.filter(Boolean);
-                    if (!results.length) {
-                      window.alert('No questions to export.');
-                      return;
-                    }
-                    // Get book title from localStorage, fallback to 'questions'
-                    let bookTitle = localStorage.getItem('bookTitle') || 'questions';
-                    // Clean filename: remove illegal characters
-                    bookTitle = bookTitle.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/\s+/g, '_');
-                    // Dynamically import xlsx
-                    const XLSX = await import('xlsx');
-                    // Prepare worksheet data with options and correct answer columns
-                    const wsData = [
-                      [
-                        'No.',
-                        'Question',
-                        'Option A',
-                        'Option B',
-                        'Option C',
-                        'Option D',
-                        'Correct Answer',
-                        'Sample Answer',
-                        'Learning Objective',
-                        'Reference Info',
-                        'Book Name'
-                      ],
-                      ...results.map((q, idx) => {
-                        const options = Array.isArray(q.values) ? q.values : (Array.isArray(q.options) ? q.options : []);
-                        return [
-                          idx + 1,
-                          q.label || q.Question || q.text || q.QuestionText || '',
-                          options[0] || '',
-                          options[1] || '',
-                          options[2] || '',
-                          options[3] || '',
-                          q.CorrectAnswer || q.answer || '',
-                          (!options.length) ? (q.CorrectAnswer || q.answer || '') : '',
-                          q.LearningObjective || '',
-                          q.ReferenceInfo || '',
-                          q.BookName || ''
-                        ];
-                      })
-                    ];
-                    const ws = XLSX.utils.aoa_to_sheet(wsData);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Questions');
-                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${bookTitle}.xlsx`;
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                      document.body.removeChild(a);
-                      window.URL.revokeObjectURL(url);
-                    }, 100);
-                  } catch (e) {
-                    window.alert('Failed to export to Excel.');
-                  }
-                }}
+              <Button 
+                className="bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => setIsSuccessDialogOpen(true)}
               >
-                Export All to Excel
+                <Database className="w-4 h-4 mr-2" />
+                Save Data
               </Button>
             </div>
           </div>
-          {/* Display questions from localStorage (questionGenResults) */}
-          {(() => {
-            let results = [];
-            try {
-              const raw = localStorage.getItem("questionGenResults");
-              const data = JSON.parse(raw || "null");
-              // Debug: log the raw value and parsed data
-              if (typeof window !== 'undefined') {
-                console.log('QuestionResults: raw localStorage value', raw);
-                console.log('QuestionResults: parsed data', data);
-              }
-              // Try all common array locations
-              if (Array.isArray(data)) {
-                results = data;
-              } else if (data && Array.isArray(data.data)) {
-                results = data.data;
-              } else if (data && Array.isArray(data.questions)) {
-                results = data.questions;
-              } else if (data && Array.isArray(data.result)) {
-                results = data.result;
-              } else if (data && typeof data === 'object') {
-                // If the object has multiple numbered keys (0,1,2,3...), treat as array-like
-                const keys = Object.keys(data);
-                if (keys.length > 1 && keys.every(k => !isNaN(Number(k)))) {
-                  // Only treat as array if all values are objects with a question/label property
-                  const arrLike = keys.map(k => data[k]);
-                  if (arrLike.every(q => typeof q === 'object' && (q.label || q.Question || q.text))) {
-                    results = arrLike;
-                  }
-                } else if (data.label || data.Question || data.text) {
-                  results = [data];
-                }
-              }
-            } catch { }
-            // Flatten if any nested arrays (defensive)
-            if (Array.isArray(results) && results.length === 1 && Array.isArray(results[0])) {
-              results = results[0];
-            }
-            // Defensive: if results is not an array but is a non-null object, wrap it
-            if (!Array.isArray(results) && results && typeof results === 'object') {
-              results = [results];
-            }
-            // Remove any null/undefined entries
-            results = Array.isArray(results) ? results.filter(Boolean) : [];
-            // Debug: log the results array
-            if (typeof window !== 'undefined') {
-              console.log('QuestionResults: extracted results', results);
-            }
-            if (!results || results.length === 0) {
-              return <div className="p-8 text-center text-gray-500">No generated questions found. Please generate questions first.</div>;
-            }
-            return results.map((q, idx) => (
-              <Card key={q.id || idx} className="mb-6 border border-gray-200">
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="bg-black text-white px-3 py-1 rounded text-sm font-medium">Question {idx + 1}</span>
-                    {q.MaxMarks && <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm">{q.MaxMarks} Marks</span>}
+
+          {/* Questions List */}
+          {questions.map((question, index) => (
+            <Card key={question.id} className="mb-6 border border-gray-200">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="bg-black text-white px-3 py-1 rounded text-sm font-medium">Question {index + 1}</span>
+                    <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm">{question.marks} Marks</span>
                     <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm">
-                      {q.QuestionType || (q.values ? "Multiple Choice" : "Written Response")}
+                      {question.type === "multiple-choice" ? "Multiple Choice" : "Written Response"}
                     </span>
-
-
                   </div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">{q.label || q.Question || q.text || q.QuestionText}</h4>
-                  {q.values && Array.isArray(q.values) && q.values.length > 0 ? (
-                    <>
-                      <div className="space-y-3 mb-4">
-                        {q.values.map((option, i) => (
-                          <div
-                            key={i}
-                            className={`flex items-center gap-3 p-3 rounded-lg ${q.CorrectAnswer && q.CorrectAnswer.startsWith(String.fromCharCode(65 + i)) ? 'bg-green-50 border border-green-200' : 'border border-gray-200'}`}
-                          >
-                            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${q.CorrectAnswer && q.CorrectAnswer.startsWith(String.fromCharCode(65 + i)) ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700'}`}>{String.fromCharCode(65 + i)}</span>
-                            <span className={q.CorrectAnswer && q.CorrectAnswer.startsWith(String.fromCharCode(65 + i)) ? 'text-gray-900' : 'text-gray-700'}>{option}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
-                        <p className="text-sm text-blue-900">
-                          <strong>Correct Answer:</strong> {q.CorrectAnswer}
-                        </p>
-                      </div>
-                      {/* Feedback for each option if present */}
-                      {Object.keys(q).filter(k => k.startsWith('FeedbackOption')).length > 0 && (
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-2">
-                          <div className="font-medium mb-1">Feedback:</div>
-                          <ul className="list-disc ml-6">
-                            {Object.keys(q).filter(k => k.startsWith('FeedbackOption')).map((k, i) => (
-                              <li key={i}><strong>{k.replace('FeedbackOption', '')}:</strong> {q[k]}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-2">
-                      <div className="flex items-start gap-3 mb-3">
-                        <MessageSquare className="w-5 h-5 text-green-600 mt-0.5" />
-                        <h5 className="font-medium text-green-900">Sample Answer:</h5>
-                      </div>
-                      <p className="text-green-800 leading-relaxed">{q.CorrectAnswer || q.answer}</p>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    {q.LearningObjective && (
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs">
-                        <span className="font-medium">Learning Objective:</span> {q.LearningObjective}
-                      </div>
-                    )}
-                    {q.ReferenceInfo && (
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs">
-                        <span className="font-medium">Reference Info:</span> {q.ReferenceInfo}
-                      </div>
-                    )}
-                    {q.BookName && (
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs">
-                        <span className="font-medium">Book Name:</span> {q.BookName}
-                      </div>
-                    )}
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-600"
+                      onClick={() => setIsEditDialogOpen(true)}
+                    >
+                      <Edit3 className="w-4 h-4 mr-1" />
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-purple-600"
+                      onClick={() => setIsPreviewDialogOpen(true)}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Preview
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-red-600"
+                      onClick={() => {
+                        if (confirm("Are you sure you want to delete this question?")) {
+                          setQuestions(prevQuestions => prevQuestions.filter(q => q.id !== question.id))
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
-              </Card>
-            ));
-          })()}
+                
+                <h4 className="text-lg font-medium text-gray-900 mb-4">
+                  {index + 1}. {question.text}
+                </h4>
+                
+                {question.type === "multiple-choice" ? (
+                  <>
+                    <div className="space-y-3 mb-4">
+                      {question.options.map((option) => (
+                        <div 
+                          key={option.id}
+                          className={`flex items-center gap-3 p-3 rounded-lg ${
+                            option.isCorrect 
+                              ? 'bg-green-50 border border-green-200' 
+                              : 'border border-gray-200'
+                          }`}
+                        >
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
+                            option.isCorrect 
+                              ? 'bg-green-600 text-white' 
+                              : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {option.id}
+                          </span>
+                          <span className={option.isCorrect ? 'text-gray-900' : 'text-gray-700'}>
+                            {option.text}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-sm text-blue-900">
+                        <strong>Correct Answer:</strong> {question.options.find(opt => opt.isCorrect)?.id}. {question.options.find(opt => opt.isCorrect)?.text}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <MessageSquare className="w-5 h-5 text-green-600 mt-0.5" />
+                      <h5 className="font-medium text-green-900">Sample Answer:</h5>
+                    </div>
+                    <p className="text-green-800 leading-relaxed">
+                      {question.answer}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          ))}
+
         </div>
 
         {/* Need More Questions */}
@@ -804,14 +511,7 @@ const QuestionResults = () => {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Need more questions?</h3>
           <p className="text-gray-600 mb-6">Generate additional questions with the same or different parameters</p>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.location.href = '/question-generator/cyber-risk';
-              }
-            }}
-          >
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
             Generate More Questions
           </Button>
         </Card>
@@ -910,7 +610,7 @@ const QuestionResults = () => {
                     <Settings2 className="h-4 w-4" />
                     Filters & Search
                   </div>
-
+                  
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">Source Type</label>
@@ -975,8 +675,8 @@ const QuestionResults = () => {
                     <label className="text-sm font-medium text-gray-700">Search Questions</label>
                     <div className="relative">
                       <Sparkles className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <input
-                        placeholder="Search questions, topics, or content..."
+                      <input 
+                        placeholder="Search questions, topics, or content..." 
                         className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
@@ -1027,79 +727,114 @@ const QuestionResults = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* Render API data here */}
-                      {loading ? (
-                        <tr>
-                          <td colSpan={9} className="p-4 text-center text-gray-500">Loading...</td>
-                        </tr>
-                      ) : error ? (
-                        <tr>
-                          <td colSpan={9} className="p-4 text-center text-red-500">{error}</td>
-                        </tr>
-                      ) : questions.length === 0 ? (
-                        <tr>
-                          <td colSpan={9} className="p-4 text-center text-gray-500">No questions found.</td>
-                        </tr>
-                      ) : (
-                        questions.map((q, idx) => (
-                          <tr key={q.id || q.questionid || idx} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className="p-4">
-                              <input type="checkbox" className="rounded border-gray-300" />
-                            </td>
-                            <td className="p-4 text-sm font-medium text-gray-900">{idx + 1}</td>
-                            <td className="p-4 text-xs font-mono text-gray-600">{q.QuestionID || q.questionid || q.id}</td>
-                            <td className="p-4 text-sm text-gray-900 max-w-md">
-                              <p className="truncate">{q.Question || q.question || q.text || q.QuestionText}</p>
-                            </td>
-                            <td className="p-4 text-sm text-gray-700">{q.QuestionType || q.type || q.questiontype || q.questiontypeid || 'N/A'}</td>
-                            <td className="p-4 text-sm" style={{ color: "#7e2a0c" }}>{q.Topic || q.topic || q.topicname || q.subject || 'N/A'}</td>
-                            <td className="p-4">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${q.Difficulty === 'Easy' ? 'bg-green-100 text-green-800' : q.Difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' : q.Difficulty === 'Hard' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-700'}`}>
-                                {q.Difficulty || q.difficulty || q.difficultylevel || 'N/A'}
-                              </span>
-                            </td>
-                            <td className="p-4 text-sm text-gray-500">
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {(() => {
-                                  // Try all possible date fields
-                                  const dateVal = q.CreatedAt || q.createdat || q.created || q.date || q.created_date || q.createdDate;
-                                  if (!dateVal || typeof dateVal !== 'string' || dateVal.trim() === '' || dateVal === 'null' || dateVal === 'undefined') return 'N/A';
-                                  // Try parsing as date string
-                                  const parsed = new Date(dateVal);
-                                  if (!isNaN(parsed.getTime())) return parsed.toLocaleString();
-                                  // Try parsing as timestamp
-                                  if (!isNaN(Number(dateVal))) {
-                                    const ts = Number(dateVal);
-                                    const parsedTs = new Date(ts);
-                                    if (!isNaN(parsedTs.getTime())) return parsedTs.toLocaleString();
-                                  }
-                                  // Try parsing as ISO string
-                                  try {
-                                    const iso = new Date(Date.parse(dateVal));
-                                    if (!isNaN(iso.getTime())) return iso.toLocaleString();
-                                  } catch { }
-                                  // Fallback: show N/A, never blank
-                                  return 'N/A';
-                                })()}
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-1">
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <Edit3 className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
+                      <tr className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-4">
+                          <input type="checkbox" className="rounded border-gray-300" />
+                        </td>
+                        <td className="p-4 text-sm font-medium text-gray-900">1</td>
+                        <td className="p-4 text-xs font-mono text-gray-600">C20_V2024_S11_L00_MC_L2_EN_ID2426</td>
+                        <td className="p-4 text-sm text-gray-900 max-w-md">
+                          <p className="truncate">What characteristic of pure risk makes it more acceptable for insurer...</p>
+                        </td>
+                        <td className="p-4 text-sm text-gray-700">Multiple Choice</td>
+                        <td className="p-4 text-sm" style={{ color: "#7e2a0c" }}>Risk Management</td>
+                        <td className="p-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            Medium
+                          </span>
+                        </td>
+                        <td className="p-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            2 hours ago
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Edit3 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-4">
+                          <input type="checkbox" className="rounded border-gray-300" />
+                        </td>
+                        <td className="p-4 text-sm font-medium text-gray-900">2</td>
+                        <td className="p-4 text-xs font-mono text-gray-600">C20_V2024_S11_L01_TF_L1_EN_ID2427</td>
+                        <td className="p-4 text-sm text-gray-900 max-w-md">
+                          <p className="truncate">Pure risk always results in a loss or no loss situation.</p>
+                        </td>
+                        <td className="p-4 text-sm text-gray-700">True/False</td>
+                        <td className="p-4 text-sm" style={{ color: "#7e2a0c" }}>Risk Fundamentals</td>
+                        <td className="p-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Easy
+                          </span>
+                        </td>
+                        <td className="p-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            1 day ago
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Edit3 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="p-4">
+                          <input type="checkbox" className="rounded border-gray-300" />
+                        </td>
+                        <td className="p-4 text-sm font-medium text-gray-900">3</td>
+                        <td className="p-4 text-xs font-mono text-gray-600">C20_V2024_S11_L02_SA_L3_EN_ID2428</td>
+                        <td className="p-4 text-sm text-gray-900 max-w-md">
+                          <p className="truncate">Explain the relationship between risk assessment and cybersecurity f...</p>
+                        </td>
+                        <td className="p-4 text-sm text-gray-700">Short Answer</td>
+                        <td className="p-4 text-sm" style={{ color: "#7e2a0c" }}>Cybersecurity</td>
+                        <td className="p-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Hard
+                          </span>
+                        </td>
+                        <td className="p-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            3 days ago
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Edit3 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -1122,7 +857,7 @@ const QuestionResults = () => {
                   {questionType === "written-response" ? "Edit Written Response" : "Edit Multiple Choice"}
                 </DialogTitle>
                 <p className="text-sm text-gray-500 mt-1">
-                  {questionType === "written-response"
+                  {questionType === "written-response" 
                     ? "Modify the question content, sample answer, key points, and metadata below."
                     : "Modify the question content, options, feedback, and metadata below."
                   }
@@ -1130,7 +865,7 @@ const QuestionResults = () => {
               </div>
             </div>
           </DialogHeader>
-
+          
           <div className="space-y-8 py-6">
             {/* Question Stem */}
             <div className="space-y-4">
@@ -1140,8 +875,8 @@ const QuestionResults = () => {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">Question Stem</h3>
               </div>
-
-              <Textarea
+              
+              <Textarea 
                 defaultValue="Why are speculative risks generally excluded from insurance coverage, and how does this differ from the treatment of pure risks?"
                 className="min-h-[100px] text-gray-900 bg-gray-50 border-gray-200 resize-none"
                 placeholder="Enter your question here..."
@@ -1158,8 +893,8 @@ const QuestionResults = () => {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900">Sample Answer</h3>
                   </div>
-
-                  <Textarea
+                  
+                  <Textarea 
                     defaultValue="Speculative risks involve the possibility of gain or loss, making them unsuitable for insurance coverage, which is designed for predictable and measurable risks like pure risks. Pure risks only involve the chance of loss or no loss, allowing insurers to calculate premiums and manage claims effectively."
                     className="min-h-[120px] text-gray-900 bg-gray-50 border-gray-200 resize-none"
                     placeholder="Enter the sample answer..."
@@ -1180,14 +915,14 @@ const QuestionResults = () => {
                       Add Point
                     </Button>
                   </div>
-
+                  
                   <div className="space-y-3">
                     {keyPoints.map((point, index) => (
                       <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                         <div className="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-1">
                           {index + 1}
                         </div>
-                        <Textarea
+                        <Textarea 
                           defaultValue={point}
                           className="flex-1 min-h-[60px] bg-white border-gray-200 resize-none"
                           placeholder={`Enter key point ${index + 1}...`}
@@ -1198,7 +933,7 @@ const QuestionResults = () => {
                       </div>
                     ))}
                   </div>
-
+                  
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -1221,14 +956,14 @@ const QuestionResults = () => {
                       <p className="text-sm text-gray-500">Configure answer choices</p>
                     </div>
                   </div>
-
+                  
                   <div className="space-y-4">
                     {['A', 'B', 'C', 'D'].map((option, index) => (
                       <div key={option} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
                         <div className="w-10 h-10 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-sm font-bold text-gray-700 mt-1 shadow-sm">
                           {option}
                         </div>
-                        <Textarea
+                        <Textarea 
                           defaultValue={[
                             "Pure risk involves only the possibility of loss or no loss, making it insurable.",
                             "Speculative risk involves the possibility of gain, making it insurable.",
@@ -1253,7 +988,7 @@ const QuestionResults = () => {
                       <p className="text-sm text-gray-500">Select the correct option</p>
                     </div>
                   </div>
-
+                  
                   <div className="flex items-center gap-4">
                     <Select defaultValue="A">
                       <SelectTrigger className="w-24 h-12 border-gray-200 focus:border-purple-400">
@@ -1266,7 +1001,7 @@ const QuestionResults = () => {
                         <SelectItem value="D">D</SelectItem>
                       </SelectContent>
                     </Select>
-
+                    
                     <div className="flex-1 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-900">
                         <strong>Selected Answer:</strong> A. Pure risk involves only the possibility of loss or no loss, making it insurable.
@@ -1289,10 +1024,10 @@ const QuestionResults = () => {
 
                   <div className="space-y-6">
                     {[
-                      { option: 'A', feedback: 'Correct. Pure risk is insurable because it does not include the possibility of gain.', bg: 'bg-gray-50' },
-                      { option: 'B', feedback: 'Incorrect. Speculative risk includes the possibility of gain, which makes it uninsurable.', bg: 'bg-gray-50' },
-                      { option: 'C', feedback: 'Incorrect. Pure risk does not involve gain, only the possibility of loss or no loss.', bg: 'bg-gray-50' },
-                      { option: 'D', feedback: 'Incorrect. Speculative risk involves both loss and gain, making it uninsurable.', bg: 'bg-gray-50' }
+                      {option: 'A', feedback: 'Correct. Pure risk is insurable because it does not include the possibility of gain.', bg: 'bg-gray-50'},
+                      {option: 'B', feedback: 'Incorrect. Speculative risk includes the possibility of gain, which makes it uninsurable.', bg: 'bg-gray-50'},
+                      {option: 'C', feedback: 'Incorrect. Pure risk does not involve gain, only the possibility of loss or no loss.', bg: 'bg-gray-50'},
+                      {option: 'D', feedback: 'Incorrect. Speculative risk involves both loss and gain, making it uninsurable.', bg: 'bg-gray-50'}
                     ].map((item, index) => (
                       <div key={item.option} className={`p-4 ${item.bg} rounded-lg border border-gray-200`}>
                         <Label className="text-sm font-semibold text-gray-800 mb-3 block flex items-center gap-2">
@@ -1301,7 +1036,7 @@ const QuestionResults = () => {
                           </span>
                           Option {item.option} Feedback
                         </Label>
-                        <Textarea
+                        <Textarea 
                           defaultValue={item.feedback}
                           className="min-h-[80px] resize-none border-gray-200 focus:border-orange-400 focus:ring-orange-100 bg-white"
                         />
@@ -1311,7 +1046,7 @@ const QuestionResults = () => {
                 </div>
               </div>
             )}
-
+            
             {/* Question Details */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -1320,7 +1055,7 @@ const QuestionResults = () => {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">Question Details</h3>
               </div>
-
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -1339,7 +1074,7 @@ const QuestionResults = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
+                
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                     <FileQuestion className="w-4 h-4" />
@@ -1355,7 +1090,7 @@ const QuestionResults = () => {
                     </SelectContent>
                   </Select>
                 </div>
-
+                
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Database className="w-4 h-4" />
@@ -1373,17 +1108,17 @@ const QuestionResults = () => {
               </div>
             </div>
           </div>
-
+          
           <div className="flex justify-end gap-3 pt-6 border-t">
-            <Button
-              variant="outline"
+            <Button 
+              variant="outline" 
               onClick={() => setIsEditDialogOpen(false)}
               className="flex items-center gap-2"
             >
               <X className="w-4 h-4" />
               Cancel
             </Button>
-            <Button
+            <Button 
               onClick={() => setIsEditDialogOpen(false)}
               className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
             >
@@ -1415,7 +1150,7 @@ const QuestionResults = () => {
               </div>
             </div>
           </DialogHeader>
-
+          
           <div className="space-y-8 py-6">
             {/* Question Stem */}
             <div className="space-y-4">
@@ -1425,7 +1160,7 @@ const QuestionResults = () => {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">Question Stem:</h3>
               </div>
-
+              
               <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <p className="text-gray-900 leading-relaxed">
                   Why are speculative risks generally excluded from insurance coverage, and how does this differ from the treatment of pure risks?
@@ -1443,7 +1178,7 @@ const QuestionResults = () => {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900">Answer:</h3>
                   </div>
-
+                  
                   <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
                     <p className="text-purple-900 leading-relaxed">
                       Speculative risks involve the possibility of gain or loss, making them unsuitable for insurance coverage, which is designed for predictable and measurable risks like pure risks. Pure risks only involve the chance of loss or no loss, allowing insurers to calculate premiums and manage claims effectively.
@@ -1459,7 +1194,7 @@ const QuestionResults = () => {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900">Key Points:</h3>
                   </div>
-
+                  
                   <div className="p-6 bg-green-50 border border-green-200 rounded-lg space-y-4">
                     {keyPoints.map((point, index) => (
                       <div key={index} className="flex items-start gap-3">
@@ -1476,7 +1211,7 @@ const QuestionResults = () => {
               <div>
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Answer Options:</h3>
-
+                  
                   <div className="space-y-4">
                     <div className="flex items-start gap-4 p-4 bg-green-50 border-2 border-green-300 rounded-lg">
                       <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1487,7 +1222,7 @@ const QuestionResults = () => {
                         <span className="text-gray-900 ml-2">Pure risk involves only the possibility of loss or no loss, making it insurable.</span>
                       </div>
                     </div>
-
+                    
                     <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
                       <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-700 flex-shrink-0">
                         B
@@ -1497,7 +1232,7 @@ const QuestionResults = () => {
                         <span className="text-gray-700 ml-2">Speculative risk involves the possibility of gain, making it insurable.</span>
                       </div>
                     </div>
-
+                    
                     <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
                       <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-700 flex-shrink-0">
                         C
@@ -1507,7 +1242,7 @@ const QuestionResults = () => {
                         <span className="text-gray-700 ml-2">Pure risk involves both gain and loss, making it uninsurable.</span>
                       </div>
                     </div>
-
+                    
                     <div className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg">
                       <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-700 flex-shrink-0">
                         D
@@ -1535,7 +1270,7 @@ const QuestionResults = () => {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-800">Detailed Feedback:</h3>
                   </div>
-
+                  
                   <div className="space-y-4">
                     <div className="flex items-start gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                       <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1546,7 +1281,7 @@ const QuestionResults = () => {
                         <span className="text-green-800 font-medium ml-2">Correct. Pure risk is insurable because it does not include the possibility of gain.</span>
                       </div>
                     </div>
-
+                    
                     <div className="flex items-start gap-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <XCircle className="w-4 h-4 text-white" />
@@ -1556,7 +1291,7 @@ const QuestionResults = () => {
                         <span className="text-red-800 font-medium ml-2">Incorrect. Speculative risk includes the possibility of gain, which makes it uninsurable.</span>
                       </div>
                     </div>
-
+                    
                     <div className="flex items-start gap-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <XCircle className="w-4 h-4 text-white" />
@@ -1566,7 +1301,7 @@ const QuestionResults = () => {
                         <span className="text-red-800 font-medium ml-2">Incorrect. Pure risk does not involve gain, only the possibility of loss or no loss.</span>
                       </div>
                     </div>
-
+                    
                     <div className="flex items-start gap-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <XCircle className="w-4 h-4 text-white" />
@@ -1580,77 +1315,150 @@ const QuestionResults = () => {
                 </div>
               </div>
             )}
-
+            
             {/* Question Details */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
                   <FileQuestion className="w-4 h-4 text-orange-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Question Details</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Question Details:</h3>
               </div>
-
+              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Hash className="w-4 h-4" />
-                    Max Marks
-                  </Label>
-                  <Select defaultValue="5">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1</SelectItem>
-                      <SelectItem value="2">2</SelectItem>
-                      <SelectItem value="3">3</SelectItem>
-                      <SelectItem value="5">5</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <FileQuestion className="w-4 h-4 text-blue-600" />
+                    <Label className="text-sm font-medium text-blue-700">Type</Label>
+                  </div>
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <span className="text-blue-900 font-medium">{questionType === "written-response" ? "Written Response" : "Multiple Choice"}</span>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <FileQuestion className="w-4 h-4" />
-                    Type
-                  </Label>
-                  <Select defaultValue={questionType}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                      <SelectItem value="written-response">Written Response</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Hash className="w-4 h-4 text-purple-600" />
+                    <Label className="text-sm font-medium text-purple-700">Max Marks</Label>
+                  </div>
+                  <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                    <span className="text-purple-900 font-medium">5</span>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Database className="w-4 h-4" />
-                    Source
-                  </Label>
-                  <Select defaultValue="book-based">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="book-based">Book Based</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Database className="w-4 h-4 text-green-600" />
+                    <Label className="text-sm font-medium text-green-700">Source</Label>
+                  </div>
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <span className="text-green-900 font-medium">Book Based</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-orange-600" />
+                    <Label className="text-sm font-medium text-gray-700">Book Name</Label>
+                  </div>
+                  <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                    <span className="text-orange-900 font-medium">Cyber Risk</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-blue-600" />
+                    <Label className="text-sm font-medium text-blue-700">Taxonomy</Label>
+                  </div>
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <span className="text-blue-900 font-medium">Understand</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-gray-600" />
+                    <Label className="text-sm font-medium text-gray-700">User Name</Label>
+                  </div>
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <span className="text-gray-900 font-medium">Robert Jones</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 md:col-span-2 lg:col-span-3">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-gray-600" />
+                    <Label className="text-sm font-medium text-gray-700">Study</Label>
+                  </div>
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <span className="text-gray-900 font-medium">Defining Risk and Cyber Risk</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 md:col-span-2 lg:col-span-3">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-gray-600" />
+                    <Label className="text-sm font-medium text-gray-700">Learning Objective</Label>
+                  </div>
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <span className="text-gray-900 font-medium">Explain why pure risk is insurable but speculative risk is not</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 md:col-span-2 lg:col-span-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-gray-600" />
+                    <Label className="text-sm font-medium text-gray-700">Reference Info</Label>
+                  </div>
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <span className="text-gray-900 font-medium">Study 1, Learning Objective 1, Page 1.</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-
+          
           <div className="flex justify-end gap-3 pt-6 border-t">
-            <Button
-              variant="outline"
+            <Button 
+              variant="outline" 
               onClick={() => setIsPreviewDialogOpen(false)}
               className="flex items-center gap-2"
             >
               <X className="w-4 h-4" />
               Close Preview
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={isSuccessDialogOpen} onOpenChange={setIsSuccessDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center text-center p-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-gray-900 mb-2">
+                Data Saved Successfully!
+              </DialogTitle>
+            </DialogHeader>
+            <p className="text-gray-600 mb-6">
+              {questions.length} questions have been successfully saved to your repository.
+            </p>
+            <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg w-full mb-6">
+              <Database className="w-5 h-5 text-green-600" />
+              <div className="text-left">
+                <p className="text-sm font-medium text-green-800">Repository Updated</p>
+                <p className="text-xs text-green-600">Questions are now available in your collection</p>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setIsSuccessDialogOpen(false)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              Continue
             </Button>
           </div>
         </DialogContent>
