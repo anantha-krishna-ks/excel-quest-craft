@@ -1,12 +1,201 @@
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { Brain, Check, Zap, Target, Shield, Sparkles, Cpu, Database, Lightbulb } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
+import axios from "axios";
 
+// Get item generation endpoint from environment variable
+const ITEM_GEN_API_URL = import.meta.env.VITE_ITEM_GEN_API_URL;
+
+// New function for item generation logic
+const initiateItemGeneration = async (params, setCurrentStep, setProgress, navigate, setAgentStatusObj, setpleaswwaitmsg, setagentstatus) => {
+  try {
+    // Get user info from localStorage (expects userInfo as JSON with userCode, custCode, orgCode)
+    let usercode = "";
+    let custcode = "";
+    let orgcode = "";
+    try {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}") || {};
+      usercode = userInfo.userCode || "";
+      custcode = userInfo.custCode || "";
+      orgcode = userInfo.orgCode || "";
+    } catch (e) {
+      usercode = "";
+      custcode = "";
+      orgcode = "";
+    }
+    // Prepare the base payload from params and localStorage
+    // All values for appcode, booknameid, questiontypeid, taxonomyid, difficultylevelid, chaptercode, locode, sourcetype, referenceinfo, noofquestions, agent_status are now taken from localStorage (if available), else fallback to defaults
+    // Use the number of questions from params.selectedQuantity if provided, else fallback to params.noofquestions, then localStorage or default to 1
+    const noofquestions =
+      (params && params.selectedQuantity !== undefined)
+        ? Number(params.selectedQuantity)
+        : (params && params.noofquestions !== undefined)
+          ? Number(params.noofquestions)
+          : (localStorage.getItem("noofquestions")
+            ? Number(localStorage.getItem("noofquestions"))
+            : 1);
+
+    // Determine question type string for prompt (normalize to match exactly)
+    let questionType = "";
+    if (params && params.selectedQuestionType) {
+      questionType = params.selectedQuestionType;
+    } else if (localStorage.getItem("selectedQuestionType")) {
+      questionType = localStorage.getItem("selectedQuestionType");
+    }
+    // Normalize to match logic below
+    if (typeof questionType === "string") {
+      const qtype = questionType.trim().toLowerCase();
+      if (qtype === "multiple choice" || qtype === "multiple-choice") {
+        questionType = "Multiple Choice";
+      } else if (qtype === "written response" || qtype === "written-response") {
+        questionType = "Written Response";
+      }
+    }
+
+    // Get pointValue from params, localStorage, or fallback
+    let pointValue = 5;
+    if (params && params.pointValue !== undefined) {
+      pointValue = params.pointValue;
+    } else if (localStorage.getItem("pointValue")) {
+      pointValue = Number(localStorage.getItem("pointValue"));
+    }
+
+    // Build payload based on question type
+    let basePayload;
+    if (questionType === "Written Response") {
+      basePayload = {
+        url: "Testing/IIC/CYBER_RISK",
+        question: "Generate exactly " + noofquestions + " Long Answer questions for " + pointValue + " marks. Questions based exclusively on the 1st Study and study name is 'Defining Risk and Cyber Risk'. The questions should align with the content of the study material and the corresponding Learning Objective: Explain why pure risk is insurable but speculative risk is not,but **do not repeat or closely mirror the exact wording** of the LO statement. Instead, the questions should assess the application and deeper understanding of the content related to that learning objective.The questions must adhere to the specified Taxonomy: Remember. Each question must reflect content strictly from the specified study material. Important: Ensure that the 'ReferenceInfo' includes the study number, the learning objective number, and a page number strictly within the range of pages 'Learning objective 1 : pages from 1-3 to 1-6,Learning objective 2 : pages from 1-7 to 1-14,Learning objective 3 : pages from 1-15 to 1-20,' allocated to that learning objective. Clearly state that the page number must be drawn from this specified range only..Response must be in Canadian English, ensuring the use of Canadian spelling conventions, grammar, and vocabulary in every word. The output format should be in JSON, structured as follows:Response must be in Canadian English, ensuring the use of Canadian spelling conventions, grammar, and vocabulary in every word. The output format should be in JSON, structured as follows: [{'label':<Question>, 'values':[],'CorrectAnswer':<Correct Answer(minimum 100 words)>,'KeyPoints':<List exactly 5 key points, each contributing 1 mark. Do not include any references, study numbers, learning objectives, examples, or page numbers within the key points. Focus only on the essential content of the chapter and format should be <Keypoint> - <Explanation of the key point> >,'MaxMarks':5,'BookName':<List the book name which have refered if possible>,LearningObjective': <for which learning objective question belongs to. Provide learning objective name,it should be same as in book, not number.do not give word like this 'Consider all learning objectives within study'>, 'ReferenceInfo': <must provide study number, Learning objective number,Page number. Not provide formate of  page number like 'page range:','within this page range:','from this page:'. Page number strictly within the range of 'Learning objective 1 : pages from 1-3 to 1-6,Learning objective 2 : pages from 1-7 to 1-14,Learning objective 3 : pages from 1-15 to 1-20,'. Clearly state that the page number must be drawn from this specified range only.do not provide book name,study names and learning objective name.The format must be exactly as follows: 'Study <Study Number>, Learning Objective <Learning Objective number>, Page <Page number>'.>}].The number of questions should be exactly 3.Important: - Only provide the output in the exact JSON format specified. - Ensure that all questions are generated from the mentioned study only, without any additional explanations, comments, or apologies. ",
+        source: localStorage.getItem("source") || "Book",
+        custcode: localStorage.getItem("custcode") || custcode,
+        orgcode: localStorage.getItem("orgcode") || orgcode,
+        usercode: localStorage.getItem("usercode") || usercode,
+        appcode: localStorage.getItem("appcode") || "IG",
+        booknameid: localStorage.getItem("booknameid") !== null && localStorage.getItem("booknameid") !== undefined && localStorage.getItem("booknameid") !== ""
+          ? Number(localStorage.getItem("booknameid"))
+          : 2,
+        questiontypeid: Number(localStorage.getItem("questiontypeid")) || 1,
+        taxonomyid: localStorage.getItem("taxonomyid") !== null && localStorage.getItem("taxonomyid") !== undefined && localStorage.getItem("taxonomyid") !== ""
+          ? Number(localStorage.getItem("taxonomyid"))
+          : 1,
+        difficultylevelid: 1,
+        chaptercode: localStorage.getItem("selectedChapter") || "S12",
+        locode: localStorage.getItem("selectedLO") || "",
+        sourcetype: Number(localStorage.getItem("sourcetype")) || 1,
+        referenceinfo: localStorage.getItem("referenceinfo") || "",
+        noofquestions: noofquestions,
+      };
+    } else if (questionType === "Multiple Choice") {
+      basePayload = {
+        url: "Testing/IIC/CYBER_RISK",
+        question: "Generate exactly " + noofquestions + " Multiple choice questions based exclusively on the 2nd Study and study name is 'Exploring Cyber Crime'. The questions should align with the content of the study material and the corresponding Learning Objective: 1.Explain how cyber crime is defined under the Criminal Code of Canada2.Describe common hacking techniques3.Describe the potential consequences of cyber attacks for organizations and individuals4.Given a scenario, examine how stolen data can be used for extortion5.Given a scenario, examine the impacts of personal identity theft and how these impacts can be remedied,but **do not repeat or closely mirror the exact wording** of the LO statement. Instead, the questions should assess the application and deeper understanding of the content related to that learning objective.The questions must adhere to the specified Taxonomy: consider all taxonomy. Each question must reflect content strictly from the specified study material.Important: 1. For options that are complete sentences, **add a period at the end**.2. For options that are not complete sentences (e.g., single words,double words, phrases), **do not add a period**.3. Do not provide options with missing punctuation or inconsistent use of periods. 4. options must starts with prefix A., B., C., D.Ensure the options follow these punctuation rules strictly.Ensure that the 'ReferenceInfo' includes the study number, the learning objective number, and a page number strictly within the range of pages 'Learning objective 1 : pages from 2-3 to 2-4,Learning objective 2 : pages from 2-4 to 2-13,Learning objective 3 : pages from 2-14 to 2-22,Learning objective 4 : pages from 2-23 to 2-25,Learning objective 5 : pages from 2-26 to 2-30,' allocated to that learning objective. Clearly state that the page number must be drawn from this specified range only.Response must be in Canadian English, ensuring the use of Canadian spelling conventions, grammar, and vocabulary in every word. The output format should be in JSON, structured as follows:[ { 'label': <Question>, 'values': [<provide Options with prefix ABCD.options must be added with period if option is complete sentence. If the option is not a complete sentence, do not add a period at the end.options must starts with prefix A, B, C, D>], 'CorrectAnswer': <Correct option alphabet with text. It also starts with the correct prefix (A, B, C, D).>, 'FeedbackOption<option>': <Correct/Incorrect. Feedback for the particular option>, 'MaxMarks': 1, 'LearningObjective': <for which learning objective question belongs to. Provide learning objective name,it should be same as in book, not number.do not give word like this 'Consider all learning objectives within study'>, 'ReferenceInfo': <must provide study number, Learning objective number, Page number. Not provide formate of  page number like 'page range:','within this page range:','from this page:'. Page number strictly within the range of 'Learning objective 1 : pages from 2-3 to 2-4,Learning objective 2 : pages from 2-4 to 2-13,Learning objective 3 : pages from 2-14 to 2-22,Learning objective 4 : pages from 2-23 to 2-25,Learning objective 5 : pages from 2-26 to 2-30,'. Clearly state that the page number must be drawn from this specified range only.do not provide book name,study names and learning objective name.The format must be exactly as follows: 'Study <Study Number>, Learning Objective <Learning Objective number>, Page <Page number>'.>, 'BookName': <Book> } ]The number of questions should be exactly " + noofquestions + ".Important: - Only provide the output in the exact JSON format specified. - Ensure that all questions are generated from the mentioned study only, without any additional explanations, comments, or apologies.",
+        source: localStorage.getItem("source") || "Book",
+        custcode: localStorage.getItem("custcode") || custcode,
+        orgcode: localStorage.getItem("orgcode") || orgcode,
+        usercode: localStorage.getItem("usercode") || usercode,
+        appcode: localStorage.getItem("appcode") || "IG",
+        booknameid: localStorage.getItem("booknameid") !== null && localStorage.getItem("booknameid") !== undefined && localStorage.getItem("booknameid") !== ""
+          ? Number(localStorage.getItem("booknameid"))
+          : 2,
+        questiontypeid: Number(localStorage.getItem("questiontypeid")) || 1,
+        taxonomyid: localStorage.getItem("taxonomyid") !== null && localStorage.getItem("taxonomyid") !== undefined && localStorage.getItem("taxonomyid") !== ""
+          ? Number(localStorage.getItem("taxonomyid"))
+          : 1,
+        difficultylevelid: Number(localStorage.getItem("difficultylevelid")) || 1,
+        chaptercode: localStorage.getItem("selectedChapter") || "S12",
+        locode: localStorage.getItem("selectedLO") || "",
+        sourcetype: Number(localStorage.getItem("sourcetype")) || 1,
+        referenceinfo: localStorage.getItem("referenceinfo") || "",
+        selectedQuantity: noofquestions,
+        noofquestions: noofquestions,
+        agent_status: localStorage.getItem("agent_status") || "3"
+      };
+    } else {
+      // fallback: treat as written response if unknown
+      basePayload = {
+        url: "Testing/IIC/CYBER_RISK",
+        question: "Generate exactly " + noofquestions + " Long Answer questions for " + pointValue + " marks. Questions based exclusively on the 1st Study and study name is 'Defining Risk and Cyber Risk'. The questions should align with the content of the study material and the corresponding Learning Objective: Explain why pure risk is insurable but speculative risk is not,but **do not repeat or closely mirror the exact wording** of the LO statement. Instead, the questions should assess the application and deeper understanding of the content related to that learning objective.The questions must adhere to the specified Taxonomy: Remember. Each question must reflect content strictly from the specified study material. Important: Ensure that the 'ReferenceInfo' includes the study number, the learning objective number, and a page number strictly within the range of pages 'Learning objective 1 : pages from 1-3 to 1-6,Learning objective 2 : pages from 1-7 to 1-14,Learning objective 3 : pages from 1-15 to 1-20,' allocated to that learning objective. Clearly state that the page number must be drawn from this specified range only..Response must be in Canadian English, ensuring the use of Canadian spelling conventions, grammar, and vocabulary in every word. The output format should be in JSON, structured as follows:Response must be in Canadian English, ensuring the use of Canadian spelling conventions, grammar, and vocabulary in every word. The output format should be in JSON, structured as follows: [{'label':<Question>, 'values':[],'CorrectAnswer':<Correct Answer(minimum 100 words)>,'KeyPoints':<List exactly 5 key points, each contributing 1 mark. Do not include any references, study numbers, learning objectives, examples, or page numbers within the key points. Focus only on the essential content of the chapter and format should be <Keypoint> - <Explanation of the key point> >,'MaxMarks':5,'BookName':<List the book name which have refered if possible>,LearningObjective': <for which learning objective question belongs to. Provide learning objective name,it should be same as in book, not number.do not give word like this 'Consider all learning objectives within study'>, 'ReferenceInfo': <must provide study number, Learning objective number,Page number. Not provide formate of  page number like 'page range:','within this page range:','from this page:'. Page number strictly within the range of 'Learning objective 1 : pages from 1-3 to 1-6,Learning objective 2 : pages from 1-7 to 1-14,Learning objective 3 : pages from 1-15 to 1-20,'. Clearly state that the page number must be drawn from this specified range only.do not provide book name,study names and learning objective name.The format must be exactly as follows: 'Study <Study Number>, Learning Objective <Learning Objective number>, Page <Page number>'.>}].The number of questions should be exactly 3.Important: - Only provide the output in the exact JSON format specified. - Ensure that all questions are generated from the mentioned study only, without any additional explanations, comments, or apologies. ",
+        source: localStorage.getItem("source") || "Book",
+        custcode: localStorage.getItem("custcode") || custcode,
+        orgcode: localStorage.getItem("orgcode") || orgcode,
+        usercode: localStorage.getItem("usercode") || usercode,
+        appcode: localStorage.getItem("appcode") || "IG",
+        booknameid: localStorage.getItem("booknameid") !== null && localStorage.getItem("booknameid") !== undefined && localStorage.getItem("booknameid") !== ""
+          ? Number(localStorage.getItem("booknameid"))
+          : 2,
+        questiontypeid: Number(localStorage.getItem("questiontypeid")) || 1,
+        taxonomyid: localStorage.getItem("taxonomyid") !== null && localStorage.getItem("taxonomyid") !== undefined && localStorage.getItem("taxonomyid") !== ""
+          ? Number(localStorage.getItem("taxonomyid"))
+          : 1,
+        difficultylevelid: 1,
+        chaptercode: localStorage.getItem("selectedChapter") || "S12",
+        locode: localStorage.getItem("selectedLO") || "",
+        sourcetype: Number(localStorage.getItem("sourcetype")) || 1,
+        referenceinfo: localStorage.getItem("referenceinfo") || "",
+        noofquestions: noofquestions,
+      };
+    }
+
+    // Step 1: agent_status = "1"
+    let response = await axios.post(
+      ITEM_GEN_API_URL,
+      { ...basePayload, agent_status: "1" }
+    );
+    let data = response.data;
+    if (data.status === "A001") {
+      if (data.agent_status) setAgentStatusObj && setAgentStatusObj(data.agent_status);
+      setpleaswwaitmsg && setpleaswwaitmsg("agent 1");
+      setCurrentStep && setCurrentStep(1);
+      setProgress && setProgress(30);
+      // Step 2: agent_status = "2"
+      response = await axios.post(
+        ITEM_GEN_API_URL,
+        { ...basePayload, agent_status: "2" }
+      );
+      data = response.data;
+      if (data.status === "A002") {
+        if (data.agent_status) setAgentStatusObj && setAgentStatusObj(data.agent_status);
+        setpleaswwaitmsg && setpleaswwaitmsg("agent 2");
+        setCurrentStep && setCurrentStep(2);
+        setProgress && setProgress(60);
+        // Step 3: agent_status = "3"
+        response = await axios.post(
+          ITEM_GEN_API_URL,
+          { ...basePayload, agent_status: "3" }
+        );
+        data = response.data;
+        // Final step, store result and navigate to results
+        if (data.agent_status) setAgentStatusObj && setAgentStatusObj(data.agent_status);
+        setagentstatus && setagentstatus("1");
+        setpleaswwaitmsg && setpleaswwaitmsg("agent 3");
+        setCurrentStep && setCurrentStep(4);
+        setProgress && setProgress(100);
+        // Store the result in localStorage for /question-results page
+        try {
+          localStorage.setItem("questionGenResults", JSON.stringify(data));
+        } catch (e) {
+          console.error("Failed to store questionGenResults in localStorage", e);
+        }
+        setTimeout(() => {
+          navigate && navigate("/question-results");
+        }, 1000);
+      }
+    }
+  } catch (error) {
+    console.error("Error in item generation:", error);
+  }
+};
+import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
+import { Brain, Check, Zap, Target, Shield, Sparkles, Cpu, Database, Lightbulb, Pointer } from "lucide-react"
+import { Progress } from "@/components/ui/progress"
+import { sendStep1API, sendStep2API, sendStep3API } from "@/api";
 const QuestionGenerationLoading = () => {
   const navigate = useNavigate()
+  const location = useLocation();
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState(0)
+  // Optionally, add these if you want to show agent status messages
+  const [agentStatusObj, setAgentStatusObj] = useState(null);
+  const [pleaswwaitmsg, setpleaswwaitmsg] = useState("");
+  const [agentstatus, setagentstatus] = useState("");
 
   const steps = [
     {
@@ -19,18 +208,18 @@ const QuestionGenerationLoading = () => {
       subtitle: "Extracting key concepts and learning objectives",
       status: "complete"
     },
+    // {
+    //   title: "Generating Questions",
+    //   subtitle: "Creating contextually relevant questions",
+    //   status: "complete"
+    // },
+    // {
+    //   title: "Optimizing Quality",
+    //   subtitle: "Ensuring question clarity and accuracy",
+    //   status: "processing"
+    // },
     {
-      title: "Generating Questions",
-      subtitle: "Creating contextually relevant questions",
-      status: "complete"
-    },
-    {
-      title: "Optimizing Quality",
-      subtitle: "Ensuring question clarity and accuracy",
-      status: "processing"
-    },
-    {
-      title: "Finalizing Results",
+      title: "Generating & Finalizing Results",
       subtitle: "Preparing your assessment questions",
       status: "pending"
     }
@@ -64,31 +253,47 @@ const QuestionGenerationLoading = () => {
   ]
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        const newProgress = prev + 2
-        
-        // Update current step based on progress
-        if (newProgress >= 20 && currentStep < 1) setCurrentStep(1)
-        if (newProgress >= 40 && currentStep < 2) setCurrentStep(2)
-        if (newProgress >= 60 && currentStep < 3) setCurrentStep(3)
-        if (newProgress >= 80 && currentStep < 4) setCurrentStep(4)
-        
-        // Complete and navigate when done
-        if (newProgress >= 100) {
-          clearInterval(interval)
-          setTimeout(() => {
-            navigate("/question-results")
-          }, 1000)
-          return 100
-        }
-        
-        return newProgress
-      })
-    }, 100)
-
-    return () => clearInterval(interval)
-  }, [currentStep, navigate])
+    // If data is passed from QuestionGenerator, use real API logic
+    if (location.state) {
+      initiateItemGeneration(
+        location.state,
+        setCurrentStep,
+        setProgress,
+        navigate,
+        setAgentStatusObj,
+        setpleaswwaitmsg,
+        setagentstatus
+      );
+      return;
+    }
+    // Fallback: simulate progress if no data
+    const handleStepProgress = async () => {
+      try {
+        // Step 1
+        const input1 = { a: "valueA", b: "valueB" };
+        const result1 = await sendStep1API(input1);
+        setCurrentStep(1);
+        setProgress(30);
+        // Step 2
+        const input2 = { paramFromStep1: result1.someValue, extra: "more" };
+        const result2 = await sendStep2API(input2);
+        setCurrentStep(2);
+        setProgress(60);
+        // Step 3
+        const input3 = { paramFromStep2: result2.output };
+        const result3 = await sendStep3API(input3);
+        setCurrentStep(3);
+        setProgress(90);
+        setProgress(100);
+        setTimeout(() => {
+          navigate("/question-results");
+        }, 1000);
+      } catch (error) {
+        console.error("Error in step progression:", error);
+      }
+    };
+    handleStepProgress();
+  }, [navigate, location.state])
 
   const getStepStatus = (index: number) => {
     if (index < currentStep) return "complete"
@@ -111,9 +316,9 @@ const QuestionGenerationLoading = () => {
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
             <span className="text-white font-bold text-sm">AL</span>
           </div>
-          <img 
-            src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
-            alt="AI-Levate" 
+          <img
+            src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
+            alt="AI-Levate"
             className="h-6 w-auto"
           />
           <div className="flex items-center gap-2 ml-4">
@@ -133,7 +338,7 @@ const QuestionGenerationLoading = () => {
               <div className="relative w-32 h-32 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
                 <Brain className="w-16 h-16 text-white animate-pulse" />
               </div>
-              
+
               {/* Status indicator */}
               <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                 <Check className="w-3 h-3 text-white" />
@@ -161,7 +366,7 @@ const QuestionGenerationLoading = () => {
                   <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
                 </div>
               </div>
-              
+
               <Progress value={progress} className="h-3 bg-gray-200" />
 
               {/* Processing Steps */}
@@ -171,21 +376,19 @@ const QuestionGenerationLoading = () => {
                   return (
                     <div
                       key={index}
-                      className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 ${
-                        status === "complete" 
-                          ? "bg-green-50 border border-green-200" 
+                      className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-300 ${status === "complete"
+                          ? "bg-green-50 border border-green-200"
                           : status === "processing"
-                          ? "bg-blue-50 border border-blue-200"
-                          : "bg-gray-50 border border-gray-200"
-                      }`}
+                            ? "bg-blue-50 border border-blue-200"
+                            : "bg-gray-50 border border-gray-200"
+                        }`}
                     >
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        status === "complete" 
-                          ? "bg-green-500" 
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${status === "complete"
+                          ? "bg-green-500"
                           : status === "processing"
-                          ? "bg-blue-500"
-                          : "bg-gray-400"
-                      }`}>
+                            ? "bg-blue-500"
+                            : "bg-gray-400"
+                        }`}>
                         {status === "complete" ? (
                           <Check className="w-6 h-6 text-white" />
                         ) : status === "processing" ? (
@@ -194,22 +397,20 @@ const QuestionGenerationLoading = () => {
                           <Check className="w-6 h-6 text-white opacity-50" />
                         )}
                       </div>
-                      
+
                       <div className="flex-1">
-                        <h3 className={`text-base font-semibold mb-1 ${
-                          status === "complete" ? "text-green-900" :
-                          status === "processing" ? "text-blue-900" : "text-gray-500"
-                        }`}>
+                        <h3 className={`text-base font-semibold mb-1 ${status === "complete" ? "text-green-900" :
+                            status === "processing" ? "text-blue-900" : "text-gray-500"
+                          }`}>
                           {step.title}
                         </h3>
-                        <p className={`text-sm ${
-                          status === "complete" ? "text-green-700" :
-                          status === "processing" ? "text-blue-700" : "text-gray-400"
-                        }`}>
+                        <p className={`text-sm ${status === "complete" ? "text-green-700" :
+                            status === "processing" ? "text-blue-700" : "text-gray-400"
+                          }`}>
                           {step.subtitle}
                         </p>
                       </div>
-                      
+
                       {status === "complete" && (
                         <div className="text-sm font-medium text-green-600 flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
                           <Check className="w-3 h-3" />
@@ -232,8 +433,8 @@ const QuestionGenerationLoading = () => {
           {/* Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-white rounded-xl p-6 text-center border border-gray-200 shadow-sm"
               >
                 <div className="flex justify-center mb-4">
