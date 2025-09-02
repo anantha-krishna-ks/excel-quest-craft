@@ -1,70 +1,307 @@
-import { useState } from "react"
-import { Link, useParams, useNavigate } from "react-router-dom"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { 
-  ArrowLeft, 
-  Sparkles,
-  Brain,
-  Target,
-  Globe,
-  Hash,
-  MessageSquare,
-  ChevronDown,
-  Zap,
-  Settings2,
-  FileText,
-  FileSpreadsheet,
-  Save,
-  Database,
-  Clock,
-  Eye,
-  Edit3,
-  Trash2,
-  User
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
+import { getChapters as getChaptersByBookCode, Chapter, getLearningObjectives, LearningObjective, fetchDropdownOptions } from "../api";
+import { Card } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
+import { Textarea } from "../components/ui/textarea";
+import { Switch } from "../components/ui/switch";
+import { ArrowLeft, Sparkles, FileText, Zap, Settings2, Target, Globe, Hash, Brain, MessageSquare, Database, User, FileSpreadsheet, Trash2, Eye, Edit3, Clock, Save } from "lucide-react";
 
-const formSchema = z.object({
-  studyDomain: z.string().min(1, "Study domain is required"),
-  taxonomyFramework: z.string().min(1, "Taxonomy framework is required"),
-  questionQuantity: z.string().min(1, "Question quantity is required"),
-  learningObjectives: z.string().min(1, "Learning objectives is required"),
-  questionFormat: z.string().min(1, "Question format is required"),
-  pointValue: z.string().min(1, "Point value is required"),
-  additionalInstructions: z.string().min(1, "Additional instructions are required"),
-})
+function transformUsageData(statsRaw: any[]): any[] {
+  // Dummy implementation to avoid runtime error
+  return statsRaw;
+}
 
 const QuestionGenerator = () => {
-  const { bookCode } = useParams()
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState("generate")
-  const [generationMode, setGenerationMode] = useState(true) // true for LLM, false for Knowledge Base
+  // DropdownDashboard state for taxonomy, question type, and quantity
+  const [taxonomyList, setTaxonomyList] = useState<string[]>([]);
+  const [questionTypes, setQuestionTypes] = useState<string[]>([]);
+  const [questionQuantities, setQuestionQuantities] = useState<number[]>([]);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      studyDomain: "defining-risk",
-      taxonomyFramework: "",
-      questionQuantity: "1",
-      learningObjectives: "explain-pure-risk", 
-      questionFormat: "multiple-choice",
-      pointValue: "1",
-      additionalInstructions: "",
-    },
-  })
+  // Always default to "-- Select --" (empty value) for Taxonomy Framework
+  // Always default to "-- Select --" (empty value) for Taxonomy Framework on navigation
+  const [selectedTaxonomy, setSelectedTaxonomy] = useState(() => "");
+  const [selectedQuestionType, setSelectedQuestionType] = useState(() => {
+    // Always default to "Multiple Choice" on navigation
+    return "Multiple Choice";
+  });
+  // Always default to "-- Select --" (empty value) for Question Quantity on navigation
+  const [selectedQuantity, setSelectedQuantity] = useState<string | number>(() => "");
 
-  const handleGenerateQuestions = (values: z.infer<typeof formSchema>) => {
-    // This function only runs if validation passes
-    console.log("Form submitted with values:", values)
-    navigate("/question-generation-loading")
+  const [dropdownError, setDropdownError] = useState<string>("");
+  useEffect(() => {
+    const fetchDropdowns = async () => {
+      // Try to get session info from localStorage, fallback to userInfo if needed
+      let custcode = localStorage.getItem("custcode");
+      let orgcode = localStorage.getItem("orgcode");
+      let appcode = localStorage.getItem("appcode");
+      // If any are missing, try to get from userInfo (like ItemGeneration)
+      if (!custcode || !orgcode) {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}") || {};
+        if (!custcode) custcode = userInfo.customerCode || "ES";
+        if (!orgcode) orgcode = userInfo.orgCode || "Exc195";
+        if (!appcode) appcode = "IG";
+        // Set them in localStorage for API compatibility
+        if (custcode) localStorage.setItem("custcode", custcode);
+        if (orgcode) localStorage.setItem("orgcode", orgcode);
+        if (appcode) localStorage.setItem("appcode", appcode);
+      }
+      if (!custcode || !orgcode || !appcode) {
+        setDropdownError("Please login again. Required session information is missing.");
+        setTaxonomyList([]);
+        setQuestionTypes([]);
+        setQuestionQuantities([]);
+        return;
+      }
+      try {
+        const data = await fetchDropdownOptions();
+        let found = false;
+        data.forEach((item: any) => {
+          const parsed = JSON.parse(item.jsonDetails);
+          if (item.type === "taxonomy") {
+            setTaxonomyList(parsed.map((t: any) => t.taxonomy));
+            found = true;
+          }
+          if (item.type === "QuestionType") {
+            setQuestionTypes(parsed.map((q: any) => q.questiontype));
+            found = true;
+          }
+          if (item.type === "numberof_questions") {
+            setQuestionQuantities(parsed.map((n: any) => n.numberof_questions));
+            found = true;
+          }
+        });
+        if (!found) {
+          setDropdownError("No dropdown data found. Please contact support.");
+        } else {
+          setDropdownError("");
+        }
+      } catch (error) {
+        setDropdownError("Failed to load dropdowns. Please check your connection or login again.");
+        setTaxonomyList([]);
+        setQuestionTypes([]);
+        setQuestionQuantities([]);
+      }
+    };
+    fetchDropdowns();
+  }, []);
+
+  // --- Book Title State and Effect ---
+  const { bookCode } = useParams();
+  const location = useLocation();
+  const [bookTitle, setBookTitle] = useState("");
+
+  function getBookTitle() {
+    // 1. Prefer navigation state (from ItemGeneration.tsx)
+    if (location && location.state && (location.state.bookTitle || location.state.title || location.state.name)) {
+      // Try all possible keys for book name
+      return location.state.bookTitle || location.state.title || location.state.name;
+    }
+    // 2. Fallback to localStorage logic
+    let code = "1";
+    if (typeof bookCode === 'string' && bookCode) {
+      code = bookCode;
+    } else {
+      const stored = localStorage.getItem('bookCode');
+      if (stored) code = stored;
+    }
+    let bookTitle = "";
+    try {
+      const cardRaw = localStorage.getItem(`bookCard_${code}`);
+      if (cardRaw) {
+        const card = JSON.parse(cardRaw);
+        // Try to get the book title from the card object, including nested book.title
+        bookTitle = card.title || card.bookTitle || card.name || (card.book && card.book.title) || "";
+      }
+    } catch { }
+    if (!bookTitle) {
+      bookTitle = localStorage.getItem('bookTitle') || "Untitled Book";
+    }
+    return bookTitle;
   }
+
+  useEffect(() => {
+    // Always update book title on mount and when navigation state or bookCode changes
+    setBookTitle(getBookTitle());
+    // Listen for storage changes (e.g., if bookCard or bookTitle changes in another tab)
+    const updateBookTitle = () => setBookTitle(getBookTitle());
+    window.addEventListener('storage', updateBookTitle);
+    return () => window.removeEventListener('storage', updateBookTitle);
+  }, [bookCode, location && location.state]);
+
+  let tokenStats = [];
+  try {
+    const statsRaw = JSON.parse(localStorage.getItem("usageStats") || "null");
+    if (Array.isArray(statsRaw)) {
+      tokenStats = transformUsageData(statsRaw);
+    }
+  } catch { }
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("generate");
+  const [generationMode, setGenerationMode] = useState(true); // true for LLM, false for Knowledge Base
+
+  // Use state and effect for reactive remaining tokens
+  const [remainingTokens, setRemainingTokens] = useState(0);
+
+  // Chapter dropdown state (Study Domain)
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [selectedChapter, setSelectedChapter] = useState(() => localStorage.getItem("selectedChapter") || "");
+  const [chaptersLoading, setChaptersLoading] = useState(false);
+  const [chaptersError, setChaptersError] = useState<string>("");
+
+  // Learning Objectives (LO) dropdown state
+  const [learningObjectives, setLearningObjectives] = useState<LearningObjective[]>([]);
+  const [selectedLO, setSelectedLO] = useState(() => localStorage.getItem("selectedLO") || "");
+  const [loLoading, setLoLoading] = useState(false);
+  const [loError, setLoError] = useState<string>("");
+
+  // Point Value
+  const [pointValue, setPointValue] = useState(() => localStorage.getItem("pointValue") || "1");
+
+  // Additional Instructions
+  const [additionalInstructions, setAdditionalInstructions] = useState(() => {
+    // Only restore if coming from navigation, not on page refresh
+    const navState = window.performance && window.performance.getEntriesByType && window.performance.getEntriesByType('navigation');
+    // Defensive: check for type property on PerformanceNavigationTiming
+    let isReload = false;
+    if (navState && navState.length > 0) {
+      const nav = navState[0] as any;
+      if (nav && nav.type && nav.type === 'reload') {
+        isReload = true;
+      }
+    }
+    if (isReload) {
+      // On reload, clear the value
+      localStorage.removeItem('additionalInstructions');
+      return '';
+    }
+    return localStorage.getItem("additionalInstructions") || "";
+  });
+
+  useEffect(() => {
+    function updateTokens() {
+      try {
+        const stats = JSON.parse(localStorage.getItem("usageStats") || "null");
+        let value = 0;
+        if (Array.isArray(stats)) {
+          if (typeof stats[2] === "number") {
+            value = stats[2];
+          } else if (typeof stats[2] === "string") {
+            value = Number(stats[2].replace(/,/g, ""));
+          }
+        }
+        setRemainingTokens(isNaN(value) ? 0 : value);
+      } catch {
+        setRemainingTokens(0);
+      }
+    }
+    updateTokens();
+    window.addEventListener("storage", updateTokens);
+    return () => window.removeEventListener("storage", updateTokens);
+  }, []);
+
+  // Fetch chapters for dropdown
+  useEffect(() => {
+    const loadChapters = async () => {
+      setChaptersLoading(true);
+      setChaptersError("");
+      try {
+        // Always use bookCode "2" for chapter API
+        const result = await getChaptersByBookCode(localStorage.getItem("bookType") || "");
+        if (Array.isArray(result) && result.length > 0) {
+          setChapters(result);
+          // Restore from localStorage or default to first
+          setSelectedChapter((prev) => {
+            const stored = localStorage.getItem("selectedChapter");
+            if (stored && result.some(ch => ch.chapterCode === stored)) return stored;
+            return result[0].chapterCode || "";
+          });
+        } else {
+          setChapters([]);
+          setSelectedChapter("");
+        }
+      } catch (err) {
+        setChaptersError("Failed to load chapters");
+        setChapters([]);
+        setSelectedChapter("");
+      } finally {
+        setChaptersLoading(false);
+      }
+    };
+    loadChapters();
+  }, [bookCode]);
+
+  // Fetch LOs when selectedChapter changes
+  useEffect(() => {
+    if (!selectedChapter) {
+      setLearningObjectives([]);
+      setSelectedLO("");
+      return;
+    }
+    setLoLoading(true);
+    setLoError("");
+    setLearningObjectives([]);
+    setSelectedLO("");
+    // Defensive: trim chapter code for API
+    const chapterCode = selectedChapter.trim();
+    getLearningObjectives(chapterCode)
+      .then((result) => {
+        setLearningObjectives(result);
+        // Restore from localStorage or default to first
+        const stored = localStorage.getItem("selectedLO");
+        if (stored && result.some(lo => lo.loCode === stored)) {
+          setSelectedLO(stored);
+        } else if (result.length > 0) {
+          setSelectedLO(result[0].loCode || "");
+        }
+      })
+      .catch(() => {
+        setLoError("Failed to load learning objectives");
+        setLearningObjectives([]);
+        setSelectedLO("");
+      })
+      .finally(() => setLoLoading(false));
+  }, [selectedChapter]);
+
+  const handleGenerateQuestions = () => {
+    // Gather all required data for item generation
+    const params = {
+      question: additionalInstructions,
+      selectedOption: generationMode ? "Book Based" : "Global",
+      selectedBook: { bookid: localStorage.getItem("bookCode") || "2" },
+      questiontypeid: selectedQuestionType,
+      taxonomyid: selectedTaxonomy,
+      difficultylevelid: "1", // You may want to add a difficulty dropdown
+      selectedChapterCode: selectedChapter,
+      looutcomesId: selectedLO,
+      selectedQuantity: selectedQuantity, // Pass as selectedQuantity for downstream
+      noofquestions: selectedQuantity, // Always pass as noofquestions for downstream
+      creativitylevelid: "1", // You may want to add a creativity dropdown
+      agenttype: "1", // You may want to add an agent type selector
+    };
+    navigate("/question-generation-loading", { state: params });
+  };
+
+  // Persist Study Domain (Chapter)
+  useEffect(() => {
+    if (selectedChapter) localStorage.setItem("selectedChapter", selectedChapter);
+  }, [selectedChapter]);
+
+  // Persist Learning Objective
+  useEffect(() => {
+    if (selectedLO) localStorage.setItem("selectedLO", selectedLO);
+  }, [selectedLO]);
+
+  // Persist Point Value
+  useEffect(() => {
+    if (pointValue) localStorage.setItem("pointValue", pointValue);
+  }, [pointValue]);
+
+  // Persist Additional Instructions
+  useEffect(() => {
+    localStorage.setItem("additionalInstructions", additionalInstructions);
+  }, [additionalInstructions]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -76,27 +313,41 @@ const QuestionGenerator = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">AL</span>
               </div>
-              <img 
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
-                alt="AI-Levate" 
+              <img
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
+                alt="AI-Levate"
                 className="h-5 w-auto"
               />
-              <span className="text-sm text-gray-500">Cyber Risk</span>
+              <span className="text-sm text-gray-500">
+                {bookTitle}
+              </span>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-purple-600 rounded flex items-center justify-center">
                 <span className="text-white text-xs">✦</span>
               </div>
-              <span className="text-sm text-purple-600 font-medium">Cyber Risk</span>
+              <span className="text-sm text-purple-600 font-medium">{bookTitle}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
                 <span className="text-white text-xs">⚡</span>
               </div>
-              <span className="text-sm text-blue-600 font-medium">7,762 Tokens</span>
+              <span className="text-sm text-blue-600 font-medium">
+                {/* Show total tokens used from localStorage data[0] if available, else 0 */}
+                {(() => {
+                  let total = "0";
+                  try {
+                    const statsRaw = JSON.parse(localStorage.getItem("usageStats") || "null");
+                    if (Array.isArray(statsRaw) && statsRaw.length > 0 && statsRaw[0] != null) {
+                      total = Number(statsRaw[0]).toLocaleString();
+                    }
+                  } catch { }
+                  return total + " Tokens";
+                })()}
+              </span>
             </div>
             <Link to="/item-generation">
               <Button variant="ghost" size="sm" className="text-gray-600">
@@ -104,9 +355,9 @@ const QuestionGenerator = () => {
                 Back to Knowledge Base
               </Button>
             </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className="text-gray-600"
               onClick={() => {
                 localStorage.removeItem('authToken')
@@ -129,22 +380,23 @@ const QuestionGenerator = () => {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setActiveTab("generate")}
-                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                  activeTab === "generate"
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
+                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${activeTab === "generate"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
               >
                 <Sparkles className="h-4 w-4" />
                 Generate Questions
               </button>
               <button
-                onClick={() => setActiveTab("repository")}
-                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                  activeTab === "repository"
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
+                onClick={() => {
+                  setActiveTab("repository");
+                  navigate("/question-repository");
+                }}
+                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${window.location.pathname === "/question-repository" || activeTab === "repository"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
               >
                 <FileText className="h-4 w-4" />
                 Question Repository
@@ -165,9 +417,29 @@ const QuestionGenerator = () => {
                     <Zap className="w-4 h-4 text-green-600" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">7,762</div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {remainingTokens.toLocaleString()}
+
+                </div>
                 <div className="text-sm text-green-600 flex items-center gap-1">
-                  <span>+250 today</span>
+                  <span>
+                    {/* Show today's token usage from localStorage usageStats[1] if available, else 0 */}
+                    {(() => {
+                      let today = 0;
+                      try {
+                        const statsRaw = JSON.parse(localStorage.getItem("usageStats") || "null");
+                        if (Array.isArray(statsRaw) && statsRaw.length > 1 && statsRaw[1] != null) {
+                          if (typeof statsRaw[1] === "number") {
+                            today = statsRaw[1];
+                          } else if (typeof statsRaw[1] === "string") {
+                            const cleaned = statsRaw[1].replace(/[^\d.]/g, "");
+                            today = Number(cleaned);
+                          }
+                        }
+                      } catch { }
+                      return `+${today.toLocaleString()} today`;
+                    })()}
+                  </span>
                 </div>
               </Card>
 
@@ -181,8 +453,8 @@ const QuestionGenerator = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Knowledge Base</span>
-                  <Switch 
-                    checked={generationMode} 
+                  <Switch
+                    checked={generationMode}
                     onCheckedChange={setGenerationMode}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -200,12 +472,14 @@ const QuestionGenerator = () => {
                   <h3 className="text-sm font-medium text-gray-700 mb-4">Source Material</h3>
                   <p className="text-xs text-gray-500 mb-4">AI enhanced content</p>
                   <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center">
-                    <img 
-                      src="/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png" 
+                    <img
+                      src="/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png"
                       alt="Cyber Risk Management"
                       className="w-full h-32 object-cover rounded-lg mb-3"
                     />
-                    <h4 className="font-medium text-gray-900 text-sm mb-1">Cyber Risk Management</h4>
+                    <h4 className="font-medium text-gray-900 text-sm mb-1">
+                      {bookTitle}
+                    </h4>
                     <p className="text-xs text-gray-500">Source material loaded successfully</p>
                   </div>
                 </Card>
@@ -224,526 +498,206 @@ const QuestionGenerator = () => {
                     </div>
                   </div>
 
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleGenerateQuestions)} className="space-y-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left side form */}
-                        <div className="space-y-6">
-                          {/* Study Domain */}
-                          <FormField
-                            control={form.control}
-                            name="studyDomain"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="flex items-center gap-2">
-                                  <Target className="w-4 h-4 text-blue-600" />
-                                  Study Domain
-                                </FormLabel>
-                                <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full bg-white border-gray-200">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="defining-risk">Defining Risk and Cyber</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* Taxonomy Framework */}
-                          <FormField
-                            control={form.control}
-                            name="taxonomyFramework"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="flex items-center gap-2">
-                                  <Globe className="w-4 h-4 text-blue-600" />
-                                  Taxonomy Framework
-                                </FormLabel>
-                                <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full bg-white border-gray-200">
-                                      <SelectValue placeholder="Select framework" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="remember">Remember</SelectItem>
-                                      <SelectItem value="understand">Understand</SelectItem>
-                                      <SelectItem value="apply">Apply</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* Question Quantity */}
-                          <FormField
-                            control={form.control}
-                            name="questionQuantity"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="flex items-center gap-2">
-                                  <Hash className="w-4 h-4 text-orange-600" />
-                                  Question Quantity
-                                </FormLabel>
-                                <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full bg-white border-gray-200">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="1">1</SelectItem>
-                                      <SelectItem value="5">5</SelectItem>
-                                      <SelectItem value="10">10</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Left side form */}
+                    <div className="space-y-6">
+                      {/* Study Domain */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Target className="w-4 h-4 text-blue-600" />
+                          <label className="text-sm font-medium text-gray-700">Study Domain (Chapter)</label>
                         </div>
-
-                        {/* Right side form */}
-                        <div className="space-y-6">
-                          {/* Learning Objectives */}
-                          <FormField
-                            control={form.control}
-                            name="learningObjectives"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="flex items-center gap-2">
-                                  <Brain className="w-4 h-4 text-purple-600" />
-                                  Learning Objectives
-                                </FormLabel>
-                                <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full bg-white border-gray-200">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="explain-pure-risk">Explain why pure risk is</SelectItem>
-                                      <SelectItem value="define-cyber-risk">Define cyber risk fundamentals</SelectItem>
-                                      <SelectItem value="analyze-threats">Analyze security threats</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* Question Format */}
-                          <FormField
-                            control={form.control}
-                            name="questionFormat"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="flex items-center gap-2">
-                                  <FileText className="w-4 h-4 text-green-600" />
-                                  Question Format
-                                </FormLabel>
-                                <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full bg-white border-gray-200">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                                      <SelectItem value="written-response">Written Response</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          {/* Point Value */}
-                          <FormField
-                            control={form.control}
-                            name="pointValue"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="flex items-center gap-2">
-                                  <span className="w-4 h-4 text-pink-600 text-sm font-bold">★</span>
-                                  Point Value
-                                </FormLabel>
-                                <FormControl>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger className="w-full bg-white border-gray-200">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="1">1</SelectItem>
-                                      <SelectItem value="2">2</SelectItem>
-                                      <SelectItem value="5">5</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Additional Instructions - Full Width */}
-                      <FormField
-                        control={form.control}
-                        name="additionalInstructions"
-                        render={({ field }) => (
-                          <FormItem className="mt-6">
-                            <FormLabel className="flex items-center gap-2">
-                              <MessageSquare className="w-4 h-4 text-purple-600" />
-                              Additional Instructions
-                            </FormLabel>
-                            <FormControl>
-                              <Textarea 
-                                placeholder="Provide specific instructions for AI question generation..."
-                                className="min-h-[100px] bg-white border-gray-200"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Generate Button */}
-                      <div className="flex justify-center mt-8">
-                        <Button 
-                          type="submit"
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg"
+                        <Select
+                          value={selectedChapter}
+                          onValueChange={val => setSelectedChapter(val)}
+                          disabled={chaptersLoading || chapters.length === 0}
                         >
-                          <Sparkles className="w-4 h-4 mr-2" />
-                          Generate Questions
-                        </Button>
+                          <SelectTrigger className="w-full bg-white border-gray-200">
+                            <SelectValue placeholder={chaptersLoading ? "Loading..." : chaptersError ? chaptersError : "Select chapter"} />
+                          </SelectTrigger>
+                          <SelectContent>
+
+                            {chaptersLoading && (
+                              <div className="px-4 py-2 text-sm text-gray-500">Loading chapters...</div>
+                            )}
+                            {chaptersError && !chaptersLoading && (
+                              <div className="px-4 py-2 text-sm text-red-500">{chaptersError}</div>
+                            )}
+                            {!chaptersLoading && !chaptersError && chapters.length > 0 && chapters.map((chapter) => (
+                              <SelectItem key={chapter.chapterCode} value={chapter.chapterCode}>
+                                {chapter.chapterName || chapter.chapterCode}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                    </form>
-                  </Form>
+
+                      {/* Taxonomy Framework (Taxonomy) */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Globe className="w-4 h-4 text-blue-600" />
+                          <label className="text-sm font-medium text-gray-700">Taxonomy Framework</label>
+                        </div>
+                        {dropdownError ? (
+                          <div className="text-red-500 text-xs mb-2">{dropdownError}</div>
+                        ) : null}
+                        <select
+                          className="w-full border rounded px-3 py-2"
+                          value={selectedTaxonomy}
+                          onChange={e => {
+                            setSelectedTaxonomy(e.target.value);
+                            localStorage.setItem("selectedTaxonomy", e.target.value);
+                          }}
+                          disabled={!!dropdownError || taxonomyList.length === 0}
+                        >
+                          <option value="">-- Select --</option>
+                          {taxonomyList.map((tax, idx) => (
+                            <option key={idx} value={tax}>{tax}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Question Quantity */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="w-4 h-4 text-pink-600 text-sm font-bold">
+                            <Hash className="w-4 h-4 text-orange-600" />
+                          </span>
+                          <label className="text-sm font-medium text-gray-700">Question Quantity</label>
+                        </div>
+                        {dropdownError ? (
+                          <div className="text-red-500 text-xs mb-2">{dropdownError}</div>
+                        ) : null}
+                        <select
+                          className="w-full border rounded px-3 py-2"
+                          value={selectedQuantity}
+                          onChange={e => {
+                            setSelectedQuantity(e.target.value);
+                            localStorage.setItem("selectedQuantity", e.target.value);
+                          }}
+                          disabled={!!dropdownError || questionQuantities.length === 0}
+                        >
+
+                          {questionQuantities.map((qty, idx) => (
+                            <option key={idx} value={qty}>{qty}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Right side form */}
+                    <div className="space-y-6">
+                      {/* Learning Objectives*/}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Brain className="w-4 h-4 text-blue-600" />
+                          <label className="text-sm font-medium text-gray-700">Learning Objectives</label>
+                        </div>
+                        <Select
+                          value={selectedLO}
+                          onValueChange={val => setSelectedLO(val)}
+                          disabled={loLoading || learningObjectives.length === 0}
+                        >
+                          <SelectTrigger className="w-full bg-white border-gray-200">
+                            <SelectValue placeholder={loLoading ? "Loading..." : loError ? loError : "Select learning objective"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {loLoading && (
+                              <div className="px-4 py-2 text-sm text-gray-500">Loading learning objectives...</div>
+                            )}
+                            {loError && !loLoading && (
+                              <div className="px-4 py-2 text-sm text-red-500">{loError}</div>
+                            )}
+                            {!loLoading && !loError && learningObjectives.length > 0 && learningObjectives.map((lo) => (
+                              <SelectItem key={lo.loCode} value={lo.loCode}>
+                                {lo.loName || lo.loCode}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+
+                      {/* Question Format (Question Type) */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <FileText className="w-4 h-4 text-green-600" />
+                          <label className="text-sm font-medium text-gray-700">Question Format</label>
+                        </div>
+                        {dropdownError ? (
+                          <div className="text-red-500 text-xs mb-2">{dropdownError}</div>
+                        ) : null}
+                        <select
+                          className="w-full border rounded px-3 py-2"
+                          value={selectedQuestionType}
+                          onChange={e => {
+                            setSelectedQuestionType(e.target.value);
+                            localStorage.setItem("selectedQuestionType", e.target.value);
+                          }}
+                          disabled={!!dropdownError || questionTypes.length === 0}
+                        >
+                          {questionTypes.map((type, idx) => (
+                            <option key={idx} value={type}>{type}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Point Value */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="w-4 h-4 text-pink-600 text-sm font-bold">★</span>
+                          <label className="text-sm font-medium text-gray-700">Point Value</label>
+                        </div>
+                        <select
+                          className="w-full border rounded px-3 py-2"
+                          value={pointValue}
+                          onChange={e => setPointValue(e.target.value)}
+                        >
+
+                          {selectedQuestionType === "Multiple Choice" && (
+                            <>
+                              <option value="5">1</option>
+
+                            </>
+                          )}
+                          {selectedQuestionType === "Written Response" && (
+                            <>
+                              <option value="5">5</option>
+                              <option value="10">10</option>
+                            </>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Instructions - Full Width */}
+                  <div className="mt-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MessageSquare className="w-4 h-4 text-purple-600" />
+                      <label className="text-sm font-medium text-gray-700">Additional Instructions</label>
+                    </div>
+                    <Textarea
+                      placeholder="Provide specific instructions for AI question generation..."
+                      className="min-h-[100px] bg-white border-gray-200"
+                      value={additionalInstructions}
+                      onChange={e => setAdditionalInstructions(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Generate Button */}
+                  <div className="flex justify-center mt-8">
+                    <Button
+                      onClick={handleGenerateQuestions}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate Questions
+                    </Button>
+                  </div>
                 </Card>
               </div>
             </div>
-          </div>
-        )}
-
-        {activeTab === "repository" && (
-          <div className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="border border-gray-200">
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-600">Total Questions</p>
-                      <p className="text-2xl font-bold" style={{ color: "#1c398e", fontSize: '1.25rem' }}>
-                        1,247
-                      </p>
-                      <p className="text-xs text-gray-500">+15% this month</p>
-                    </div>
-                    <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Database className="h-5 w-5 text-blue-600" />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="border border-gray-200">
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-600">AI Generated</p>
-                      <p className="text-2xl font-bold" style={{ color: "#0d542b", fontSize: '1.25rem' }}>
-                        892
-                      </p>
-                      <p className="text-xs text-gray-500">High quality</p>
-                    </div>
-                    <div className="h-8 w-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <Sparkles className="h-5 w-5 text-purple-600" />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="border border-gray-200">
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-600">This Week</p>
-                      <p className="text-2xl font-bold" style={{ color: "#59168b", fontSize: '1.25rem' }}>
-                        47
-                      </p>
-                      <p className="text-xs text-gray-500">New questions</p>
-                    </div>
-                    <div className="h-8 w-8 bg-green-100 rounded-lg flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-green-600" />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="border border-gray-200">
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-600">Contributors</p>
-                      <p className="text-2xl font-bold" style={{ color: "#7e2a0c", fontSize: '1.25rem' }}>
-                        12
-                      </p>
-                      <p className="text-xs text-gray-500">Active authors</p>
-                    </div>
-                    <div className="h-8 w-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                      <User className="h-5 w-5 text-orange-600" />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Filters & Search */}
-            <Card className="border border-gray-200">
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Settings2 className="h-4 w-4" />
-                    Filters & Search
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Source Type</label>
-                      <Select defaultValue="all-sources">
-                        <SelectTrigger className="bg-white border-gray-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                          <SelectItem value="all-sources">All Sources</SelectItem>
-                          <SelectItem value="book-based">Book Based</SelectItem>
-                          <SelectItem value="ai-generated">AI Generated</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Study Area</label>
-                      <Select defaultValue="all-areas">
-                        <SelectTrigger className="bg-white border-gray-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                          <SelectItem value="all-areas">All Areas</SelectItem>
-                          <SelectItem value="cyber-risk">Cyber Risk</SelectItem>
-                          <SelectItem value="risk-management">Risk Management</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Question Type</label>
-                      <Select defaultValue="all-types">
-                        <SelectTrigger className="bg-white border-gray-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                          <SelectItem value="all-types">All Types</SelectItem>
-                          <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                          <SelectItem value="true-false">True/False</SelectItem>
-                          <SelectItem value="short-answer">Short Answer</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Difficulty</label>
-                      <Select defaultValue="all-levels">
-                        <SelectTrigger className="bg-white border-gray-200">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                          <SelectItem value="all-levels">All Levels</SelectItem>
-                          <SelectItem value="easy">Easy</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="hard">Hard</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Search Questions</label>
-                    <div className="relative">
-                      <Sparkles className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <input 
-                        placeholder="Search questions, topics, or content..." 
-                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Questions Table */}
-            <Card className="border border-gray-200">
-              <div className="p-0">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">3 Questions</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 border-gray-200">
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Delete Selected
-                    </Button>
-                    <Button variant="outline" size="sm" className="border-gray-200">
-                      <FileText className="h-4 w-4 mr-1" />
-                      Export to Word
-                    </Button>
-                    <Button variant="outline" size="sm" className="border-gray-200">
-                      <FileSpreadsheet className="h-4 w-4 mr-1" />
-                      Export to Excel
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200 bg-gray-50">
-                        <th className="text-left p-4 text-sm font-medium text-gray-700 w-12">
-                          <input type="checkbox" className="rounded border-gray-300" />
-                        </th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700 w-16">#</th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700 w-48">Question ID</th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700">Question</th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700">Type</th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700">Topic</th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700">Difficulty</th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700">Created</th>
-                        <th className="text-left p-4 text-sm font-medium text-gray-700 w-24">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="p-4">
-                          <input type="checkbox" className="rounded border-gray-300" />
-                        </td>
-                        <td className="p-4 text-sm font-medium text-gray-900">1</td>
-                        <td className="p-4 text-xs font-mono text-gray-600">C20_V2024_S11_L00_MC_L2_EN_ID2426</td>
-                        <td className="p-4 text-sm text-gray-900 max-w-md">
-                          <p className="truncate">What characteristic of pure risk makes it more acceptable for insurer...</p>
-                        </td>
-                        <td className="p-4 text-sm text-gray-700">Multiple Choice</td>
-                        <td className="p-4 text-sm" style={{ color: "#7e2a0c" }}>Risk Management</td>
-                        <td className="p-4">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            Medium
-                          </span>
-                        </td>
-                        <td className="p-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            2 hours ago
-                          </div>
-                        </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="p-4">
-                          <input type="checkbox" className="rounded border-gray-300" />
-                        </td>
-                        <td className="p-4 text-sm font-medium text-gray-900">2</td>
-                        <td className="p-4 text-xs font-mono text-gray-600">C20_V2024_S11_L01_TF_L1_EN_ID2427</td>
-                        <td className="p-4 text-sm text-gray-900 max-w-md">
-                          <p className="truncate">Pure risk always results in a loss or no loss situation.</p>
-                        </td>
-                        <td className="p-4 text-sm text-gray-700">True/False</td>
-                        <td className="p-4 text-sm" style={{ color: "#7e2a0c" }}>Risk Fundamentals</td>
-                        <td className="p-4">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Easy
-                          </span>
-                        </td>
-                        <td className="p-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            1 day ago
-                          </div>
-                        </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="p-4">
-                          <input type="checkbox" className="rounded border-gray-300" />
-                        </td>
-                        <td className="p-4 text-sm font-medium text-gray-900">3</td>
-                        <td className="p-4 text-xs font-mono text-gray-600">C20_V2024_S11_L02_SA_L3_EN_ID2428</td>
-                        <td className="p-4 text-sm text-gray-900 max-w-md">
-                          <p className="truncate">Explain the relationship between risk assessment and cybersecurity f...</p>
-                        </td>
-                        <td className="p-4 text-sm text-gray-700">Short Answer</td>
-                        <td className="p-4 text-sm" style={{ color: "#7e2a0c" }}>Cybersecurity</td>
-                        <td className="p-4">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            Hard
-                          </span>
-                        </td>
-                        <td className="p-4 text-sm text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            3 days ago
-                          </div>
-                        </td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </Card>
           </div>
         )}
 
