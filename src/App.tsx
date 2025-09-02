@@ -10,6 +10,9 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ItemGenerator from "./pages/ItemGenerator";
 import ItemGeneration from "./pages/ItemGeneration";
+import ItemRewriter from "./pages/ItemRewriter";
+import ItemSimilarity from "./pages/ItemSimilarity";
+import SpeechEvaluation from "./pages/SpeechEvaluation";
 import QuestionGenerator from "./pages/QuestionGenerator";
 import QuestionGenerationLoading from "./pages/QuestionGenerationLoading";
 import QuestionResults from "./pages/QuestionResults";
@@ -17,7 +20,6 @@ import QuestionRepository from "./pages/QuestionRepository";
 import Reports from "./pages/Reports";
 import ManageUsers from "./pages/ManageUsers";
 import NotFound from "./pages/NotFound";
-import ItemSimilarity from "./pages/ItemSimilarity";
 
 const queryClient = new QueryClient();
 
@@ -29,18 +31,19 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/item-generator" element={<ItemGenerator />} />
           <Route path="/item-generation" element={<ItemGeneration />} />
+          <Route path="/item-rewriter" element={<ItemRewriter />} />
+          <Route path="/item-similarity" element={<ItemSimilarity />} />
+          <Route path="/speech-evaluation" element={<SpeechEvaluation />} />
           <Route path="/question-generator/:bookCode" element={<QuestionGenerator />} />
           <Route path="/question-generation-loading" element={<QuestionGenerationLoading />} />
           <Route path="/question-results" element={<QuestionResults />} />
           <Route path="/question-repository" element={<QuestionRepository />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/manage-users" element={<ManageUsers />} />
-          <Route path="/item-similarity" element={<ItemSimilarity />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -50,4 +53,3 @@ const App = () => (
 );
 
 export default App;
-

@@ -21,9 +21,9 @@ const Index = () => {
       <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
-          <img
-            src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-            alt="AI-Levate"
+          <img 
+            src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+            alt="AI-Levate" 
             className="h-10 w-auto"
           />
         </div>
@@ -75,7 +75,7 @@ const Index = () => {
                 </div>
               </div>
 
-              <Button
+              <Button 
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
@@ -98,8 +98,8 @@ const Index = () => {
               <p className="text-sm text-gray-600 mb-4">
                 New User? Register here...
               </p>
-              <Button
-                variant="outline"
+              <Button 
+                variant="outline" 
                 onClick={() => navigate('/register')}
                 className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-medium px-8 py-2 transition-all duration-200"
               >
@@ -113,10 +113,10 @@ const Index = () => {
         <div className="mt-8 text-center space-y-2">
           <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
             <Sparkles className="w-3 h-3" />
-            <span className="flex items-center gap-1">Powered By:
-              <img
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                alt="AI-Levate"
+            <span className="flex items-center gap-1">Powered By: 
+              <img 
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                alt="AI-Levate" 
                 className="h-3 w-auto"
               />
             </span>

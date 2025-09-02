@@ -13,15 +13,11 @@ import { useNavigate } from "react-router-dom"
 
 export function ProfileDropdown() {
   const navigate = useNavigate()
-  // Get user info from localStorage
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}")
-  const displayName = userInfo.username || userInfo.name || "User";
-
+  
   const handleLogout = () => {
     // Clear any stored authentication data
     localStorage.removeItem('authToken')
     localStorage.removeItem('userSession')
-    localStorage.removeItem('userInfo')
     sessionStorage.clear()
     console.log("User logged out successfully")
     navigate("/")
@@ -33,7 +29,7 @@ export function ProfileDropdown() {
         <Button variant="ghost" className="h-10 w-10 rounded-full">
           <Avatar className="h-8 w-8 shadow-lg">
             <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-sm">
-              {displayName.charAt(0).toUpperCase()}
+              RJ
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -41,8 +37,10 @@ export function ProfileDropdown() {
       <DropdownMenuContent className="w-56 mr-4 mt-2 bg-card/95 backdrop-blur-xl border border-border/20" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{displayName}</p>
-            
+            <p className="text-sm font-medium leading-none">Robert Jones</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              robert@excelsoftt.com
+            </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

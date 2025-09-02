@@ -1,10 +1,10 @@
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import {
-  ArrowLeft,
-  BarChart3,
-  BookOpen,
+import { 
+  ArrowLeft, 
+  BarChart3, 
+  BookOpen, 
   TrendingUp,
   Users,
   Zap,
@@ -39,7 +39,7 @@ const ItemGenerator = () => {
       textColor: "text-blue-700"
     },
     {
-      label: "Today's Usage",
+      label: "Today's Usage", 
       value: "2,238",
       subLabel: "Balance: 7,762 remaining",
       change: "+5%",
@@ -103,7 +103,7 @@ const ItemGenerator = () => {
       cover: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png"
     },
     {
-      year: "2023",
+      year: "2023", 
       title: "Principles and Practice of Insurance",
       subtitle: "Chartered Insurance Professional",
       code: "C11",
@@ -127,11 +127,11 @@ const ItemGenerator = () => {
               <div className="h-6 w-px bg-border/40" />
               <h1 className="text-xl font-semibold text-foreground">Item Generator</h1>
             </div>
-
+            
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>Welcome Back,</span>
-                <span className="font-semibold text-primary">Shivaraj Mi</span>
+                <span className="font-semibold text-primary">Robert Jones</span>
               </div>
               <Button variant="ghost" size="icon" className="hover:scale-110 transition-transform duration-200">
                 <Bell className="h-5 w-5" />
@@ -148,7 +148,7 @@ const ItemGenerator = () => {
       {/* Main Content - Bento Grid Layout */}
       <main className="flex-1 p-6">
         <div className="grid grid-cols-12 gap-6 h-full">
-
+          
           {/* Generated Books Section */}
           <div className="col-span-12 lg:col-span-4">
             <Card className="h-full bg-white/90 backdrop-blur-sm border border-border/30 shadow-xl">
@@ -192,11 +192,11 @@ const ItemGenerator = () => {
 
           {/* Statistics Grid */}
           <div className="col-span-12 lg:col-span-8 space-y-6">
-
+            
             {/* Key Metrics - Bento Style */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {stats.map((stat, index) => (
-                <Card
+                <Card 
                   key={index}
                   className={`group bg-white/90 backdrop-blur-sm border border-border/30 shadow-xl hover:shadow-2xl hover-glow transition-all duration-500 hover:-translate-y-1 relative overflow-hidden`}
                   style={{ animationDelay: `${index * 150}ms` }}
@@ -205,7 +205,7 @@ const ItemGenerator = () => {
                   <div className="absolute inset-0 opacity-5">
                     <div className={`w-full h-full bg-gradient-to-br ${stat.gradient}`} />
                   </div>
-
+                  
                   <CardContent className="p-4 relative z-10">
                     <div className="flex items-center justify-between mb-3">
                       <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${stat.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
@@ -217,7 +217,7 @@ const ItemGenerator = () => {
                         </Badge>
                       )}
                     </div>
-
+                    
                     <div className="space-y-2">
                       <div className={`text-2xl font-bold ${stat.textColor} group-hover:scale-105 transition-transform duration-300`}>
                         {stat.value}
@@ -225,13 +225,13 @@ const ItemGenerator = () => {
                       <p className="text-xs font-medium text-muted-foreground">
                         {stat.label}
                       </p>
-
+                      
                       {stat.subLabel && (
                         <p className="text-xs text-muted-foreground">
                           {stat.subLabel}
                         </p>
                       )}
-
+                      
                       {stat.subStats && (
                         <div className="space-y-1 mt-3">
                           {stat.subStats.map((subStat, subIndex) => (
@@ -250,7 +250,7 @@ const ItemGenerator = () => {
 
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
+              
               {/* Daily Usage Trend */}
               <Card className="bg-white/90 backdrop-blur-sm border border-border/30 shadow-xl">
                 <CardHeader className="pb-4">
@@ -265,17 +265,17 @@ const ItemGenerator = () => {
                       <AreaChart data={chartData}>
                         <defs>
                           <linearGradient id="usageGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="hsl(215 55% 40%)" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="hsl(215 55% 40%)" stopOpacity={0.05} />
+                            <stop offset="5%" stopColor="hsl(215 55% 40%)" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(215 55% 40%)" stopOpacity={0.05}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                        <XAxis
-                          dataKey="name"
+                        <XAxis 
+                          dataKey="name" 
                           stroke="hsl(var(--muted-foreground))"
                           fontSize={12}
                         />
-                        <YAxis
+                        <YAxis 
                           stroke="hsl(var(--muted-foreground))"
                           fontSize={12}
                         />
@@ -305,12 +305,12 @@ const ItemGenerator = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={weeklyData} barGap={8}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                        <XAxis
-                          dataKey="day"
+                        <XAxis 
+                          dataKey="day" 
                           stroke="hsl(var(--muted-foreground))"
                           fontSize={12}
                         />
-                        <YAxis
+                        <YAxis 
                           stroke="hsl(var(--muted-foreground))"
                           fontSize={12}
                         />

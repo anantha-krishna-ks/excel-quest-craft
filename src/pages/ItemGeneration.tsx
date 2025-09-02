@@ -1,126 +1,84 @@
-import {
-  ArrowLeft,
-  Users,
-  FileText,
-  Bookmark,
-  ChevronRight,
-  Zap,
-  CheckCircle,
-  Clock,
-  Shield
-} from "lucide-react";
+import { ArrowLeft, Users, FileText, Bookmark, ChevronRight, Zap, CheckCircle, Clock, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState } from "react";
-import itemGenerationImage from "@/assets/item-generation.png"
-
-import { fetchUsageStats, getBookWiseUsage, BookUsage } from "@/api";
 
 const ItemGeneration = () => {
-  const [stats, setStats] = useState<any[]>([]);
-  const [books, setBooks] = useState<BookUsage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-  const custcode = userInfo.customerCode || "ES";
-  const orgcode = userInfo.orgCode || "Exc195";
-  const usercode = userInfo.userCode || "Adm488";
-  const appcode = "IG";
-
-  const transformUsageData = (data: any[]) => [
+  const stats = [
     {
       icon: <Zap className="w-5 h-5 text-orange-600" />,
       title: "Token Usage",
-      total: data[0]?.toLocaleString() || "0",
+      total: "51,449",
       subtitle: "Total Tokens used",
       bgColor: "bg-orange-50",
       items: [
-        { label: "Today's usage", value: data[1]?.toLocaleString() || "0", color: "text-orange-600" },
-        { label: "Balance usage", value: data[2]?.toLocaleString() || "0", color: "text-orange-600" }
+        { label: "Today's usage", value: "5,349", color: "text-orange-600" },
+        { label: "Balance usage", value: "4,651", color: "text-orange-600" }
       ]
     },
     {
       icon: <FileText className="w-5 h-5 text-blue-600" />,
       title: "Questions Generated",
-      total: data[10]?.toString() || "0",
+      total: "72",
       subtitle: "Total Questions Generated",
       bgColor: "bg-blue-50",
       items: [
-        { label: "Multiple Choice", value: data[8]?.toString() || "0", color: "text-blue-600" },
-        { label: "Written Response", value: data[9]?.toString() || "0", color: "text-blue-600" }
+        { label: "Multiple Choice", value: "65", color: "text-blue-600" },
+        { label: "Written Response", value: "7", color: "text-blue-600" }
       ]
     },
     {
       icon: <Bookmark className="w-5 h-5 text-green-600" />,
       title: "Questions Saved",
-      total: data[3]?.toString() || "0",
+      total: "28",
       subtitle: "Total Questions Saved",
       bgColor: "bg-green-50",
       items: [
-        { label: "Multiple Choice", value: data[4]?.toString() || "0", color: "text-green-600" },
-        { label: "Written Response", value: data[5]?.toString() || "0", color: "text-green-600" }
+        { label: "Multiple Choice", value: "27", color: "text-green-600" },
+        { label: "Written Response", value: "1", color: "text-green-600" }
       ]
     }
   ];
 
-  useEffect(() => {
-    const loadStats = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data: string | any[] = await fetchUsageStats({
-          custcode,
-          orgcode,
-          usercode,
-          appcode,
-          type: 1
-        });
-
-        let parsed: any[] = [];
-        if (typeof data === "string") {
-          parsed = (data as string).split(",").map((v: string, i: number) => {
-            if (i === 7) return v.trim();
-            const num = Number(v.replace(/[^\d.-]/g, ""));
-            return isNaN(num) ? v.trim() : num;
-          });
-        } else if (Array.isArray(data) && data.length === 1 && typeof data[0] === "string") {
-          parsed = (String(data[0])).split(",").map((v: string, i: number) => {
-            if (i === 7) return v.trim();
-            const num = Number(v.replace(/[^\d.-]/g, ""));
-            return isNaN(num) ? v.trim() : num;
-          });
-        } else if (Array.isArray(data) && data.length === 1 && Array.isArray(data[0])) {
-          parsed = data[0];
-        }
-
-        setStats(transformUsageData(parsed));
-        // Store parsed usage stats in localStorage for session-like access in other pages
-        try {
-          localStorage.setItem("usageStats", JSON.stringify(parsed));
-        } catch { }
-      } catch (err: any) {
-        setError(err.message || "Failed to load stats");
-        setStats([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const loadBooks = async () => {
-      try {
-        const usage = await getBookWiseUsage(usercode, orgcode, custcode, appcode);
-        setBooks(usage);
-      } catch (err) {
-        console.error("Error loading book usage:", err);
-      }
-    };
-
-    loadStats();
-    loadBooks();
-  }, []);
+  const knowledgeBases = [
+    {
+      id: 1,
+      year: "2024",
+      level: "Advanced",
+      category: "Risk Management",
+      title: "Cyber Risk",
+      description: "Comprehensive cybersecurity and risk management materials",
+      questions: 11,
+      image: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png",
+      status: "Active",
+      lastUpdated: "2 days ago"
+    },
+    {
+      id: 2,
+      year: "2023",
+      level: "Intermediate",
+      category: "Insurance",
+      title: "Principles and Practice of Insurance",
+      description: "Fundamental principles and practical applications of insurance",
+      questions: 17,
+      image: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png",
+      status: "Active",
+      lastUpdated: "1 week ago"
+    },
+    {
+      id: 3,
+      year: "2024",
+      level: "Advanced",
+      category: "Finance",
+      title: "Financial Risk Assessment",
+      description: "Modern approaches to financial risk analysis and management",
+      questions: 23,
+      image: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png",
+      status: "Active",
+      lastUpdated: "3 days ago"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -132,21 +90,21 @@ const ItemGeneration = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">AL</span>
               </div>
-              <img
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                alt="AI-Levate"
+              <img 
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                alt="AI-Levate" 
                 className="h-5 w-auto"
               />
               <span className="text-sm text-gray-500">Knowledge Base Selection</span>
             </div>
           </div>
-
+          
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
                 <span className="text-white text-xs">✦</span>
               </div>
-              {stats[0]?.items[1]?.value ?? "0"}
+              <span className="text-sm text-blue-600 font-medium">4,651 Tokens</span>
             </div>
             <Link to="/dashboard">
               <Button variant="ghost" size="sm" className="text-gray-600">
@@ -168,13 +126,7 @@ const ItemGeneration = () => {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {loading && (
-            <div className="col-span-3 flex justify-center items-center text-blue-600 text-base font-medium py-8">Loading stats...</div>
-          )}
-          {error && (
-            <div className="col-span-3 flex justify-center items-center text-red-600 text-base font-medium py-8">{error}</div>
-          )}
-          {!loading && !error && stats.map((stat, index) => (
+          {stats.map((stat, index) => (
             <Card key={index} className={`p-6 ${stat.bgColor} border border-gray-200 shadow-sm`}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
@@ -182,10 +134,12 @@ const ItemGeneration = () => {
                 </div>
                 <span className="font-medium text-gray-700">{stat.title}</span>
               </div>
+              
               <div className="mb-4">
                 <div className="text-2xl font-bold text-gray-900 mb-2">{stat.total}</div>
                 <div className="text-sm font-medium text-gray-600">{stat.subtitle}</div>
               </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 {stat.items.map((item, idx) => (
                   <div key={idx} className="text-left">
@@ -200,81 +154,65 @@ const ItemGeneration = () => {
 
         {/* Knowledge Base Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {books.map((book, idx) => {
-            // Map BookUsage to card fields with defaults
-            const card = {
-              id: book.bookCode || idx,
-              image: book.imagePath ? `./assets/${book.imagePath}` : "/assets/itemGenerationImage.png",
-
-              level: book.bookType === 2 ? "Advanced" : "Standard", // Example mapping
-              questions: book.totalQuestions ?? 0,
-              category: book.bookType === 2 ? "Reference" : "Textbook", // Example mapping
-              title: book.title || "Untitled Book",
-
-              lastUpdated: "Recently", // No lastUpdated in BookUsage
-
-            };
-            return (
-              <Card key={card.id} className="overflow-hidden bg-white border border-gray-200 hover:shadow-md transition-shadow">
-                {/* Image Section */}
-                <div className="relative h-48 bg-gray-100">
-                  <img
-                    src={card.image}
-                    alt={card.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3">
-
-                  </div>
-                  <div className="absolute top-3 right-3">
-
-                  </div>
-                  <div className="absolute bottom-3 right-3">
-                    <div className="bg-white rounded-lg px-2 py-1 flex items-center gap-1">
-                      <FileText className="w-3 h-3 text-blue-600" />
-                      <span className="text-xs font-medium text-gray-900">Questions: {card.questions}</span>
-                    </div>
-                  </div>
+          {knowledgeBases.map((base) => (
+            <Card key={base.id} className="overflow-hidden bg-white border border-gray-200 hover:shadow-md transition-shadow">
+              {/* Image Section */}
+              <div className="relative h-48 bg-gray-100">
+                <img 
+                  src={base.image} 
+                  alt={base.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-3 left-3">
+                  <Badge variant="secondary" className="bg-gray-900 text-white hover:bg-gray-900">
+                    {base.year}
+                  </Badge>
                 </div>
-
-                {/* Content Section */}
-                <div className="p-6">
-                  <div className="mb-3">
-
-                    <h3 className="font-semibold text-gray-900 mb-2">{card.title}</h3>
-
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-gray-400" />
-                      <span>{card.lastUpdated}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3 text-green-500" />
-                    </div>
-                  </div>
-
-                  <Link
-                    to={`/question-generator/${card.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    onClick={() => {
-                      try {
-                        localStorage.setItem('bookTitle', card.title);
-                        localStorage.setItem('category', card.category);
-                        localStorage.setItem('bookType', String(book.bookType));
-                      } catch (e) { }
-                    }}
+                <div className="absolute top-3 right-3">
+                  <Badge 
+                    variant="secondary" 
+                    className={base.level === 'Advanced' ? 'bg-red-100 text-red-700 hover:bg-red-100' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-100'}
                   >
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                      <Zap className="w-4 h-4 mr-2" />
-                      Start Generating
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
+                    {base.level}
+                  </Badge>
                 </div>
-              </Card>
-            );
-          })}
+                <div className="absolute bottom-3 right-3">
+                  <div className="bg-white rounded-lg px-2 py-1 flex items-center gap-1">
+                    <FileText className="w-3 h-3 text-blue-600" />
+                    <span className="text-xs font-medium text-gray-900">Questions: {base.questions}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Section */}
+              <div className="p-6">
+                <div className="mb-3">
+                  <div className="text-sm text-gray-500 mb-1">{base.category}</div>
+                  <h3 className="font-semibold text-gray-900 mb-2">{base.title}</h3>
+                  <p className="text-sm text-gray-600">{base.description}</p>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <span>{base.lastUpdated}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                    <span>{base.status}</span>
+                  </div>
+                </div>
+
+                <Link to={`/question-generator/${base.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Start Generating
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          ))}
         </div>
 
         {/* Footer */}

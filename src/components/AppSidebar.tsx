@@ -52,7 +52,8 @@ export function AppSidebar() {
     <div className="fixed left-0 top-0 h-full w-52 bg-white/95 backdrop-blur-xl border-r border-border/20 shadow-xl z-40 hidden lg:block">
       <div className="p-6 border-b border-border/20">
         <div className="flex items-center gap-3">
-          
+          <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+          </div>
           <img 
             src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
             alt="AI-Levate" 
