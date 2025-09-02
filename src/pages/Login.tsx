@@ -2,45 +2,95 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, Eye, EyeOff } from "lucide-react";
+import { Sparkles, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "@/api"; // <-- Make sure this path is correct
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    general: ""
+  });
+  const [formData, setFormData] = useState({
+    username: "",
+    password: ""
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear errors when user starts typing
+    if (errors[field as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [field]: "", general: "" }));
+    }
   };
 
-  const canSubmit = () => formData.username.trim() && formData.password.trim();
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const user = await loginUser(formData.username, formData.password);
-      console.log("Login successful:", user);
-      // Save user info to localStorage as 'userInfo' for dashboard
-      localStorage.setItem("userInfo", JSON.stringify(user));
-
-      // Save email and password to sessionStorage for API calls in other components
-      sessionStorage.setItem("email", formData.username);
-      sessionStorage.setItem("password", formData.password);
-
-      console.log(JSON.stringify(user));
-      navigate("/dashboard"); // ✅ Navigate only when login succeeds
-    } catch (err: any) {
-      window.alert("Login failed: " + err.message);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    
+    // Reset errors
+    setErrors({ username: "", password: "", general: "" });
+    
+    // Validation
+    let hasErrors = false;
+    const newErrors = { username: "", password: "", general: "" };
+    
+    // Check if fields are empty
+    if (!formData.username.trim()) {
+      newErrors.username = "Please enter your username or email address";
+      hasErrors = true;
     }
+    
+    if (!formData.password.trim()) {
+      newErrors.password = "Please enter your password";
+      hasErrors = true;
+    }
+    
+    if (hasErrors) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    // Email format validation for username field
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isEmail = emailRegex.test(formData.username);
+    
+    // Simulate login validation with demo account
+    const validAccounts = [
+      { username: "demo@example.com", password: "password123", type: "email" }
+    ];
+    
+    const matchedAccount = validAccounts.find(account => 
+      account.username.toLowerCase() === formData.username.toLowerCase()
+    );
+    
+    if (!matchedAccount) {
+      if (isEmail) {
+        newErrors.username = `No account found with email "${formData.username}". Please check the spelling or create a new account.`;
+      } else {
+        newErrors.username = `Username "${formData.username}" doesn't exist. Try using: demo@example.com`;
+      }
+      setErrors(newErrors);
+      return;
+    }
+    
+    if (matchedAccount.password !== formData.password) {
+      if (formData.password.length < 6) {
+        newErrors.password = "Password is too short. Please enter at least 6 characters.";
+      } else {
+        newErrors.password = `Incorrect password for ${matchedAccount.type === 'email' ? 'this email' : 'username "' + matchedAccount.username + '"'}. Please try again.`;
+      }
+      setErrors(newErrors);
+      return;
+    }
+    
+    // Successful login
+    navigate("/dashboard");
+  };
+
+  const canSubmit = () => {
+    return formData.username.trim() && formData.password.trim();
   };
 
   return (
@@ -50,7 +100,7 @@ const Login = () => {
         <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-spin" style={{ animationDuration: '20s' }} />
         <div className="absolute top-1/3 -right-20 w-64 h-64 bg-gradient-to-r from-purple-400/15 to-pink-400/15 rounded-full blur-3xl animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }} />
         <div className="absolute -bottom-32 left-1/4 w-96 h-96 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 rounded-full blur-3xl animate-spin" style={{ animationDuration: '30s' }} />
-
+        
         {/* Floating Elements */}
         <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400/40 rounded-full animate-pulse" />
         <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-purple-400/40 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
@@ -63,9 +113,9 @@ const Login = () => {
           <div className="max-w-md text-center space-y-8">
             {/* AI-Levate Logo */}
             <div className="flex items-center justify-center space-x-3 mb-8">
-              <img
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                alt="AI-Levate"
+              <img 
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                alt="AI-Levate" 
                 className="h-12 w-auto"
               />
             </div>
@@ -74,13 +124,13 @@ const Login = () => {
             <div className="relative mx-auto w-80 h-80">
               {/* Central Core */}
               <div className="absolute inset-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-r from-primary to-blue-500 rounded-full shadow-2xl animate-pulse" />
-
+              
               {/* Orbiting Elements */}
               <div className="absolute inset-0 animate-spin" style={{ animationDuration: '20s' }}>
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-80" />
                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full opacity-80" />
               </div>
-
+              
               <div className="absolute inset-0 animate-spin" style={{ animationDuration: '15s', animationDirection: 'reverse' }}>
                 <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full opacity-80" />
                 <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-6 h-6 bg-gradient-to-r from-red-400 to-rose-400 rounded-full opacity-80" />
@@ -120,9 +170,9 @@ const Login = () => {
           <div className="w-full max-w-md">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center justify-center mb-8">
-              <img
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                alt="AI-Levate"
+              <img 
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                alt="AI-Levate" 
                 className="h-10 w-auto"
               />
             </div>
@@ -137,19 +187,31 @@ const Login = () => {
 
                 {/* Login Form */}
                 <form className="space-y-6" onSubmit={handleSubmit}>
-                  {loading && (
-                    <div className="flex justify-center items-center text-blue-600 text-base font-medium py-2">
-                      Signing in, please wait...
+                  {/* General Error Message */}
+                  {errors.general && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg animate-fade-in">
+                      <div className="flex items-center">
+                        <AlertCircle className="w-4 h-4 text-red-500 mr-2 flex-shrink-0" />
+                        <p className="text-sm text-red-700">{errors.general}</p>
+                      </div>
                     </div>
                   )}
+
                   <div>
                     <Input
                       placeholder="Username or Email"
                       value={formData.username}
                       onChange={(e) => handleInputChange('username', e.target.value)}
-                      className="h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200"
-                      disabled={loading}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${
+                        errors.username ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : ''
+                      }`}
                     />
+                    {errors.username && (
+                      <div className="flex items-center mt-2 animate-fade-in">
+                        <AlertCircle className="w-4 h-4 text-red-500 mr-1 flex-shrink-0" />
+                        <p className="text-sm text-red-600">{errors.username}</p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="relative">
@@ -158,42 +220,55 @@ const Login = () => {
                       placeholder="Password"
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
-                      className="h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 pr-12"
-                      disabled={loading}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 pr-12 ${
+                        errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : ''
+                      }`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary transition-colors"
-                      disabled={loading}
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
+                    {errors.password && (
+                      <div className="flex items-center mt-2 animate-fade-in">
+                        <AlertCircle className="w-4 h-4 text-red-500 mr-1 flex-shrink-0" />
+                        <p className="text-sm text-red-600">{errors.password}</p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between">
                     <button
                       type="button"
                       className="text-sm text-primary hover:text-primary/80 transition-colors"
-                      disabled={loading}
                     >
                       Forgot password?
                     </button>
                   </div>
 
-                  <Button
+                  {/* Help section with demo credentials */}
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-xs font-medium text-blue-800 mb-2">Demo Account (for testing):</p>
+                    <div className="text-xs text-blue-700">
+                      <div><strong>Email:</strong> demo@example.com / password123</div>
+                    </div>
+                  </div>
+
+                  <Button 
                     type="submit"
-                    disabled={!canSubmit() || loading}
+                    disabled={!canSubmit()}
                     className="w-full h-12 bg-[#2563eb] hover:bg-[#2563eb]/90 text-white font-semibold rounded-lg transform transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
                   >
-                    {loading ? "Signing In..." : "Sign In"}
+                    Sign In
                   </Button>
                 </form>
 
                 <div className="mt-6 text-center">
                   <p className="text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <button
+                    <button 
                       onClick={() => navigate('/register')}
                       className="text-primary hover:text-primary/80 font-medium transition-colors underline"
                     >
@@ -208,10 +283,10 @@ const Login = () => {
             <div className="mt-8 text-center space-y-2">
               <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
                 <Sparkles className="w-3 h-3" />
-                <span className="flex items-center gap-1">Powered By:
-                  <img
-                    src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                    alt="AI-Levate"
+                <span className="flex items-center gap-1">Powered By: 
+                  <img 
+                    src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                    alt="AI-Levate" 
                     className="h-3 w-auto"
                   />
                 </span>

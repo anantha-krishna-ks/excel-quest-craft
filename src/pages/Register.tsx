@@ -1,18 +1,16 @@
 import { useState } from "react";
-import CryptoJS from 'crypto-js';
-import axios from 'axios';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertCircle, CheckCircle2, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Brain, Sparkles, ArrowRight, ArrowLeft, Check, Mail, User, Building, Shield, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "@/api";
 
 const Register = () => {
   const navigate = useNavigate();
-  // Removed unused useState
+  const [currentStep, setCurrentStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -45,13 +43,15 @@ const Register = () => {
     general: ""
   });
 
-  const handleInputChange = (field: keyof typeof formData, value: string | boolean) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-
+    
+    // Clear errors when user starts typing
     if (errors[field as keyof typeof errors]) {
       setErrors(prev => ({ ...prev, [field]: "", general: "" }));
     }
-
+    
+    // Real-time validation
     if (typeof value === 'string' && value.length > 0) {
       if (field === 'email') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,41 +61,69 @@ const Register = () => {
       } else if (field === 'confirmPassword') {
         setFieldValidation(prev => ({ ...prev, [field]: value === formData.password && value.length >= 6 }));
       } else if (field === 'contactNumber') {
-        const phoneRegex = /^[\+]?\d{7,15}$/;
-        setFieldValidation(prev => ({ ...prev, [field]: phoneRegex.test(value) }));
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        setFieldValidation(prev => ({ ...prev, [field]: phoneRegex.test(value.replace(/\s/g, '')) }));
       } else {
         setFieldValidation(prev => ({ ...prev, [field]: value.trim().length > 0 }));
-      }
-    } else if (typeof value === 'boolean') {
-      if (field === 'acceptTerms') {
-        setFieldValidation(prev => ({ ...prev, [field]: value }));
       }
     }
   };
 
+  const getProgressPercentage = () => {
+    return (currentStep / 3) * 100;
+  };
 
+  const canProceedStep1 = () => {
+    return formData.firstName.trim() && formData.email.trim() && fieldValidation.email;
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const canProceedStep2 = () => {
+    return formData.username.trim() && formData.password.trim() && fieldValidation.password;
+  };
+
+  const canSubmit = () => {
+    return formData.organizationName.trim() && formData.acceptTerms;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const newErrors = { ...errors };
+    
+    // Reset errors
+    const newErrors = {
+      firstName: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      contactNumber: "",
+      organizationName: "",
+      general: ""
+    };
+    
+    // Validation
     let hasErrors = false;
-
+    
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
       hasErrors = true;
     }
+    
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
       hasErrors = true;
     } else if (!fieldValidation.email) {
-      newErrors.email = "Invalid email address";
+      newErrors.email = "Please enter a valid email address";
       hasErrors = true;
     }
+    
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
       hasErrors = true;
+    } else if (formData.username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters";
+      hasErrors = true;
     }
+    
     if (!formData.password.trim()) {
       newErrors.password = "Password is required";
       hasErrors = true;
@@ -103,163 +131,47 @@ const Register = () => {
       newErrors.password = "Password must be at least 6 characters";
       hasErrors = true;
     }
+    
     if (!formData.confirmPassword.trim()) {
-      newErrors.confirmPassword = "Confirm your password";
+      newErrors.confirmPassword = "Please confirm your password";
       hasErrors = true;
-    } else if (formData.password !== formData.confirmPassword) {
+    } else if (formData.confirmPassword !== formData.password) {
       newErrors.confirmPassword = "Passwords do not match";
       hasErrors = true;
     }
+    
+    if (formData.contactNumber.trim() && !fieldValidation.contactNumber) {
+      newErrors.contactNumber = "Please enter a valid contact number";
+      hasErrors = true;
+    }
+    
     if (!formData.organizationName.trim()) {
       newErrors.organizationName = "Organization name is required";
       hasErrors = true;
     }
+    
     if (!formData.acceptTerms) {
-      newErrors.general = "Accept the terms to continue";
+      newErrors.general = "Please accept the End User License Agreement to continue";
       hasErrors = true;
     }
-
+    
     if (hasErrors) {
       setErrors(newErrors);
       return;
     }
-
-    try {
-      const payload = {
-        firstname: formData.firstName,
-        lastname: formData.lastName,
-        email: formData.email,
-        contactnumber: formData.contactNumber || "",
-        orgname: formData.organizationName,
-        username: formData.username,
-        password: formData.password,
-        createdBy: "",
-        userID: 0
-      };
-
-      const response = await registerUser(payload);
-
-      // Defensive: try to extract a message from the response
-      let errorMsg = '';
-      if (response && typeof response === 'object') {
-        errorMsg = response.message || '';
-      }
-
-      if (response.status === "S001") {
-        // Show backend message if available, else fallback
-        const successMsg = response.message || "✅ Registration successful. Please login.";
-        alert(successMsg);
-        // Log the full response for debugging
-        // eslint-disable-next-line no-console
-        console.log("Registration success response:", response);
-
-        // Function to send registration email after successful registration
-        const sendRegistrationEmail = async (username: string, email: string) => {
-          const dynamicKey = 'Excelsoft'; // Use a static key for simplicity; consider using a more secure method in production 
-          const userData = JSON.stringify({ username, email });
-          const encryptedData = CryptoJS.AES.encrypt(userData, dynamicKey).toString();
-          const encodedEncryptedData = encodeURIComponent(encryptedData);
-          const loginUrl = `https://ailevate.excelsoftcorp.com/#/login?data=${encodedEncryptedData}`;
-          const emailBody = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; text-align: center; padding: 20px;">
-      <img src="https://ailevate.excelsoftcorp.com/assets/images/Subscribedimage.png" alt="Welcome to AI-Levate" style="max-width: 100%; height: auto; margin-bottom: 20px; border-radius: 10px;">
-      <h1 style="color: #007bff;">Hi ${username},</h1>
-      <p style="font-size: 16px; margin-bottom: 20px;">
-        Congratulations! You have been successfully registered to <strong>AI-Levate</strong>.
-      </p>
-      <p style="font-size: 16px; margin-bottom: 20px;">
-        Please verify your login by clicking on the below link:
-      </p>
-      <a href="${loginUrl}" 
-        style="display: inline-block; background-color: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">
-        Login
-      </a>
-      <p style="margin-top: 30px; font-size: 14px; color: #555;">
-        Thanks and Regards,<br>
-        <strong>Excelsoft Technologies Ltd</strong><br>
-        Mysore
-      </p>
-    </div>
-  `;
-          const emailData = {
-            to: email,
-            subject: 'Registration Successful - AI-Levate',
-            body: emailBody,
-          };
-          try {
-            const response = await axios.post(
-              'https://ai.excelsoftcorp.com/aiapps/AIProductApi/send-email',
-              emailData
-            );
-            if (response?.data?.status === 'success') {
-              // Optionally show a toast or notification here
-              // Email sent successfully
-            } else {
-              // Optionally handle email send failure
-              // eslint-disable-next-line no-console
-              console.error('Failed to send email:', response.data);
-            }
-          } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error('Error sending email:', error);
-          }
-        };
-
-        // Call the email function after successful registration
-        // Call the email function after successful registration
-        // Move this call to after the function declaration to avoid TDZ error
-        sendRegistrationEmail(formData.username, formData.email).then(() => {
-          navigate("/");
-        });
-        return;
-      } else if (response.status === 'FL001') {
-        setErrors(prev => ({ ...prev, general: 'User already exists.' }));
-      } else if (response.status === 'O001') {
-        setErrors(prev => ({ ...prev, general: 'Organization already exists.' }));
-      } else if (response.status === 'LO001') {
-        setErrors(prev => ({ ...prev, general: 'The User Name already exists.' }));
-      } else if (response.status === 'EM001') {
-        setErrors(prev => ({ ...prev, general: 'The Email already exists.' }));
-      } else if (errorMsg) {
-        setErrors(prev => ({ ...prev, general: errorMsg }));
-      } else {
-        setErrors(prev => ({ ...prev, general: 'User registration failed' }));
-      }
-    } catch (error: any) {
-      // Robust error extraction for various error shapes (Axios, fetch, etc.)
-      // Log error for debugging
-      // eslint-disable-next-line no-console
-      console.error("Registration error (full object):", error);
-      let errorMsg = "Registration failed";
-      const status = error?.response?.data?.status;
-      if (status === 'FL001') {
-        errorMsg = 'User already exists.';
-      } else if (status === 'O001') {
-        errorMsg = 'Organization already exists.';
-      } else if (status === 'LO001') {
-        errorMsg = 'The User Name already exists.';
-      } else if (status === 'EM001') {
-        errorMsg = 'The Email already exists.';
-      } else if (error?.response?.data?.message) {
-        errorMsg = error.response.data.message;
-      } else if (error?.message) {
-        errorMsg = error.message;
-      } else if (typeof error === 'string') {
-        errorMsg = error;
-      } else if (error?.toString) {
-        errorMsg = error.toString();
-      }
-      // If still default, show a user-friendly fallback instead of just '{}'
-      if (
-        (errorMsg === "Registration failed" || errorMsg === "{}" || errorMsg === "[object Object]") &&
-        error && typeof error === 'object' && Object.keys(error).length === 0
-      ) {
-        errorMsg = "Registration failed. Please check your details or try a different email/username.";
-      }
-      setErrors(prev => ({ ...prev, general: errorMsg }));
-    }
+    
+    // Simulate successful registration
+    console.log("Registration successful:", formData);
+    navigate("/dashboard");
   };
 
+  const nextStep = () => {
+    if (currentStep < 3) setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 relative overflow-hidden">
@@ -268,7 +180,7 @@ const Register = () => {
         <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-spin" style={{ animationDuration: '20s' }} />
         <div className="absolute top-1/3 -right-20 w-64 h-64 bg-gradient-to-r from-purple-400/15 to-pink-400/15 rounded-full blur-3xl animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }} />
         <div className="absolute -bottom-32 left-1/4 w-96 h-96 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 rounded-full blur-3xl animate-spin" style={{ animationDuration: '30s' }} />
-
+        
         {/* Floating Elements */}
         <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400/40 rounded-full animate-pulse" />
         <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-purple-400/40 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
@@ -281,9 +193,9 @@ const Register = () => {
           <div className="max-w-md text-center space-y-8">
             {/* AI-Levate Logo */}
             <div className="flex items-center justify-center space-x-3 mb-8">
-              <img
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                alt="AI-Levate"
+              <img 
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                alt="AI-Levate" 
                 className="h-12 w-auto"
               />
             </div>
@@ -292,13 +204,13 @@ const Register = () => {
             <div className="relative mx-auto w-80 h-80">
               {/* Central Core */}
               <div className="absolute inset-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-r from-primary to-blue-500 rounded-full shadow-2xl animate-pulse" />
-
+              
               {/* Orbiting Elements */}
               <div className="absolute inset-0 animate-spin" style={{ animationDuration: '20s' }}>
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-80" />
                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full opacity-80" />
               </div>
-
+              
               <div className="absolute inset-0 animate-spin" style={{ animationDuration: '15s', animationDirection: 'reverse' }}>
                 <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full opacity-80" />
                 <div className="absolute top-1/2 left-0 transform -translate-y-1/2 w-6 h-6 bg-gradient-to-r from-red-400 to-rose-400 rounded-full opacity-80" />
@@ -338,9 +250,9 @@ const Register = () => {
           <div className="w-full max-w-md">
             {/* Mobile Logo */}
             <div className="lg:hidden flex items-center justify-center mb-8">
-              <img
-                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                alt="AI-Levate"
+              <img 
+                src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                alt="AI-Levate" 
                 className="h-10 w-auto"
               />
             </div>
@@ -351,7 +263,7 @@ const Register = () => {
                 <div className="text-center mb-8">
                   <div className="text-sm text-gray-500 mb-4">
                     Already have an account?{' '}
-                    <button
+                    <button 
                       onClick={() => navigate('/')}
                       className="text-primary hover:text-primary/80 font-medium transition-colors underline"
                     >
@@ -380,9 +292,10 @@ const Register = () => {
                         placeholder="First Name *"
                         value={formData.firstName}
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${errors.firstName ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
-                            fieldValidation.firstName ? 'border-green-300 focus:border-green-500' : ''
-                          }`}
+                        className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${
+                          errors.firstName ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 
+                          fieldValidation.firstName ? 'border-green-300 focus:border-green-500' : ''
+                        }`}
                       />
                       {errors.firstName && (
                         <div className="flex items-center mt-1 animate-fade-in">
@@ -405,9 +318,10 @@ const Register = () => {
                       placeholder="Email Address *"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
-                          fieldValidation.email && formData.email ? 'border-green-300 focus:border-green-500' : ''
-                        }`}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${
+                        errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 
+                        fieldValidation.email && formData.email ? 'border-green-300 focus:border-green-500' : ''
+                      }`}
                     />
                     {errors.email && (
                       <div className="flex items-center mt-2 animate-fade-in">
@@ -428,9 +342,10 @@ const Register = () => {
                       placeholder="Username *"
                       value={formData.username}
                       onChange={(e) => handleInputChange('username', e.target.value)}
-                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${errors.username ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
-                          fieldValidation.username && formData.username ? 'border-green-300 focus:border-green-500' : ''
-                        }`}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${
+                        errors.username ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 
+                        fieldValidation.username && formData.username ? 'border-green-300 focus:border-green-500' : ''
+                      }`}
                     />
                     {errors.username && (
                       <div className="flex items-center mt-2 animate-fade-in">
@@ -446,9 +361,10 @@ const Register = () => {
                       placeholder="Password *"
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
-                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 pr-12 ${errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
-                          fieldValidation.password && formData.password ? 'border-green-300 focus:border-green-500' : ''
-                        }`}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 pr-12 ${
+                        errors.password ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 
+                        fieldValidation.password && formData.password ? 'border-green-300 focus:border-green-500' : ''
+                      }`}
                     />
                     <button
                       type="button"
@@ -477,9 +393,10 @@ const Register = () => {
                       placeholder="Confirm Password *"
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 pr-12 ${errors.confirmPassword ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
-                          fieldValidation.confirmPassword && formData.confirmPassword ? 'border-green-300 focus:border-green-500' : ''
-                        }`}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 pr-12 ${
+                        errors.confirmPassword ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 
+                        fieldValidation.confirmPassword && formData.confirmPassword ? 'border-green-300 focus:border-green-500' : ''
+                      }`}
                     />
                     <button
                       type="button"
@@ -508,9 +425,10 @@ const Register = () => {
                       placeholder="Contact Number"
                       value={formData.contactNumber}
                       onChange={(e) => handleInputChange('contactNumber', e.target.value)}
-                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${errors.contactNumber ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
-                          fieldValidation.contactNumber && formData.contactNumber ? 'border-green-300 focus:border-green-500' : ''
-                        }`}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${
+                        errors.contactNumber ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 
+                        fieldValidation.contactNumber && formData.contactNumber ? 'border-green-300 focus:border-green-500' : ''
+                      }`}
                     />
                     {errors.contactNumber && (
                       <div className="flex items-center mt-2 animate-fade-in">
@@ -531,9 +449,10 @@ const Register = () => {
                       placeholder="Organization Name *"
                       value={formData.organizationName}
                       onChange={(e) => handleInputChange('organizationName', e.target.value)}
-                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${errors.organizationName ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
-                          fieldValidation.organizationName && formData.organizationName ? 'border-green-300 focus:border-green-500' : ''
-                        }`}
+                      className={`h-12 border-gray-200 bg-white/80 focus:border-primary focus:ring-primary/20 transition-all duration-200 ${
+                        errors.organizationName ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 
+                        fieldValidation.organizationName && formData.organizationName ? 'border-green-300 focus:border-green-500' : ''
+                      }`}
                     />
                     {errors.organizationName && (
                       <div className="flex items-center mt-2 animate-fade-in">
@@ -551,13 +470,13 @@ const Register = () => {
                     />
                     <Label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
                       I accept the{' '}
-                      <a href="https://ai.excelsoftcorp.com/aiapps/EULA/AIEULA.html" className="text-primary hover:text-primary/80 underline">
+                      <a href="#" className="text-primary hover:text-primary/80 underline">
                         End User License Agreement (EULA)
                       </a>
                     </Label>
                   </div>
 
-                  <Button
+                  <Button 
                     type="submit"
                     className="w-full h-12 bg-[#2563eb] hover:bg-[#2563eb]/90 text-white font-semibold rounded-lg transform transition-all duration-200 hover:scale-[1.02]"
                   >
@@ -571,10 +490,10 @@ const Register = () => {
             <div className="mt-8 text-center space-y-2">
               <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
                 <Sparkles className="w-3 h-3" />
-                <span className="flex items-center gap-1">Powered By:
-                  <img
-                    src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png"
-                    alt="AI-Levate"
+                <span className="flex items-center gap-1">Powered By: 
+                  <img 
+                    src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
+                    alt="AI-Levate" 
                     className="h-3 w-auto"
                   />
                 </span>
