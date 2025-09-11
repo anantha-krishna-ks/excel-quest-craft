@@ -175,7 +175,7 @@ const Dashboard = () => {
     },
     {
       id: "essay-evaluation",
-      title: "Essay Evaluation",
+      title: "Essay Evaluation - Fine tuned",
       description: "Subjective questions are evaluated for predefined books, using AI to get score and feedbacks for answer responses.",
       path: "/essay-evaluation",
       image: essayEvaluationImage,
