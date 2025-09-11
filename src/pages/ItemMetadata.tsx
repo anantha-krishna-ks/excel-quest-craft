@@ -7,7 +7,13 @@ import {
   Filter,
   FileText,
   Database,
-  CheckCircle
+  CheckCircle,
+  Sparkles,
+  BarChart3,
+  Target,
+  Trash2,
+  Eye,
+  Settings
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +23,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AppSidebar } from "@/components/AppSidebar"
 import { ProfileDropdown } from "@/components/ProfileDropdown"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "@/hooks/use-toast"
 
 const ItemMetadata = () => {
@@ -26,6 +35,52 @@ const ItemMetadata = () => {
   const [customMetadata2, setCustomMetadata2] = useState("")
   const [customMetadata3, setCustomMetadata3] = useState("")
   const [showResults, setShowResults] = useState(false)
+  const [activeTab, setActiveTab] = useState("upload")
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const stats = [
+    {
+      icon: <Sparkles className="w-5 h-5" />,
+      title: "Items Processed",
+      total: "2,847",
+      subtitle: "Total Analyzed",
+      bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
+      iconBg: "bg-blue-600",
+      textColor: "text-blue-600",
+      borderColor: "border-blue-200"
+    },
+    {
+      icon: <Database className="w-5 h-5" />,
+      title: "Metadata Generated",
+      total: "8,541",
+      subtitle: "Total Tags",
+      bgColor: "bg-gradient-to-br from-green-50 to-green-100",
+      iconBg: "bg-green-600",
+      textColor: "text-green-600",
+      borderColor: "border-green-200"
+    },
+    {
+      icon: <Target className="w-5 h-5" />,
+      title: "Accuracy Rate",
+      total: "96.8%",
+      subtitle: "Quality Score",
+      bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
+      iconBg: "bg-purple-600",
+      textColor: "text-purple-600",
+      borderColor: "border-purple-200"
+    },
+    {
+      icon: <BarChart3 className="w-5 h-5" />,
+      title: "Processing Time",
+      total: "2.3s",
+      subtitle: "Avg per Item",
+      bgColor: "bg-gradient-to-br from-orange-50 to-orange-100",
+      iconBg: "bg-orange-600",
+      textColor: "text-orange-600",
+      borderColor: "border-orange-200"
+    }
+  ]
 
   const metadataOptions = [
     "Select metadata",
@@ -49,15 +104,65 @@ const ItemMetadata = () => {
   const customMetadata2Options = getAvailableOptions([customMetadata1, customMetadata3])
   const customMetadata3Options = getAvailableOptions([customMetadata1, customMetadata2])
 
+  const validateFile = (file: File) => {
+    if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls') && !file.name.endsWith('.csv')) {
+      toast({
+        title: "Invalid File Format",
+        description: "Please upload .xlsx, .xls, or .csv files only",
+        variant: "destructive",
+      })
+      return false
+    }
+    return true
+  }
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (file) {
+    if (file && validateFile(file)) {
       setUploadedFile(file)
+      setActiveTab("configure")
       toast({
         title: "File uploaded successfully",
-        description: `${file.name} has been uploaded.`
+        description: `${file.name} has been uploaded and validated.`
       })
     }
+  }
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault()
+    setIsDragOver(false)
+    const file = event.dataTransfer.files[0]
+    if (file && validateFile(file)) {
+      setUploadedFile(file)
+      setActiveTab("configure")
+      toast({
+        title: "File uploaded successfully",
+        description: `${file.name} has been uploaded and validated.`
+      })
+    }
+  }
+
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (event: React.DragEvent) => {
+    event.preventDefault()
+    setIsDragOver(false)
+  }
+
+  const handleRemoveFile = () => {
+    setUploadedFile(null)
+    setActiveTab("upload")
+    const fileInput = document.getElementById('file-upload') as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
+    }
+    toast({
+      title: "File Removed",
+      description: "File has been removed successfully"
+    })
   }
 
   const handleDownloadTemplate = () => {
@@ -98,11 +203,18 @@ const ItemMetadata = () => {
       return
     }
 
-    setShowResults(true)
-    toast({
-      title: "Analysis complete",
-      description: "Metadata has been generated successfully."
-    })
+    setIsProcessing(true)
+    
+    // Simulate processing time
+    setTimeout(() => {
+      setIsProcessing(false)
+      setShowResults(true)
+      setActiveTab("results")
+      toast({
+        title: "Analysis complete",
+        description: "Metadata has been generated successfully."
+      })
+    }, 2500)
   }
 
   // Sample results data
@@ -131,209 +243,375 @@ const ItemMetadata = () => {
   ]
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-gray-50">
       <AppSidebar />
+      
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link to="/dashboard">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover:bg-gray-100">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
                 </Button>
               </Link>
-              <div className="flex items-center gap-2">
-                <Database className="h-6 w-6 text-blue-600" />
-                <h1 className="text-2xl font-semibold text-gray-900">Item Metadata Generator</h1>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                  <Database className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Item Metadata Generator</h1>
+                  <p className="text-sm text-gray-500">AI-powered metadata extraction and analysis</p>
+                </div>
               </div>
             </div>
-            <ProfileDropdown />
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+              <ProfileDropdown />
+            </div>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
-            
-            {/* Step 1: Download Template */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 bg-blue-600 text-white rounded-full text-sm">1</span>
-                  Download Standard Template
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  Download the standard template and enter your item details as specified.
-                </p>
-                <Button onClick={handleDownloadTemplate} className="flex items-center gap-2">
-                  <Download className="h-4 w-4" />
-                  Download Template
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Step 2: Upload File */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 bg-blue-600 text-white rounded-full text-sm">2</span>
-                  Import Completed File
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  Upload the completed template file with your item details.
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <Label htmlFor="file-upload" className="sr-only">Upload file</Label>
-                    <Input
-                      id="file-upload"
-                      type="file"
-                      accept=".csv,.xlsx,.xls"
-                      onChange={handleFileUpload}
-                      className="cursor-pointer"
-                    />
-                  </div>
-                  {uploadedFile && (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <CheckCircle className="h-4 w-4" />
-                      <span className="text-sm">{uploadedFile.name}</span>
+        {/* Stats Cards */}
+        <div className="px-6 py-4 bg-white border-b">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {stats.map((stat, index) => (
+              <Card key={index} className={`${stat.bgColor} ${stat.borderColor} border-2 transition-all duration-200 hover:shadow-lg hover:scale-105`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-sm font-medium ${stat.textColor}`}>{stat.title}</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-gray-900">{stat.total}</p>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">{stat.subtitle}</p>
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Step 3: Select Metadata */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 bg-blue-600 text-white rounded-full text-sm">3</span>
-                  Select Metadata to Generate
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="main-metadata">Primary Metadata</Label>
-                  <Select value={selectedMetadata} onValueChange={setSelectedMetadata}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select metadata type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {metadataOptions.map((option) => (
-                        <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
-                          {option}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="custom-metadata-1">Custom Metadata 1</Label>
-                    <Select value={customMetadata1} onValueChange={setCustomMetadata1}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select metadata" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customMetadata1Options.map((option) => (
-                          <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="custom-metadata-2">Custom Metadata 2</Label>
-                    <Select value={customMetadata2} onValueChange={setCustomMetadata2}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select metadata" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customMetadata2Options.map((option) => (
-                          <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="custom-metadata-3">Custom Metadata 3</Label>
-                    <Select value={customMetadata3} onValueChange={setCustomMetadata3}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select metadata" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customMetadata3Options.map((option) => (
-                          <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Button onClick={handleFilterAndGenerate} className="w-full flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filter and Generate
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Results Table */}
-            {showResults && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Generated Metadata Results
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-16">Sl. No.</TableHead>
-                          <TableHead>Question</TableHead>
-                          <TableHead>
-                            {selectedMetadata || "Metadata 1"}
-                          </TableHead>
-                          <TableHead>
-                            {customMetadata1 || "Metadata 2"}
-                          </TableHead>
-                          <TableHead>
-                            {customMetadata2 || "Metadata 3"}
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {resultsData.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell className="font-medium">{item.id}</TableCell>
-                            <TableCell className="max-w-md">{item.question}</TableCell>
-                            <TableCell>{item.metadata1}</TableCell>
-                            <TableCell>{item.metadata2}</TableCell>
-                            <TableCell>{item.metadata3}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <div className={`p-3 rounded-lg ${stat.iconBg} text-white`}>
+                      {stat.icon}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            )}
+            ))}
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-auto p-6">
+          <div className="max-w-6xl mx-auto">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-8 bg-white border border-gray-200 p-1">
+                <TabsTrigger value="upload" className="flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Upload & Template
+                </TabsTrigger>
+                <TabsTrigger value="configure" className="flex items-center gap-2" disabled={!uploadedFile}>
+                  <Settings className="h-4 w-4" />
+                  Configure Metadata
+                </TabsTrigger>
+                <TabsTrigger value="results" className="flex items-center gap-2" disabled={!showResults}>
+                  <BarChart3 className="h-4 w-4" />
+                  Results
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="upload" className="space-y-6">
+                {/* Download Template Card */}
+                <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-blue-800">
+                      <div className="p-2 bg-blue-600 text-white rounded-lg">
+                        <Download className="h-5 w-5" />
+                      </div>
+                      Step 1: Download Standard Template
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-blue-700 mb-4">
+                      Download our standard template to ensure your data is formatted correctly for optimal metadata generation.
+                    </p>
+                    <Button 
+                      onClick={handleDownloadTemplate} 
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Template (.CSV)
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Upload File Card */}
+                <Card className="border-2 border-green-100 bg-gradient-to-br from-green-50 to-green-100">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-green-800">
+                      <div className="p-2 bg-green-600 text-white rounded-lg">
+                        <Upload className="h-5 w-5" />
+                      </div>
+                      Step 2: Upload Your Completed File
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-green-700 mb-4">
+                      Upload your completed template with item details. Supported formats: .CSV, .XLSX, .XLS
+                    </p>
+                    
+                    <div 
+                      className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${
+                        isDragOver 
+                          ? 'border-green-400 bg-green-50' 
+                          : uploadedFile 
+                            ? 'border-green-300 bg-green-50' 
+                            : 'border-gray-300 hover:border-green-400'
+                      }`}
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                    >
+                      {uploadedFile ? (
+                        <div className="space-y-4">
+                          <CheckCircle className="h-12 w-12 text-green-600 mx-auto" />
+                          <div>
+                            <p className="text-lg font-semibold text-green-800">{uploadedFile.name}</p>
+                            <p className="text-sm text-green-600">File uploaded successfully</p>
+                          </div>
+                          <div className="flex gap-3 justify-center">
+                            <Button 
+                              onClick={handleRemoveFile}
+                              variant="outline" 
+                              size="sm"
+                              className="text-red-600 border-red-200 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove File
+                            </Button>
+                            <Button 
+                              onClick={() => setActiveTab("configure")}
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Continue to Configure
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <Upload className="h-12 w-12 text-gray-400 mx-auto" />
+                          <div>
+                            <p className="text-lg font-medium text-gray-700">
+                              Drag and drop your file here, or click to browse
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Supports .CSV, .XLSX, .XLS files up to 10MB
+                            </p>
+                          </div>
+                          <div>
+                            <Label htmlFor="file-upload" className="sr-only">Upload file</Label>
+                            <Input
+                              id="file-upload"
+                              type="file"
+                              accept=".csv,.xlsx,.xls"
+                              onChange={handleFileUpload}
+                              className="max-w-xs mx-auto cursor-pointer"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="configure" className="space-y-6">
+                <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-purple-800">
+                      <div className="p-2 bg-purple-600 text-white rounded-lg">
+                        <Settings className="h-5 w-5" />
+                      </div>
+                      Configure Metadata Generation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="main-metadata" className="text-sm font-medium text-purple-800">
+                          Primary Metadata Type <span className="text-red-500">*</span>
+                        </Label>
+                        <Select value={selectedMetadata} onValueChange={setSelectedMetadata}>
+                          <SelectTrigger className="bg-white border-purple-200">
+                            <SelectValue placeholder="Select primary metadata type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {metadataOptions.map((option) => (
+                              <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="custom-metadata-1" className="text-sm font-medium text-purple-800">
+                            Custom Metadata 1 (Optional)
+                          </Label>
+                          <Select value={customMetadata1} onValueChange={setCustomMetadata1}>
+                            <SelectTrigger className="bg-white border-purple-200">
+                              <SelectValue placeholder="Select metadata" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {customMetadata1Options.map((option) => (
+                                <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="custom-metadata-2" className="text-sm font-medium text-purple-800">
+                            Custom Metadata 2 (Optional)
+                          </Label>
+                          <Select value={customMetadata2} onValueChange={setCustomMetadata2}>
+                            <SelectTrigger className="bg-white border-purple-200">
+                              <SelectValue placeholder="Select metadata" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {customMetadata2Options.map((option) => (
+                                <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="custom-metadata-3" className="text-sm font-medium text-purple-800">
+                            Custom Metadata 3 (Optional)
+                          </Label>
+                          <Select value={customMetadata3} onValueChange={setCustomMetadata3}>
+                            <SelectTrigger className="bg-white border-purple-200">
+                              <SelectValue placeholder="Select metadata" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {customMetadata3Options.map((option) => (
+                                <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {isProcessing ? (
+                        <Card className="bg-blue-50 border-blue-200">
+                          <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                              <div className="animate-spin">
+                                <Sparkles className="h-6 w-6 text-blue-600" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-blue-800">Processing your items...</p>
+                                <p className="text-sm text-blue-600">AI is analyzing and generating metadata</p>
+                                <Progress value={75} className="w-full mt-2" />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <Button 
+                          onClick={handleFilterAndGenerate} 
+                          size="lg" 
+                          className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                          disabled={!selectedMetadata || selectedMetadata === "Select metadata"}
+                        >
+                          <Filter className="h-4 w-4 mr-2" />
+                          Generate Metadata Analysis
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="results" className="space-y-6">
+                <Card className="border-2 border-orange-100 bg-gradient-to-br from-orange-50 to-orange-100">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 text-orange-800">
+                        <div className="p-2 bg-orange-600 text-white rounded-lg">
+                          <BarChart3 className="h-5 w-5" />
+                        </div>
+                        Generated Metadata Results
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="border-orange-200 hover:bg-orange-100">
+                          <Download className="h-4 w-4 mr-2" />
+                          Export CSV
+                        </Button>
+                        <Button variant="outline" size="sm" className="border-orange-200 hover:bg-orange-100">
+                          <Eye className="h-4 w-4 mr-2" />
+                          Preview
+                        </Button>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-white rounded-lg border border-orange-200">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-orange-100">
+                            <TableHead className="w-16 font-semibold">Sl. No.</TableHead>
+                            <TableHead className="font-semibold">Question</TableHead>
+                            <TableHead className="font-semibold">
+                              {selectedMetadata || "Metadata 1"}
+                            </TableHead>
+                            <TableHead className="font-semibold">
+                              {customMetadata1 || "Metadata 2"}
+                            </TableHead>
+                            <TableHead className="font-semibold">
+                              {customMetadata2 || "Metadata 3"}
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {resultsData.map((item) => (
+                            <TableRow key={item.id} className="hover:bg-orange-50">
+                              <TableCell className="font-medium">{item.id}</TableCell>
+                              <TableCell className="max-w-md text-sm">{item.question}</TableCell>
+                              <TableCell>
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                  {item.metadata1}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                  {item.metadata2}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                                  {item.metadata3}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>
