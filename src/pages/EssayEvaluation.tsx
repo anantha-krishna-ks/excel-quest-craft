@@ -1,10 +1,8 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { AppSidebar } from "@/components/AppSidebar"
-import { ProfileDropdown } from "@/components/ProfileDropdown"
 import { Link } from "react-router-dom"
-import { BookOpen, Users, FileText, ArrowRight } from "lucide-react"
+import { BookOpen, Users, FileText, ArrowRight, ArrowLeft, PenTool } from "lucide-react"
 import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 
 const EssayEvaluation = () => {
@@ -28,28 +26,48 @@ const EssayEvaluation = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AppSidebar />
-      
-      <div className="ml-0 lg:ml-52 min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Essay Evaluation - Fine tuned</h1>
-                <p className="text-xs text-gray-600">AI-powered evaluation for subjective responses</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 px-6 py-4 sticky top-0 z-50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+                <PenTool className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-900">Essay Evaluation - Fine tuned</span>
+                <span className="text-xs text-gray-500">AI-powered evaluation for subjective responses</span>
               </div>
             </div>
-            
-            <div className="flex items-center gap-4">
-              <ProfileDropdown />
-            </div>
           </div>
-        </header>
+          
+          <div className="flex items-center gap-4">
+            <Link to="/dashboard">
+              <Button variant="ghost" size="sm" className="text-gray-600">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
 
-        {/* Main Content */}
-        <main className="flex-1 px-6 py-6">
+      {/* Main Content */}
+      <div className="p-6 max-w-7xl mx-auto space-y-8">
+        {/* Page Title */}
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+            <PenTool className="w-4 h-4" />
+            Essay Assessment Platform
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+            Essay Evaluation System
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Subjective questions are evaluated for predefined books, using AI to get score and feedbacks for answer responses
+          </p>
+        </div>
           {/* Stats Widgets */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Card className="p-6 bg-blue-50 border border-gray-200 shadow-sm">
@@ -122,7 +140,6 @@ const EssayEvaluation = () => {
               ))}
             </div>
           </div>
-        </main>
       </div>
     </div>
   )

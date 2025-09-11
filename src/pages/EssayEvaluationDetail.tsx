@@ -6,10 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { AppSidebar } from "@/components/AppSidebar"
-import { ProfileDropdown } from "@/components/ProfileDropdown"
-import { useParams } from "react-router-dom"
-import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp } from "lucide-react"
+import { useParams, Link } from "react-router-dom"
+import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp, ArrowLeft, PenTool } from "lucide-react"
 import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 
 const EssayEvaluationDetail = () => {
@@ -45,28 +43,35 @@ const EssayEvaluationDetail = () => {
   const totalQuestions = questions.length
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AppSidebar />
-      
-      <div className="ml-0 lg:ml-52 min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Essay Evaluation Detail</h1>
-                <p className="text-xs text-gray-600">Evaluate candidate responses and review evaluations</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 px-6 py-4 sticky top-0 z-50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
+                <PenTool className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-900">Essay Evaluation Detail</span>
+                <span className="text-xs text-gray-500">Evaluate candidate responses and review evaluations</span>
               </div>
             </div>
-            
-            <div className="flex items-center gap-4">
-              <ProfileDropdown />
-            </div>
           </div>
-        </header>
+          
+          <div className="flex items-center gap-4">
+            <Link to="/essay-evaluation">
+              <Button variant="ghost" size="sm" className="text-gray-600">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Essays
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
 
-        {/* Main Content */}
-        <main className="flex-1 px-6 py-6">
+      {/* Main Content */}
+      <div className="p-6 max-w-7xl mx-auto space-y-8">
           <Tabs defaultValue="evaluate" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="evaluate">Evaluate Candidate</TabsTrigger>
@@ -218,7 +223,6 @@ const EssayEvaluationDetail = () => {
               </Card>
             </TabsContent>
           </Tabs>
-        </main>
       </div>
     </div>
   )
