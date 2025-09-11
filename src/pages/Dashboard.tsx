@@ -174,7 +174,7 @@ const Dashboard = () => {
     },
     {
       id: "essay-evaluation",
-      title: "Essay Evaluation - Fine...",
+      title: "Essay Evaluation Copy paste candidate response",
       description: "Personalized feedback using AI to get some evaluation...",
       path: "/essay-evaluation",
       image: comingSoonImage,
