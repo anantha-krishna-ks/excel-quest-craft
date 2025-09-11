@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -43,187 +43,238 @@ const EssayEvaluationDetail = () => {
   const totalQuestions = questions.length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 px-6 py-4 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-                <PenTool className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold text-gray-900">Essay Evaluation Detail</span>
-                <span className="text-xs text-gray-500">Evaluate candidate responses and review evaluations</span>
-              </div>
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+              <PenTool className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">Essay Evaluation Detail</h1>
+              <p className="text-sm text-gray-500">Evaluate candidate responses and review evaluations</p>
             </div>
           </div>
-          
           <div className="flex items-center gap-4">
             <Link to="/essay-evaluation">
-              <Button variant="ghost" size="sm" className="text-gray-600">
-                <ArrowLeft className="w-4 h-4 mr-2" />
+              <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+                <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Essays
               </Button>
             </Link>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="p-6 max-w-7xl mx-auto space-y-8">
+      <main className="p-6">
+        <div className="max-w-6xl mx-auto space-y-8">
           <Tabs defaultValue="evaluate" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="evaluate">Evaluate Candidate</TabsTrigger>
               <TabsTrigger value="review">Review Evaluation</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="evaluate" className="space-y-6">
-              {/* Header Section */}
-              <Card className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="md:w-1/3">
-                    <img 
-                      src={essayEvaluationImage}
-                      alt="Essay Evaluation"
-                      className="w-full h-40 object-cover rounded-lg"
-                    />
-                  </div>
-                  <div className="md:w-2/3">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Enter Candidate ID for Evaluation</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="candidateId">Candidate ID *</Label>
-                        <Input 
-                          id="candidateId"
-                          value={candidateId}
-                          onChange={(e) => setCandidateId(e.target.value)}
-                          placeholder="Enter candidate ID"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="courseDetails">Course Details</Label>
-                        <Input 
-                          id="courseDetails"
-                          value={courseDetails}
-                          onChange={(e) => setCourseDetails(e.target.value)}
-                          placeholder="Enter course details"
-                        />
+            <TabsContent value="evaluate" className="space-y-8">
+              {/* Step 1: Candidate Information */}
+              <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-blue-800">
+                    <div className="p-2 bg-blue-600 text-white rounded-lg">
+                      <PenTool className="h-5 w-5" />
+                    </div>
+                    Step 1: Enter Candidate Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="md:w-1/3">
+                      <img 
+                        src={essayEvaluationImage}
+                        alt="Essay Evaluation"
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                    </div>
+                    <div className="md:w-2/3 space-y-4">
+                      <p className="text-blue-700 mb-4">
+                        Enter the candidate ID and course details to begin the evaluation process.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="candidateId" className="text-blue-800">Candidate ID *</Label>
+                          <Input 
+                            id="candidateId"
+                            value={candidateId}
+                            onChange={(e) => setCandidateId(e.target.value)}
+                            placeholder="Enter candidate ID"
+                            className="bg-white border-blue-200"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="courseDetails" className="text-blue-800">Course Details</Label>
+                          <Input 
+                            id="courseDetails"
+                            value={courseDetails}
+                            onChange={(e) => setCourseDetails(e.target.value)}
+                            placeholder="Enter course details"
+                            className="bg-white border-blue-200"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </CardContent>
               </Card>
 
-              {/* Summary Section */}
-              <Card className="p-6">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Summary</h3>
-                    <p className="text-gray-600">Total Questions: <span className="font-semibold text-gray-900">{totalQuestions}</span></p>
+              {/* Step 2: Evaluation Actions */}
+              <Card className="border-2 border-green-100 bg-gradient-to-br from-green-50 to-green-100">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-green-800">
+                    <div className="p-2 bg-green-600 text-white rounded-lg">
+                      <Save className="h-5 w-5" />
+                    </div>
+                    Step 2: Evaluation Summary & Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                      <p className="text-green-700 mb-2">
+                        Total Questions: <span className="font-semibold text-green-800">{totalQuestions}</span>
+                      </p>
+                      <p className="text-sm text-green-600">
+                        Use the actions below to manage your evaluation process.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button className="bg-green-600 hover:bg-green-700 text-white">
+                        Evaluate Essay
+                      </Button>
+                      <Button variant="outline" className="border-green-200 hover:bg-green-50">
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Response
+                      </Button>
+                      <Button variant="outline" className="border-green-200 hover:bg-green-50">
+                        <FileSpreadsheet className="h-4 w-4 mr-2" />
+                        Export to Excel
+                      </Button>
+                      <Button variant="outline" className="border-green-200 hover:bg-green-50">
+                        <Trash className="h-4 w-4 mr-2" />
+                        Clear All
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="border-green-200 hover:bg-green-50"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp className="h-4 w-4 mr-2" />
+                            Collapse
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-4 w-4 mr-2" />
+                            Expand
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                      Evaluate Essay
-                    </Button>
-                    <Button variant="outline">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Response
-                    </Button>
-                    <Button variant="outline">
-                      <FileSpreadsheet className="h-4 w-4 mr-2" />
-                      Export to Excel
-                    </Button>
-                    <Button variant="outline">
-                      <Trash className="h-4 w-4 mr-2" />
-                      Clear All
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => setIsExpanded(!isExpanded)}
-                    >
-                      {isExpanded ? (
-                        <>
-                          <ChevronUp className="h-4 w-4 mr-2" />
-                          Collapse
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="h-4 w-4 mr-2" />
-                          Expand
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
+                </CardContent>
               </Card>
 
-              {/* Questions Section */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Questions</h3>
-                <Accordion type="single" collapsible className="w-full">
-                  {questions.map((question) => (
-                    <AccordionItem key={question.id} value={`question-${question.id}`}>
-                      <AccordionTrigger className="text-left">
-                        <div className="flex flex-col items-start">
-                          <div className="font-medium">Question ID: {question.id}</div>
-                          <div className="text-sm text-gray-600 mt-1">
-                            Question Stem: {question.stem}
+              {/* Step 3: Questions */}
+              <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-purple-800">
+                    <div className="p-2 bg-purple-600 text-white rounded-lg">
+                      <FileSpreadsheet className="h-5 w-5" />
+                    </div>
+                    Step 3: Evaluate Questions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-purple-700 mb-6">
+                    Review each question and provide candidate responses for evaluation.
+                  </p>
+                  <Accordion type="single" collapsible className="w-full space-y-4">
+                    {questions.map((question) => (
+                      <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
+                        <AccordionTrigger className="text-left px-4 hover:no-underline">
+                          <div className="flex flex-col items-start">
+                            <div className="font-medium text-purple-800">Question ID: {question.id}</div>
+                            <div className="text-sm text-purple-600 mt-1">
+                              Question Stem: {question.stem}
+                            </div>
                           </div>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4">
-                        <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                          <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Key Answer:</h4>
-                            <p className="text-sm text-gray-700">{question.keyAnswer}</p>
-                          </div>
-                          
-                          <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Marker Notes:</h4>
-                            <p className="text-sm text-gray-700">{question.markerNotes}</p>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 space-y-4">
+                          <div className="bg-purple-50 p-4 rounded-lg space-y-3 border border-purple-100">
+                            <div>
+                              <h4 className="font-semibold text-purple-900 mb-2">Key Answer:</h4>
+                              <p className="text-sm text-purple-800">{question.keyAnswer}</p>
+                            </div>
+                            
+                            <div>
+                              <h4 className="font-semibold text-purple-900 mb-2">Marker Notes:</h4>
+                              <p className="text-sm text-purple-800">{question.markerNotes}</p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold text-purple-900 mb-2">Key Points:</h4>
+                              <ul className="list-disc list-inside space-y-1 text-sm text-purple-800">
+                                {question.keyPoints.map((point, index) => (
+                                  <li key={index}>{point}</li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div className="flex gap-4 text-sm text-purple-700 pt-2 border-t border-purple-200">
+                              <span><strong>Max Score:</strong> {question.maxScore}</span>
+                              <span><strong>Reference:</strong> {question.reference}</span>
+                            </div>
                           </div>
 
-                          <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Key Points:</h4>
-                            <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-                              {question.keyPoints.map((point, index) => (
-                                <li key={index}>{point}</li>
-                              ))}
-                            </ul>
+                          <div className="space-y-2">
+                            <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium">
+                              Answer Response:
+                            </Label>
+                            <Textarea 
+                              id={`answer-${question.id}`}
+                              placeholder="Enter candidate's answer response..."
+                              className="min-h-[100px] bg-white border-purple-200"
+                              value={question.answer}
+                            />
                           </div>
-
-                          <div className="flex gap-4 text-sm text-gray-600">
-                            <span><strong>Max Score:</strong> {question.maxScore}</span>
-                            <span><strong>Reference:</strong> {question.reference}</span>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor={`answer-${question.id}`}>Answer Response:</Label>
-                          <Textarea 
-                            id={`answer-${question.id}`}
-                            placeholder="Enter candidate's answer response..."
-                            className="min-h-[100px]"
-                            value={question.answer}
-                          />
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </CardContent>
               </Card>
             </TabsContent>
             
-            <TabsContent value="review" className="space-y-6">
-              <Card className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Review Evaluation</h2>
-                <p className="text-gray-600">Review evaluation functionality will be implemented here.</p>
+            <TabsContent value="review" className="space-y-8">
+              <Card className="border-2 border-orange-100 bg-gradient-to-br from-orange-50 to-orange-100">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-orange-800">
+                    <div className="p-2 bg-orange-600 text-white rounded-lg">
+                      <FileSpreadsheet className="h-5 w-5" />
+                    </div>
+                    Review Evaluation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-orange-700">Review evaluation functionality will be implemented here.</p>
+                </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }
