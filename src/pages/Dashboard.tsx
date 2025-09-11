@@ -18,6 +18,7 @@ import docChatImage from "@/assets/doc-chat-ncert.png"
 import ocrImage from "@/assets/ocr.png"
 import comingSoonImage from "@/assets/coming-soon.png"
 import speechEvaluationImage from "@/assets/speech-evaluation-hero.jpg"
+import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("All")
@@ -174,10 +175,10 @@ const Dashboard = () => {
     },
     {
       id: "essay-evaluation",
-      title: "Essay Evaluation Copy paste candidate response",
-      description: "Personalized feedback using AI to get some evaluation...",
+      title: "Essay Evaluation",
+      description: "Subjective questions are evaluated for predefined books, using AI to get score and feedbacks for answer responses.",
       path: "/essay-evaluation",
-      image: comingSoonImage,
+      image: essayEvaluationImage,
       category: "Assessment",
       icon: BarChart3,
       subscriptionStatus: "pending"
