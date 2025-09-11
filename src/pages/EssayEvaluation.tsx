@@ -1,0 +1,131 @@
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { AppSidebar } from "@/components/AppSidebar"
+import { ProfileDropdown } from "@/components/ProfileDropdown"
+import { Link } from "react-router-dom"
+import { BookOpen, Users, FileText, ArrowRight } from "lucide-react"
+import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
+
+const EssayEvaluation = () => {
+  const essayCards = [
+    {
+      id: "essay-1",
+      title: "Biology Assessment",
+      image: essayEvaluationImage,
+      questionsTotal: 8,
+      questionsEvaluated: 1,
+      usersEvaluated: 1
+    },
+    {
+      id: "essay-2", 
+      title: "Physics Evaluation",
+      image: essayEvaluationImage,
+      questionsTotal: 10,
+      questionsEvaluated: 3,
+      usersEvaluated: 2
+    }
+  ]
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <AppSidebar />
+      
+      <div className="ml-0 lg:ml-52 min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+          <div className="flex h-16 items-center justify-between px-6">
+            <div className="flex items-center gap-4">
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">Essay Evaluation - Fine tuned</h1>
+                <p className="text-xs text-gray-600">AI-powered evaluation for subjective responses</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <ProfileDropdown />
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="flex-1 px-6 py-6">
+          {/* Stats Widgets */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card className="p-6 bg-blue-50 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                  <FileText className="h-4 w-4 text-blue-600" />
+                </div>
+                <span className="font-medium text-gray-700">Total Questions Evaluated</span>
+              </div>
+              <div className="text-3xl font-bold text-gray-900">2</div>
+            </Card>
+
+            <Card className="p-6 bg-green-50 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                  <Users className="h-4 w-4 text-green-600" />
+                </div>
+                <span className="font-medium text-gray-700">Total Users Evaluated</span>
+              </div>
+              <div className="text-3xl font-bold text-gray-900">2</div>
+            </Card>
+          </div>
+
+          {/* Essay Cards */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Available Essays</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {essayCards.map((essay) => (
+                <Card key={essay.id} className="group bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1">
+                  <div className="relative">
+                    <img 
+                      src={essay.image} 
+                      alt={essay.title}
+                      className="w-full h-40 object-cover rounded-t-lg"
+                    />
+                    <div className="absolute top-3 left-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm">
+                      <BookOpen className="h-4 w-4 text-gray-700" />
+                    </div>
+                  </div>
+                  
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold text-gray-900 mb-4">{essay.title}</h3>
+                    
+                    <div className="space-y-2 mb-4 text-sm text-gray-600">
+                      <div className="flex justify-between">
+                        <span>Number of Questions:</span>
+                        <span className="font-medium text-gray-900">{essay.questionsTotal}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Questions Evaluated:</span>
+                        <span className="font-medium text-gray-900">{essay.questionsEvaluated}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Users Evaluated:</span>
+                        <span className="font-medium text-gray-900">{essay.usersEvaluated}</span>
+                      </div>
+                    </div>
+                    
+                    <Link to={`/essay-evaluation/${essay.id}`}>
+                      <Button 
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 hover:scale-[1.02]"
+                        size="sm"
+                      >
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        Open Essay
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
+
+export default EssayEvaluation

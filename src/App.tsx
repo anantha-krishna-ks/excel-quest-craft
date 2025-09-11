@@ -14,6 +14,8 @@ import ItemRewriter from "./pages/ItemRewriter";
 import ItemSimilarity from "./pages/ItemSimilarity";
 import ItemMetadata from "./pages/ItemMetadata";
 import SpeechEvaluation from "./pages/SpeechEvaluation";
+import EssayEvaluation from "./pages/EssayEvaluation";
+import EssayEvaluationDetail from "./pages/EssayEvaluationDetail";
 import QuestionGenerator from "./pages/QuestionGenerator";
 import QuestionGenerationLoading from "./pages/QuestionGenerationLoading";
 import QuestionResults from "./pages/QuestionResults";
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/item-similarity" element={<ItemSimilarity />} />
           <Route path="/item-metadata" element={<ItemMetadata />} />
           <Route path="/speech-evaluation" element={<SpeechEvaluation />} />
+          <Route path="/essay-evaluation" element={<EssayEvaluation />} />
+          <Route path="/essay-evaluation/:essayId" element={<EssayEvaluationDetail />} />
           <Route path="/question-generator/:bookCode" element={<QuestionGenerator />} />
           <Route path="/question-generation-loading" element={<QuestionGenerationLoading />} />
           <Route path="/question-results" element={<QuestionResults />} />
