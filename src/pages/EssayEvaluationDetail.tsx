@@ -87,6 +87,34 @@ const EssayEvaluationDetail = () => {
     setShowSaveDialog(false)
   }
 
+  const handleDownloadEvaluation = (evaluation: any) => {
+    // Create a simple CSV download
+    const csvContent = `Candidate ID,Evaluated Date,Evaluated By,Question,Answer,AI Score,Feedback\n` +
+      evaluation.questions.map((q: any) => 
+        `"${evaluation.candidateId}","${evaluation.evaluatedDate}","${evaluation.evaluatedBy}","${q.stem}","${q.answer}","${q.aiScore}","${q.feedback}"`
+      ).join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `evaluation_${evaluation.candidateId}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  const handleViewEvaluation = (evaluation: any) => {
+    // Switch to evaluate tab and load the evaluation data
+    setCandidateId(evaluation.candidateId)
+    setQuestions(evaluation.questions.length > 0 ? evaluation.questions : questions)
+    setIsEvaluated(evaluation.questions.length > 0)
+    // Force switch to evaluate tab
+    const evaluateTab = document.querySelector('[value="evaluate"]') as HTMLElement
+    if (evaluateTab) {
+      evaluateTab.click()
+    }
+  }
+
   const [questions, setQuestions] = useState([
     {
       id: 1,
@@ -511,10 +539,20 @@ const EssayEvaluationDetail = () => {
                             <TableCell>{evaluation.evaluatedBy}</TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button variant="ghost" size="sm">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleDownloadEvaluation(evaluation)}
+                                  title="Download evaluation"
+                                >
                                   <Download className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleViewEvaluation(evaluation)}
+                                  title="View evaluation"
+                                >
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </div>
