@@ -193,7 +193,7 @@ const EssayEvaluationDetail = () => {
                     <div className="p-2 bg-purple-600 text-white rounded-lg">
                       <FileSpreadsheet className="h-5 w-5" />
                     </div>
-                    Step 3: Evaluate Questions
+                    Step 2: Evaluate Questions
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -212,6 +212,18 @@ const EssayEvaluationDetail = () => {
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4 space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium">
+                              Answer Response:
+                            </Label>
+                            <Textarea 
+                              id={`answer-${question.id}`}
+                              placeholder="Enter candidate's answer response..."
+                              className="min-h-[100px] bg-white border-purple-200"
+                              value={question.answer}
+                            />
+                          </div>
+                          
                           <div className="bg-purple-50 p-4 rounded-lg space-y-3 border border-purple-100">
                             <div>
                               <h4 className="font-semibold text-purple-900 mb-2">Key Answer:</h4>
@@ -236,18 +248,6 @@ const EssayEvaluationDetail = () => {
                               <span><strong>Max Score:</strong> {question.maxScore}</span>
                               <span><strong>Reference:</strong> {question.reference}</span>
                             </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium">
-                              Answer Response:
-                            </Label>
-                            <Textarea 
-                              id={`answer-${question.id}`}
-                              placeholder="Enter candidate's answer response..."
-                              className="min-h-[100px] bg-white border-purple-200"
-                              value={question.answer}
-                            />
                           </div>
                         </AccordionContent>
                       </AccordionItem>
