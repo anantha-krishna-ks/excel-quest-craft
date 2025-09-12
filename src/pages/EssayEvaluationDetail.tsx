@@ -227,41 +227,23 @@ const EssayEvaluationDetail = () => {
                         </div>
                         
                         <AccordionContent className="px-4 pb-4">
-                          <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div className="space-y-4">
-                                <div>
-                                  <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Answer</h4>
-                                  <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
-                                </div>
-                                
-                                <div>
-                                  <h4 className="text-sm font-semibold text-purple-900 mb-2">Marker Notes</h4>
-                                  <p className="text-sm text-gray-700 leading-relaxed">{question.markerNotes}</p>
-                                </div>
-                              </div>
-                              
-                              <div>
-                                <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Points</h4>
-                                <ul className="space-y-2 text-sm text-gray-700">
-                                  {question.keyPoints.map((point, index) => (
-                                    <li key={index} className="flex items-start gap-2">
-                                      <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                                      <span className="leading-relaxed">{point}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
+                          <div className="space-y-4">
+                            <div className="bg-purple-50 rounded-lg p-4">
+                              <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Answer</h4>
+                              <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
                             </div>
                             
-                            <div className="flex flex-wrap gap-6 pt-4 border-t border-gray-100">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-gray-500">Max Score:</span>
-                                <span className="text-sm font-semibold text-purple-700">{question.maxScore}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-gray-500">Reference:</span>
-                                <span className="text-sm text-gray-600">{question.reference}</span>
+                            <div className="flex items-center justify-between py-2 px-4 bg-gray-50 rounded-lg">
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-gray-600">Max Score:</span>
+                                  <span className="text-lg font-bold text-purple-700">{question.maxScore}</span>
+                                </div>
+                                <div className="h-4 w-px bg-gray-300"></div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-gray-600">Reference:</span>
+                                  <span className="text-sm text-gray-700">{question.reference}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
