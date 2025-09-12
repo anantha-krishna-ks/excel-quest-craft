@@ -674,7 +674,7 @@ const EssayEvaluationDetail = () => {
                   variant="outline" 
                   size="sm"
                   onClick={handleDownloadAsExcel}
-                  className="border-green-200 hover:bg-green-50"
+                  className="border-green-500 text-green-700 hover:bg-green-100 hover:border-green-600 bg-white"
                 >
                   <FileSpreadsheet className="h-4 w-4 mr-2" />
                   Download as Excel
@@ -683,7 +683,7 @@ const EssayEvaluationDetail = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => setViewDialogExpanded(!viewDialogExpanded)}
-                  className="border-blue-200 hover:bg-blue-50"
+                  className="border-blue-500 text-blue-700 hover:bg-blue-100 hover:border-blue-600 bg-white"
                 >
                   {viewDialogExpanded ? (
                     <>
