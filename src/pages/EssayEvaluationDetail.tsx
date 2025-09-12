@@ -87,6 +87,10 @@ const EssayEvaluationDetail = () => {
     ))
   }
 
+  const clearAllAnswers = () => {
+    setQuestions(questions.map(q => ({ ...q, answer: "" })))
+  }
+
   const handleEvaluateEssay = async () => {
     setIsLoading(true)
     
@@ -415,7 +419,11 @@ const EssayEvaluationDetail = () => {
                           <FileSpreadsheet className="h-4 w-4 mr-2" />
                           Export to Excel
                         </Button>
-                        <Button variant="outline" className="ai-button-secondary">
+                        <Button 
+                          variant="outline" 
+                          className="ai-button-secondary"
+                          onClick={clearAllAnswers}
+                        >
                           <Trash className="h-4 w-4 mr-2" />
                           Clear All
                         </Button>
