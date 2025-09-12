@@ -455,7 +455,11 @@ const EssayEvaluationDetail = () => {
                   <p className="text-purple-700 mb-6">
                     Review each question and provide candidate responses for evaluation.
                   </p>
-                  <Accordion type="single" collapsible className="w-full space-y-4">
+                  <Accordion 
+                    type="multiple" 
+                    className="w-full space-y-4"
+                    value={isExpanded ? questions.map(q => `question-${q.id}`) : []}
+                  >
                     {questions.map((question) => (
                       <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
                         <AccordionTrigger className="text-left px-4 hover:no-underline">
