@@ -27,6 +27,8 @@ const EssayEvaluationDetail = () => {
   const [selectedEvaluation, setSelectedEvaluation] = useState<any>(null)
   const [viewDialogExpanded, setViewDialogExpanded] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [openItems, setOpenItems] = useState<string[]>([])
+  const [viewOpenItems, setViewOpenItems] = useState<string[]>([])
   const [savedEvaluations, setSavedEvaluations] = useState([
     {
       id: 1,
@@ -430,7 +432,16 @@ const EssayEvaluationDetail = () => {
                         <Button 
                           variant="outline"
                           className="ai-button-secondary"
-                          onClick={() => setIsExpanded(!isExpanded)}
+                          onClick={() => {
+                            if (openItems.length === questions.length) {
+                              setOpenItems([])
+                              setIsExpanded(false)
+                            } else {
+                              const all = questions.map(q => `question-${q.id}`)
+                              setOpenItems(all)
+                              setIsExpanded(true)
+                            }
+                          }}
                         >
                           {isExpanded ? (
                             <>
@@ -466,7 +477,12 @@ const EssayEvaluationDetail = () => {
                   <Accordion 
                     type="multiple" 
                     className="w-full space-y-4"
-                    value={isExpanded ? questions.map(q => `question-${q.id}`) : undefined}
+                    value={openItems}
+                    onValueChange={(v) => {
+                      const vals = v as string[]
+                      setOpenItems(vals)
+                      setIsExpanded(vals.length === questions.length)
+                    }}
                   >
                     {questions.map((question) => (
                       <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
@@ -682,7 +698,17 @@ const EssayEvaluationDetail = () => {
                 <Button 
                   variant="outline"
                   size="sm"
-                  onClick={() => setViewDialogExpanded(!viewDialogExpanded)}
+                  onClick={() => {
+                    const total = selectedEvaluation?.questions?.length ?? 0
+                    if (viewOpenItems.length === total) {
+                      setViewOpenItems([])
+                      setViewDialogExpanded(false)
+                    } else {
+                      const all = (selectedEvaluation?.questions ?? []).map((q: any) => `question-${q.id}`)
+                      setViewOpenItems(all)
+                      setViewDialogExpanded(true)
+                    }
+                  }}
                   className="border-blue-500 text-blue-700 hover:bg-blue-100 hover:border-blue-600 bg-white"
                 >
                   {viewDialogExpanded ? (
@@ -727,7 +753,13 @@ const EssayEvaluationDetail = () => {
                 <Accordion 
                   type="multiple" 
                   className="w-full space-y-4"
-                  value={viewDialogExpanded ? selectedEvaluation?.questions?.map((q: any) => `question-${q.id}`) || [] : undefined}
+                  value={viewOpenItems}
+                  onValueChange={(v) => {
+                    const vals = v as string[]
+                    setViewOpenItems(vals)
+                    const total = selectedEvaluation?.questions?.length ?? 0
+                    setViewDialogExpanded(total > 0 && vals.length === total)
+                  }}
                 >
                   {selectedEvaluation.questions.map((question: any, index: number) => (
                     <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
