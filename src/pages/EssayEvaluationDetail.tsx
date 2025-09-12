@@ -226,47 +226,30 @@ const EssayEvaluationDetail = () => {
                           </div>
                         </div>
                         
-                        <AccordionContent className="px-4 pb-4">
-                          <div className="space-y-4">
-                            <div className="space-y-3">
-                              <div className="pb-2 border-b border-gray-100">
-                                <h4 className="text-xs font-semibold text-purple-900 mb-2">Key Answer</h4>
-                                <div className="bg-gray-50 p-2 rounded text-xs text-gray-700 leading-relaxed">
-                                  {question.keyAnswer}
-                                </div>
-                              </div>
-                              
-                              <div className="pb-2 border-b border-gray-100">
-                                <h4 className="text-xs font-semibold text-purple-900 mb-2">Marker Notes</h4>
-                                <div className="bg-gray-50 p-2 rounded text-xs text-gray-700 leading-relaxed">
-                                  {question.markerNotes}
-                                </div>
-                              </div>
-                              
-                              <div>
-                                <h4 className="text-xs font-semibold text-purple-900 mb-2">Key Points</h4>
-                                <div className="space-y-1">
-                                  {question.keyPoints.map((point, index) => (
-                                    <div key={index} className="flex items-start gap-2 p-2 bg-gray-50 rounded text-xs">
-                                      <div className="w-4 h-4 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-[10px] font-medium flex-shrink-0">
-                                        {index + 1}
-                                      </div>
-                                      <span className="text-gray-700 leading-relaxed">{point}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
+                        <AccordionContent className="px-4 pb-4 space-y-4">
+                          <div className="bg-purple-50 p-4 rounded-lg space-y-3 border border-purple-100">
+                            <div>
+                              <h4 className="font-semibold text-purple-900 mb-2">Key Answer:</h4>
+                              <p className="text-sm text-purple-800">{question.keyAnswer}</p>
                             </div>
                             
-                            <div className="flex flex-wrap gap-4 pt-2 border-t border-gray-200">
-                              <div className="flex items-center gap-1">
-                                <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Max Score:</span>
-                                <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">{question.maxScore}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Reference:</span>
-                                <span className="text-xs text-gray-600">{question.reference}</span>
-                              </div>
+                            <div>
+                              <h4 className="font-semibold text-purple-900 mb-2">Marker Notes:</h4>
+                              <p className="text-sm text-purple-800">{question.markerNotes}</p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold text-purple-900 mb-2">Key Points:</h4>
+                              <ul className="list-disc list-inside space-y-1 text-sm text-purple-800">
+                                {question.keyPoints.map((point, index) => (
+                                  <li key={index}>{point}</li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div className="flex gap-4 text-sm text-purple-700 pt-2 border-t border-purple-200">
+                              <span><strong>Max Score:</strong> {question.maxScore}</span>
+                              <span><strong>Reference:</strong> {question.reference}</span>
                             </div>
                           </div>
                         </AccordionContent>
