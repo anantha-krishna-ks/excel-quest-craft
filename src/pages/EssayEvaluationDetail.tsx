@@ -690,74 +690,81 @@ const EssayEvaluationDetail = () => {
               </div>
 
               {/* Questions Details */}
-              <div className="space-y-6">
-                {selectedEvaluation.questions.map((question: any, index: number) => (
-                  <div key={question.id} className="space-y-4">
-                    {/* Question Stem */}
-                    <div>
-                      <div className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-md mb-3">
-                        Question Stem
-                      </div>
-                      <div className="p-4 border-l-4 border-purple-400 bg-gray-50 rounded-lg">
-                        <p className="text-gray-900 font-medium leading-relaxed">{question.stem}</p>
-                      </div>
-                    </div>
-
-                    {/* Answer Response */}
-                    <div>
-                      <h4 className="text-purple-600 font-semibold mb-3">Answer Response:</h4>
-                      <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[120px]">
-                        <div className="text-gray-700 whitespace-pre-wrap">
-                          {question.answer || 'No response provided'}
+              <div className="space-y-4">
+                <p className="text-purple-700 mb-6">
+                  Review each question and candidate responses with AI evaluation results.
+                </p>
+                <Accordion type="single" collapsible className="w-full space-y-4">
+                  {selectedEvaluation.questions.map((question: any, index: number) => (
+                    <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
+                      <AccordionTrigger className="text-left px-4 hover:no-underline">
+                        <div className="flex flex-col items-start w-full gap-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-md">
+                              Question Stem
+                            </span>
+                          </div>
+                          <div className="w-full">
+                            <h3 className="text-base font-medium text-gray-900 leading-relaxed pl-2 border-l-4 border-purple-400">
+                              {question.stem}
+                            </h3>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* AI Feedback */}
-                    {question.feedback && (
-                      <div>
-                        <h4 className="text-blue-600 font-semibold mb-3">AI Feedback</h4>
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <p className="text-gray-700 leading-relaxed">{question.feedback}</p>
+                      </AccordionTrigger>
+                      
+                      <div className="px-4 pb-4 space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-purple-800 font-medium">
+                            Answer Response:
+                          </Label>
+                          <div className="min-h-[100px] bg-white border-purple-200 border rounded-lg p-3">
+                            <div className="text-gray-700 whitespace-pre-wrap">
+                              {question.answer || 'No response provided'}
+                            </div>
+                          </div>
                         </div>
+                        
+                        {question.feedback && (
+                          <div className="space-y-3">
+                            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                              <h4 className="text-sm font-semibold text-blue-900 mb-2">AI Feedback</h4>
+                              <p className="text-sm text-gray-700 leading-relaxed">{question.feedback}</p>
+                            </div>
+                            <div className="flex items-center gap-4 py-2 px-4 bg-gray-50 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-600">Max Score:</span>
+                                <span className="text-lg font-bold text-purple-700">{question.maxScore}</span>
+                              </div>
+                              <div className="h-4 w-px bg-gray-300"></div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-600">AI Score:</span>
+                                <span className="text-lg font-bold text-green-700">{question.aiScore}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-
-                    {/* Scores */}
-                    <div className="flex gap-8 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-600 font-medium">Max Score:</span>
-                        <span className="text-2xl font-bold text-purple-600">{question.maxScore}</span>
-                      </div>
-                      <div className="h-6 w-px bg-gray-300"></div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-600 font-medium">AI Score:</span>
-                        <span className="text-2xl font-bold text-green-600">{question.aiScore}</span>
-                      </div>
-                    </div>
-
-                    {/* Key Answer (when expanded) */}
-                    {viewDialogExpanded && (
-                      <div>
-                        <h4 className="text-purple-600 font-semibold mb-3">Key Answer</h4>
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                          <p className="text-gray-700 leading-relaxed">{question.keyAnswer}</p>
+                      
+                      <AccordionContent className="px-4 pb-4">
+                        <div className="space-y-4">
+                          <div className="bg-purple-50 rounded-lg p-4">
+                            <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Answer</h4>
+                            <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
+                          </div>
+                          
+                          <div className="flex items-center justify-between py-2 px-4 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-600">Reference:</span>
+                                <span className="text-sm text-gray-700">{question.reference}</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    )}
-
-                    {/* Reference */}
-                    <div>
-                      <span className="text-gray-600 font-medium">Reference: </span>
-                      <span className="text-gray-700">{question.reference}</span>
-                    </div>
-
-                    {/* Separator between questions */}
-                    {index < selectedEvaluation.questions.length - 1 && (
-                      <div className="border-b border-gray-200 my-8"></div>
-                    )}
-                  </div>
-                ))}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </div>
             </div>
           )}
