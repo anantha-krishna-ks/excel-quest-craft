@@ -317,6 +317,25 @@ const EssayEvaluationDetail = () => {
                                 {question.stem}
                               </h3>
                             </div>
+                            {isEvaluated && question.feedback && (
+                              <div className="w-full space-y-3">
+                                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                  <h4 className="text-xs font-semibold text-blue-900 mb-1">AI Feedback</h4>
+                                  <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{question.feedback}</p>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium text-gray-600">Max Score:</span>
+                                    <span className="text-sm font-bold text-purple-700">{question.maxScore}</span>
+                                  </div>
+                                  <div className="h-3 w-px bg-gray-300"></div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium text-gray-600">AI Score:</span>
+                                    <span className="text-sm font-bold text-green-700">{question.aiScore}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </AccordionTrigger>
                         
