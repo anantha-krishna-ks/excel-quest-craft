@@ -7,8 +7,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useParams, Link } from "react-router-dom"
-import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp, ArrowLeft, PenTool, Loader2 } from "lucide-react"
+import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp, ArrowLeft, PenTool, Loader2, Download, Eye } from "lucide-react"
 import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 
 const EssayEvaluationDetail = () => {
@@ -19,6 +22,23 @@ const EssayEvaluationDetail = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showResultDialog, setShowResultDialog] = useState(false)
   const [isEvaluated, setIsEvaluated] = useState(false)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [savedEvaluations, setSavedEvaluations] = useState([
+    {
+      id: 1,
+      candidateId: "GKa_002_2025-09-11 11:17:30.076024+00",
+      evaluatedDate: "11/09/2025 04:47:30 PM",
+      evaluatedBy: "Current User",
+      questions: []
+    },
+    {
+      id: 2,
+      candidateId: "GKa_002_2025-09-12 04:42:57.930813+00", 
+      evaluatedDate: "12/09/2025 10:12:57 AM",
+      evaluatedBy: "Current User",
+      questions: []
+    }
+  ])
 
   const updateQuestionAnswer = (questionId: number, answer: string) => {
     setQuestions(questions.map(q => 
@@ -47,6 +67,24 @@ const EssayEvaluationDetail = () => {
   const handleDialogClose = () => {
     setShowResultDialog(false)
     setIsEvaluated(true)
+  }
+
+  const handleSaveResponse = () => {
+    if (isEvaluated && candidateId) {
+      const newEvaluation = {
+        id: savedEvaluations.length + 1,
+        candidateId: candidateId,
+        evaluatedDate: new Date().toLocaleString(),
+        evaluatedBy: "Current User",
+        questions: questions
+      }
+      setSavedEvaluations([...savedEvaluations, newEvaluation])
+      setShowSaveDialog(true)
+    }
+  }
+
+  const handleSaveDialogClose = () => {
+    setShowSaveDialog(false)
   }
 
   const [questions, setQuestions] = useState([
@@ -254,7 +292,12 @@ const EssayEvaluationDetail = () => {
                           'Evaluate Essay'
                         )}
                       </Button>
-                      <Button variant="outline" className="border-green-200 hover:bg-green-50">
+                      <Button 
+                        variant="outline" 
+                        className="border-green-200 hover:bg-green-50"
+                        onClick={handleSaveResponse}
+                        disabled={!isEvaluated}
+                      >
                         <Save className="h-4 w-4 mr-2" />
                         Save Response
                       </Button>
@@ -389,14 +432,110 @@ const EssayEvaluationDetail = () => {
                     Review Evaluation
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-orange-700">Review evaluation functionality will be implemented here.</p>
+                <CardContent className="space-y-6">
+                  <div className="flex flex-col md:flex-row gap-4 items-end">
+                    <div className="flex-1">
+                      <Label htmlFor="userType" className="text-orange-800">User Type</Label>
+                      <Select defaultValue="me">
+                        <SelectTrigger className="bg-white border-orange-200">
+                          <SelectValue placeholder="Select user type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="me">Me</SelectItem>
+                          <SelectItem value="all">All Users</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex-1">
+                      <Label htmlFor="search" className="text-orange-800">Search</Label>
+                      <Input 
+                        id="search"
+                        placeholder="Search..."
+                        className="bg-white border-orange-200"
+                      />
+                    </div>
+                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                      Get Data
+                    </Button>
+                  </div>
+
+                  <div className="bg-white rounded-lg border border-orange-200 overflow-hidden">
+                    <div className="flex justify-between items-center p-4 border-b border-orange-200">
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
+                        >
+                          Bulk Export
+                        </Button>
+                      </div>
+                      <span className="text-sm text-gray-600">
+                        Total Candidates: <span className="font-bold text-blue-600">{savedEvaluations.length}</span>
+                      </span>
+                    </div>
+                    
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead className="w-12">
+                            <Checkbox />
+                          </TableHead>
+                          <TableHead>Candidate ID</TableHead>
+                          <TableHead>Evaluated date and time</TableHead>
+                          <TableHead>Evaluated By</TableHead>
+                          <TableHead className="w-24">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {savedEvaluations.map((evaluation) => (
+                          <TableRow key={evaluation.id}>
+                            <TableCell>
+                              <Checkbox />
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {evaluation.candidateId}
+                            </TableCell>
+                            <TableCell>{evaluation.evaluatedDate}</TableCell>
+                            <TableCell>{evaluation.evaluatedBy}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button variant="ghost" size="sm">
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </div>
       </main>
+
+      {/* Save Response Dialog */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Response Saved</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700">Essay responses for the candidate have been saved successfully.</p>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleSaveDialogClose} className="w-full">
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Evaluation Result Dialog */}
       <Dialog open={showResultDialog} onOpenChange={setShowResultDialog}>
