@@ -228,39 +228,43 @@ const EssayEvaluationDetail = () => {
                         
                         <AccordionContent className="px-4 pb-4">
                           <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div className="space-y-4">
-                                <div>
-                                  <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Answer</h4>
+                            <div className="space-y-5">
+                              <div className="pb-4 border-b border-gray-100">
+                                <h4 className="text-sm font-semibold text-purple-900 mb-3">Key Answer</h4>
+                                <div className="bg-gray-50 p-4 rounded-lg">
                                   <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
                                 </div>
-                                
-                                <div>
-                                  <h4 className="text-sm font-semibold text-purple-900 mb-2">Marker Notes</h4>
+                              </div>
+                              
+                              <div className="pb-4 border-b border-gray-100">
+                                <h4 className="text-sm font-semibold text-purple-900 mb-3">Marker Notes</h4>
+                                <div className="bg-gray-50 p-4 rounded-lg">
                                   <p className="text-sm text-gray-700 leading-relaxed">{question.markerNotes}</p>
                                 </div>
                               </div>
                               
                               <div>
-                                <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Points</h4>
-                                <ul className="space-y-2 text-sm text-gray-700">
+                                <h4 className="text-sm font-semibold text-purple-900 mb-3">Key Points</h4>
+                                <div className="space-y-3">
                                   {question.keyPoints.map((point, index) => (
-                                    <li key={index} className="flex items-start gap-2">
-                                      <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                                      <span className="leading-relaxed">{point}</span>
-                                    </li>
+                                    <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                      <div className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">
+                                        {index + 1}
+                                      </div>
+                                      <span className="text-sm text-gray-700 leading-relaxed">{point}</span>
+                                    </div>
                                   ))}
-                                </ul>
+                                </div>
                               </div>
                             </div>
                             
-                            <div className="flex flex-wrap gap-6 pt-4 border-t border-gray-100">
+                            <div className="flex flex-wrap gap-6 pt-4 border-t border-gray-200">
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-gray-500">Max Score:</span>
-                                <span className="text-sm font-semibold text-purple-700">{question.maxScore}</span>
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Max Score:</span>
+                                <span className="text-sm font-semibold text-purple-700 bg-purple-50 px-2 py-1 rounded">{question.maxScore}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-gray-500">Reference:</span>
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Reference:</span>
                                 <span className="text-sm text-gray-600">{question.reference}</span>
                               </div>
                             </div>
