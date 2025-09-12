@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useParams, Link } from "react-router-dom"
-import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp, ArrowLeft, PenTool, Loader2, Download, Eye } from "lucide-react"
+import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp, ArrowLeft, PenTool, Loader2, Download, Eye, ArrowUp } from "lucide-react"
 import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 
 const EssayEvaluationDetail = () => {
@@ -26,6 +26,7 @@ const EssayEvaluationDetail = () => {
   const [showViewDialog, setShowViewDialog] = useState(false)
   const [selectedEvaluation, setSelectedEvaluation] = useState<any>(null)
   const [viewDialogExpanded, setViewDialogExpanded] = useState(false)
+  const [showBackToTop, setShowBackToTop] = useState(false)
   const [savedEvaluations, setSavedEvaluations] = useState([
     {
       id: 1,
@@ -148,6 +149,23 @@ const EssayEvaluationDetail = () => {
     setSelectedEvaluation(evaluation)
     setShowViewDialog(true)
   }
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+
+  // Handle scroll for back to top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleCloseViewDialog = () => {
     setShowViewDialog(false)
@@ -810,6 +828,17 @@ const EssayEvaluationDetail = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-fade-in"
+          size="icon"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </Button>
+      )}
     </div>
   )
 }
