@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useParams, Link } from "react-router-dom"
-import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp, ArrowLeft, PenTool } from "lucide-react"
+import { Save, FileSpreadsheet, Trash, ChevronDown, ChevronUp, ArrowLeft, PenTool, Loader2 } from "lucide-react"
 import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 
 const EssayEvaluationDetail = () => {
@@ -15,11 +16,37 @@ const EssayEvaluationDetail = () => {
   const [candidateId, setCandidateId] = useState("")
   const [courseDetails, setCourseDetails] = useState("")
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showResultDialog, setShowResultDialog] = useState(false)
+  const [isEvaluated, setIsEvaluated] = useState(false)
 
   const updateQuestionAnswer = (questionId: number, answer: string) => {
     setQuestions(questions.map(q => 
       q.id === questionId ? { ...q, answer } : q
     ))
+  }
+
+  const handleEvaluateEssay = async () => {
+    setIsLoading(true)
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    // Update questions with mock feedback and scores
+    const updatedQuestions = questions.map(q => ({
+      ...q,
+      feedback: `Based on the candidate's response, the answer demonstrates ${Math.random() > 0.5 ? 'good' : 'excellent'} understanding of the key concepts. The response addresses most of the required points with adequate detail and shows clear comprehension of the subject matter.`,
+      aiScore: Math.floor(Math.random() * (q.maxScore - Math.floor(q.maxScore * 0.6)) + Math.floor(q.maxScore * 0.6))
+    }))
+    
+    setQuestions(updatedQuestions)
+    setIsLoading(false)
+    setShowResultDialog(true)
+  }
+
+  const handleDialogClose = () => {
+    setShowResultDialog(false)
+    setIsEvaluated(true)
   }
 
   const [questions, setQuestions] = useState([
@@ -42,7 +69,9 @@ const EssayEvaluationDetail = () => {
       ],
       maxScore: 10,
       reference: "Study 1 - Investigating Bodily Injury Claims, pp.11-12",
-      answer: ""
+      answer: "",
+      feedback: "",
+      aiScore: 0
     },
     {
       id: 2,
@@ -61,7 +90,9 @@ const EssayEvaluationDetail = () => {
       ],
       maxScore: 8,
       reference: "Study 2 - Medical Evidence and Expert Testimony, pp.15-18",
-      answer: ""
+      answer: "",
+      feedback: "",
+      aiScore: 0
     },
     {
       id: 3,
@@ -84,7 +115,9 @@ const EssayEvaluationDetail = () => {
       ],
       maxScore: 12,
       reference: "Study 3 - Settlement Negotiations and Case Valuation, pp.22-25",
-      answer: ""
+      answer: "",
+      feedback: "",
+      aiScore: 0
     }
   ])
 
@@ -207,8 +240,19 @@ const EssayEvaluationDetail = () => {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button className="bg-green-600 hover:bg-green-700 text-white">
-                        Evaluate Essay
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={handleEvaluateEssay}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Evaluating...
+                          </>
+                        ) : (
+                          'Evaluate Essay'
+                        )}
                       </Button>
                       <Button variant="outline" className="border-green-200 hover:bg-green-50">
                         <Save className="h-4 w-4 mr-2" />
@@ -298,12 +342,28 @@ const EssayEvaluationDetail = () => {
                               <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
                             </div>
                             
+                            {isEvaluated && question.feedback && (
+                              <div className="bg-blue-50 rounded-lg p-4">
+                                <h4 className="text-sm font-semibold text-blue-900 mb-2">AI Feedback</h4>
+                                <p className="text-sm text-gray-700 leading-relaxed">{question.feedback}</p>
+                              </div>
+                            )}
+                            
                             <div className="flex items-center justify-between py-2 px-4 bg-gray-50 rounded-lg">
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium text-gray-600">Max Score:</span>
                                   <span className="text-lg font-bold text-purple-700">{question.maxScore}</span>
                                 </div>
+                                {isEvaluated && question.aiScore > 0 && (
+                                  <>
+                                    <div className="h-4 w-px bg-gray-300"></div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-medium text-gray-600">AI Score:</span>
+                                      <span className="text-lg font-bold text-green-700">{question.aiScore}</span>
+                                    </div>
+                                  </>
+                                )}
                                 <div className="h-4 w-px bg-gray-300"></div>
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium text-gray-600">Reference:</span>
@@ -338,6 +398,23 @@ const EssayEvaluationDetail = () => {
           </Tabs>
         </div>
       </main>
+
+      {/* Evaluation Result Dialog */}
+      <Dialog open={showResultDialog} onOpenChange={setShowResultDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Evaluation Complete</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700">Evaluation completed and scores are generated with feedbacks</p>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleDialogClose} className="w-full">
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
