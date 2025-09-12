@@ -37,6 +37,48 @@ const EssayEvaluationDetail = () => {
       maxScore: 10,
       reference: "Study 1 - Investigating Bodily Injury Claims, pp.11-12",
       answer: ""
+    },
+    {
+      id: 2,
+      stem: "Explain the role of medical experts in personal injury claims and discuss the importance of medical documentation.",
+      keyAnswer: "Study 2, pp.15-18 – Medical Evidence in Personal Injury Claims – Any EIGHT (8) points required.",
+      markerNotes: "Focus on the significance of medical experts and proper documentation. Award marks for comprehensive understanding of medical evidence requirements.",
+      keyPoints: [
+        "Expert medical testimony: Essential for establishing causation and extent of injuries.",
+        "Medical records: Comprehensive documentation from initial treatment through recovery.",
+        "Independent medical examinations: Objective assessment by neutral medical professionals.",
+        "Treatment plans: Detailed documentation of ongoing and future medical needs.",
+        "Specialist consultations: Input from relevant medical specialists based on injury type.",
+        "Medical imaging: X-rays, MRIs, and CT scans provide objective evidence of injuries.",
+        "Prognosis documentation: Future medical needs and long-term impact assessment.",
+        "Cost of care: Detailed breakdown of medical expenses and future treatment costs."
+      ],
+      maxScore: 8,
+      reference: "Study 2 - Medical Evidence and Expert Testimony, pp.15-18",
+      answer: ""
+    },
+    {
+      id: 3,
+      stem: "Analyze the process of settlement negotiations in personal injury cases and identify key factors that influence settlement amounts.",
+      keyAnswer: "Study 3, pp.22-25 – Settlement Negotiations and Valuation – Any TWELVE (12) points required.",
+      markerNotes: "Students should demonstrate understanding of negotiation strategies and valuation factors. Allow marks for practical examples and case law references.",
+      keyPoints: [
+        "Liability assessment: Clear establishment of fault and negligence.",
+        "Damage quantification: Accurate calculation of economic and non-economic losses.",
+        "Medical evidence strength: Quality and completeness of medical documentation.",
+        "Negotiation timing: Strategic timing of settlement discussions.",
+        "Insurance policy limits: Understanding of coverage limitations and excess provisions.",
+        "Precedent cases: Reference to similar cases and their settlement amounts.",
+        "Client instructions: Clear understanding of client's settlement preferences.",
+        "Alternative dispute resolution: Mediation and arbitration options.",
+        "Trial risks: Assessment of potential outcomes if case proceeds to court.",
+        "Cost considerations: Legal costs versus potential settlement amounts.",
+        "Documentation requirements: Proper settlement documentation and releases.",
+        "Tax implications: Understanding of tax treatment of settlement payments."
+      ],
+      maxScore: 12,
+      reference: "Study 3 - Settlement Negotiations and Case Valuation, pp.22-25",
+      answer: ""
     }
   ]
 
@@ -207,7 +249,7 @@ const EssayEvaluationDetail = () => {
                           <div className="flex flex-col items-start w-full gap-3">
                             <div className="flex items-center gap-2">
                               <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-md">
-                                Question {question.id}
+                                Question Stem
                               </span>
                             </div>
                             <div className="w-full">
