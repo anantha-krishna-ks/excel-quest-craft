@@ -23,6 +23,9 @@ const EssayEvaluationDetail = () => {
   const [showResultDialog, setShowResultDialog] = useState(false)
   const [isEvaluated, setIsEvaluated] = useState(false)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [showViewDialog, setShowViewDialog] = useState(false)
+  const [selectedEvaluation, setSelectedEvaluation] = useState<any>(null)
+  const [viewDialogExpanded, setViewDialogExpanded] = useState(false)
   const [savedEvaluations, setSavedEvaluations] = useState([
     {
       id: 1,
@@ -104,15 +107,38 @@ const EssayEvaluationDetail = () => {
   }
 
   const handleViewEvaluation = (evaluation: any) => {
-    // Switch to evaluate tab and load the evaluation data
-    setCandidateId(evaluation.candidateId)
-    setQuestions(evaluation.questions.length > 0 ? evaluation.questions : questions)
-    setIsEvaluated(evaluation.questions.length > 0)
-    // Force switch to evaluate tab
-    const evaluateTab = document.querySelector('[value="evaluate"]') as HTMLElement
-    if (evaluateTab) {
-      evaluateTab.click()
-    }
+    setSelectedEvaluation(evaluation)
+    setShowViewDialog(true)
+  }
+
+  const handleCloseViewDialog = () => {
+    setShowViewDialog(false)
+    setSelectedEvaluation(null)
+    setViewDialogExpanded(false)
+  }
+
+  const handleDownloadAsExcel = () => {
+    if (!selectedEvaluation) return
+    
+    // Create Excel-like CSV content
+    const csvContent = `Evaluation Details\n\n` +
+      `Candidate ID,${selectedEvaluation.candidateId}\n` +
+      `Course Details,${selectedEvaluation.courseDetails || 'N/A'}\n` +
+      `Total Questions,${selectedEvaluation.questions.length}\n` +
+      `Evaluated Date,${selectedEvaluation.evaluatedDate}\n` +
+      `Evaluated By,${selectedEvaluation.evaluatedBy}\n\n` +
+      `Question,Key Answer,Max Score,Reference,Answer Response,AI Score\n` +
+      selectedEvaluation.questions.map((q: any, index: number) => 
+        `"Question ${index + 1}: ${q.stem}","${q.keyAnswer}","${q.maxScore}","${q.reference}","${q.answer}","${q.aiScore}"`
+      ).join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `evaluation_details_${selectedEvaluation.candidateId}_${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
   }
 
   const [questions, setQuestions] = useState([
@@ -568,6 +594,135 @@ const EssayEvaluationDetail = () => {
           </Tabs>
         </div>
       </main>
+
+      {/* View Evaluation Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Evaluation Details</span>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleDownloadAsExcel}
+                  className="border-green-200 hover:bg-green-50"
+                >
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Download as Excel
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewDialogExpanded(!viewDialogExpanded)}
+                  className="border-blue-200 hover:bg-blue-50"
+                >
+                  {viewDialogExpanded ? (
+                    <>
+                      <ChevronUp className="h-4 w-4 mr-2" />
+                      Collapse
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4 mr-2" />
+                      Expand
+                    </>
+                  )}
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedEvaluation && (
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Candidate ID:</Label>
+                  <p className="text-sm font-semibold text-gray-900">{selectedEvaluation.candidateId}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Course Details:</Label>
+                  <p className="text-sm font-semibold text-gray-900">{selectedEvaluation.courseDetails || 'N/A'}</p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-600">Total Questions:</Label>
+                  <p className="text-sm font-semibold text-gray-900">{selectedEvaluation.questions.length}</p>
+                </div>
+              </div>
+
+              {/* Questions Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Questions & Responses</h3>
+                {selectedEvaluation.questions.map((question: any, index: number) => (
+                  <Card key={question.id} className="border border-gray-200">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Question {index + 1}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-purple-800">Question:</Label>
+                        <p className="text-sm text-gray-700 mt-1 p-3 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+                          {question.stem}
+                        </p>
+                      </div>
+                      
+                      {viewDialogExpanded && (
+                        <div>
+                          <Label className="text-sm font-medium text-purple-800">Key Answer:</Label>
+                          <p className="text-sm text-gray-700 mt-1 p-3 bg-purple-50 rounded-lg">
+                            {question.keyAnswer}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Max Score:</Label>
+                          <p className="text-lg font-bold text-purple-700">{question.maxScore}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">AI Score:</Label>
+                          <p className="text-lg font-bold text-green-700">{question.aiScore}</p>
+                        </div>
+                      </div>
+                      
+                      {viewDialogExpanded && (
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Reference:</Label>
+                          <p className="text-sm text-gray-700 mt-1">{question.reference}</p>
+                        </div>
+                      )}
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-blue-800">Answer Response:</Label>
+                        <p className="text-sm text-gray-700 mt-1 p-3 bg-blue-50 rounded-lg min-h-[60px]">
+                          {question.answer || 'No response provided'}
+                        </p>
+                      </div>
+                      
+                      {question.feedback && (
+                        <div>
+                          <Label className="text-sm font-medium text-green-800">AI Feedback:</Label>
+                          <p className="text-sm text-gray-700 mt-1 p-3 bg-green-50 rounded-lg border border-green-200">
+                            {question.feedback}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button onClick={handleCloseViewDialog} className="w-full">
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Save Response Dialog */}
       <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
