@@ -135,7 +135,7 @@ const EssayEvaluationDetail = () => {
                     <div className="p-2 bg-green-600 text-white rounded-lg">
                       <Save className="h-5 w-5" />
                     </div>
-                    Step 2: Evaluation Summary & Actions
+                    Evaluation Actions
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
