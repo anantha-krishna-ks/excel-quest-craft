@@ -300,16 +300,16 @@ const EssayEvaluationDetail = () => {
       <main className="p-6">
         <div className="max-w-6xl mx-auto space-y-8">
           <Tabs defaultValue="evaluate" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-3 rounded-xl shadow-sm border gap-1 h-16">
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-2 rounded-xl shadow-sm border gap-2 h-16">
               <TabsTrigger 
                 value="evaluate" 
-                className="rounded-lg py-3 px-6 font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:border data-[state=active]:border-blue-200 text-gray-600 hover:text-gray-800"
+                className="rounded-lg h-full font-medium transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 hover:text-gray-800 hover:bg-gray-200"
               >
                 Evaluate Candidate
               </TabsTrigger>
               <TabsTrigger 
                 value="review"
-                className="rounded-lg py-3 px-6 font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-orange-700 data-[state=active]:border data-[state=active]:border-orange-200 text-gray-600 hover:text-gray-800"
+                className="rounded-lg h-full font-medium transition-all data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 hover:text-gray-800 hover:bg-gray-200"
               >
                 Review Evaluation
               </TabsTrigger>
