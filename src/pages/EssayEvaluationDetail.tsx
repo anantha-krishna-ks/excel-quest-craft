@@ -210,8 +210,8 @@ const EssayEvaluationDetail = () => {
                                 Question {question.id}
                               </span>
                             </div>
-                            <div className="bg-white border border-purple-200 rounded-lg p-4 w-full">
-                              <h3 className="text-base font-semibold text-gray-900 leading-relaxed">
+                            <div className="w-full">
+                              <h3 className="text-base font-medium text-gray-900 leading-relaxed pl-2 border-l-4 border-purple-400">
                                 {question.stem}
                               </h3>
                             </div>
