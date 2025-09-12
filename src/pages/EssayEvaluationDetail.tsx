@@ -369,56 +369,56 @@ const EssayEvaluationDetail = () => {
                         Use the actions below to manage your evaluation process.
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button 
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        onClick={handleEvaluateEssay}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Evaluating...
-                          </>
-                        ) : (
-                          'Evaluate Essay'
-                        )}
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="border-green-200 hover:bg-green-50"
-                        onClick={handleSaveResponse}
-                        disabled={!isEvaluated}
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        Save Response
-                      </Button>
-                      <Button variant="outline" className="border-green-200 hover:bg-green-50">
-                        <FileSpreadsheet className="h-4 w-4 mr-2" />
-                        Export to Excel
-                      </Button>
-                      <Button variant="outline" className="border-green-200 hover:bg-green-50">
-                        <Trash className="h-4 w-4 mr-2" />
-                        Clear All
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        className="border-green-200 hover:bg-green-50"
-                        onClick={() => setIsExpanded(!isExpanded)}
-                      >
-                        {isExpanded ? (
-                          <>
-                            <ChevronUp className="h-4 w-4 mr-2" />
-                            Collapse
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="h-4 w-4 mr-2" />
-                            Expand
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button 
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={handleEvaluateEssay}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Evaluating...
+                            </>
+                          ) : (
+                            'Evaluate Essay'
+                          )}
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="ai-button-secondary"
+                          onClick={handleSaveResponse}
+                          disabled={!isEvaluated}
+                        >
+                          <Save className="h-4 w-4 mr-2" />
+                          Save Response
+                        </Button>
+                        <Button variant="outline" className="ai-button-secondary">
+                          <FileSpreadsheet className="h-4 w-4 mr-2" />
+                          Export to Excel
+                        </Button>
+                        <Button variant="outline" className="ai-button-secondary">
+                          <Trash className="h-4 w-4 mr-2" />
+                          Clear All
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          className="ai-button-secondary"
+                          onClick={() => setIsExpanded(!isExpanded)}
+                        >
+                          {isExpanded ? (
+                            <>
+                              <ChevronUp className="h-4 w-4 mr-2" />
+                              Collapse
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="h-4 w-4 mr-2" />
+                              Expand
+                            </>
+                          )}
+                        </Button>
+                      </div>
                   </div>
                 </CardContent>
               </Card>
