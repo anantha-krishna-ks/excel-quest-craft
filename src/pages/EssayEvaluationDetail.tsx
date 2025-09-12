@@ -37,48 +37,6 @@ const EssayEvaluationDetail = () => {
       maxScore: 10,
       reference: "Study 1 - Investigating Bodily Injury Claims, pp.11-12",
       answer: ""
-    },
-    {
-      id: 2,
-      stem: "Explain the role of medical evidence in personal injury claims and describe the key types of medical documentation required.",
-      keyAnswer: "Study 2, pp.15-18 – Medical Evidence in Claims – Any EIGHT (8) points required.",
-      markerNotes: "Focus on comprehensive medical documentation. Award marks for explaining the importance and types of medical evidence.",
-      keyPoints: [
-        "Medical records: Complete medical history from all treating physicians",
-        "Diagnostic imaging: X-rays, MRIs, CT scans showing extent of injuries",
-        "Treatment documentation: Records of all treatments, medications, and procedures",
-        "Progress notes: Ongoing medical assessments and recovery updates",
-        "Medical expert opinions: Independent medical examinations and specialist reports",
-        "Disability assessments: Functional capacity evaluations and work restrictions",
-        "Future medical needs: Projected treatment costs and long-term care requirements",
-        "Pre-existing conditions: Documentation of baseline health status"
-      ],
-      maxScore: 8,
-      reference: "Study 2 - Medical Evidence and Documentation, pp.15-18",
-      answer: ""
-    },
-    {
-      id: 3,
-      stem: "Discuss the importance of witness statements in building a strong case and outline the best practices for obtaining them.",
-      keyAnswer: "Study 3, pp.22-25 – Witness Evidence Collection – Any TWELVE (12) points required.",
-      markerNotes: "Comprehensive coverage of witness statement procedures. Full marks for addressing collection methods and legal considerations.",
-      keyPoints: [
-        "Immediate collection: Obtain statements as soon as possible after incident",
-        "Witness identification: Record full contact details and relationship to incident",
-        "Statement accuracy: Ensure statements are factual and detailed",
-        "Chronological order: Organize events in proper sequence",
-        "Direct observations: Focus on what witness actually saw or heard",
-        "Avoid leading questions: Use open-ended questions for unbiased responses",
-        "Written statements: Obtain signed and dated written accounts",
-        "Video recordings: Consider recorded statements for complex cases",
-        "Witness availability: Confirm willingness to testify if needed",
-        "Corroboration: Cross-reference statements with other evidence",
-        "Legal privilege: Understand confidentiality and disclosure requirements",
-        "Statement review: Allow witness to review and confirm accuracy"
-      ],
-      maxScore: 12,
-      reference: "Study 3 - Witness Evidence and Statements, pp.22-25",
-      answer: ""
     }
   ]
 
@@ -242,66 +200,78 @@ const EssayEvaluationDetail = () => {
                   <p className="text-purple-700 mb-6">
                     Review each question and provide candidate responses for evaluation.
                   </p>
-                   <Accordion type="single" collapsible className="w-full space-y-6">
-                     {questions.map((question) => (
-                       <AccordionItem key={question.id} value={`question-${question.id}`} className="border-0 shadow-md rounded-xl bg-white overflow-hidden">
-                         <AccordionTrigger className="text-left px-6 py-4 hover:no-underline hover:bg-gray-50 transition-colors">
-                           <div className="flex flex-col items-start w-full gap-3">
-                             <div className="flex items-center gap-2">
-                               <span className="px-3 py-1 bg-purple-600 text-white text-xs font-semibold rounded-full">
-                                 Question Stem {question.id}
-                               </span>
-                             </div>
-                             <div className="w-full">
-                               <h3 className="text-base font-medium text-gray-900 leading-relaxed pl-3 border-l-4 border-purple-400">
-                                 {question.stem}
-                               </h3>
-                             </div>
-                           </div>
-                         </AccordionTrigger>
-                         
-                         <div className="px-6 pb-4 bg-gray-50 border-t border-gray-100">
-                           <div className="space-y-3 pt-4">
-                             <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium flex items-center gap-2">
-                               <PenTool className="h-4 w-4" />
-                               Answer Response:
-                             </Label>
-                             <Textarea 
-                               id={`answer-${question.id}`}
-                               placeholder="Enter candidate's answer response..."
-                               className="min-h-[120px] bg-white border-purple-200 focus:border-purple-400 resize-none"
-                               value={question.answer}
-                             />
-                           </div>
-                         </div>
-                         
-                         <AccordionContent className="px-6 pb-6 bg-white">
-                           <div className="space-y-4 pt-2">
-                             <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 border-l-4 border-purple-400">
-                               <h4 className="text-sm font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                                 <FileSpreadsheet className="h-4 w-4" />
-                                 Key Answer
-                               </h4>
-                               <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
-                             </div>
-                             
-                             <div className="flex items-center justify-between py-3 px-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border">
-                               <div className="flex items-center gap-6">
-                                 <div className="flex items-center gap-2">
-                                   <span className="text-sm font-medium text-gray-600">Max Score:</span>
-                                   <span className="text-xl font-bold text-purple-700 bg-purple-100 px-2 py-1 rounded-md">{question.maxScore}</span>
-                                 </div>
-                                 <div className="h-6 w-px bg-gray-300"></div>
-                                 <div className="flex items-center gap-2">
-                                   <span className="text-sm font-medium text-gray-600">Reference:</span>
-                                   <span className="text-sm text-gray-700 bg-white px-2 py-1 rounded border">{question.reference}</span>
-                                 </div>
-                               </div>
-                             </div>
-                           </div>
-                         </AccordionContent>
-                       </AccordionItem>
-                     ))}
+                  <Accordion type="single" collapsible className="w-full space-y-4">
+                    {questions.map((question) => (
+                      <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
+                        <AccordionTrigger className="text-left px-4 hover:no-underline">
+                          <div className="flex flex-col items-start w-full">
+                            <div className="font-medium text-purple-800">Question ID: {question.id}</div>
+                            <div className="text-sm text-purple-600 mt-1">
+                              Question Stem: {question.stem}
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        
+                        <div className="px-4 pb-4 space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium">
+                              Answer Response:
+                            </Label>
+                            <Textarea 
+                              id={`answer-${question.id}`}
+                              placeholder="Enter candidate's answer response..."
+                              className="min-h-[100px] bg-white border-purple-200"
+                              value={question.answer}
+                            />
+                          </div>
+                        </div>
+                        
+                        <AccordionContent className="px-4 pb-4">
+                          <div className="space-y-4">
+                            <div className="space-y-3">
+                              <div className="pb-2 border-b border-gray-100">
+                                <h4 className="text-xs font-semibold text-purple-900 mb-2">Key Answer</h4>
+                                <div className="bg-gray-50 p-2 rounded text-xs text-gray-700 leading-relaxed">
+                                  {question.keyAnswer}
+                                </div>
+                              </div>
+                              
+                              <div className="pb-2 border-b border-gray-100">
+                                <h4 className="text-xs font-semibold text-purple-900 mb-2">Marker Notes</h4>
+                                <div className="bg-gray-50 p-2 rounded text-xs text-gray-700 leading-relaxed">
+                                  {question.markerNotes}
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <h4 className="text-xs font-semibold text-purple-900 mb-2">Key Points</h4>
+                                <div className="space-y-1">
+                                  {question.keyPoints.map((point, index) => (
+                                    <div key={index} className="flex items-start gap-2 p-2 bg-gray-50 rounded text-xs">
+                                      <div className="w-4 h-4 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-[10px] font-medium flex-shrink-0">
+                                        {index + 1}
+                                      </div>
+                                      <span className="text-gray-700 leading-relaxed">{point}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-4 pt-2 border-t border-gray-200">
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Max Score:</span>
+                                <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">{question.maxScore}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Reference:</span>
+                                <span className="text-xs text-gray-600">{question.reference}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
                   </Accordion>
                 </CardContent>
               </Card>
