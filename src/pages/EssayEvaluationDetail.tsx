@@ -16,7 +16,13 @@ const EssayEvaluationDetail = () => {
   const [courseDetails, setCourseDetails] = useState("")
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const questions = [
+  const updateQuestionAnswer = (questionId: number, answer: string) => {
+    setQuestions(questions.map(q => 
+      q.id === questionId ? { ...q, answer } : q
+    ))
+  }
+
+  const [questions, setQuestions] = useState([
     {
       id: 1,
       stem: "Briefly describe the purpose and construction of the rib cage.",
@@ -80,7 +86,7 @@ const EssayEvaluationDetail = () => {
       reference: "Study 3 - Settlement Negotiations and Case Valuation, pp.22-25",
       answer: ""
     }
-  ]
+  ])
 
   const totalQuestions = questions.length
 
@@ -280,6 +286,7 @@ const EssayEvaluationDetail = () => {
                               placeholder="Enter candidate's answer response..."
                               className="min-h-[100px] bg-white border-purple-200"
                               value={question.answer}
+                              onChange={(e) => updateQuestionAnswer(question.id, e.target.value)}
                             />
                           </div>
                         </div>
