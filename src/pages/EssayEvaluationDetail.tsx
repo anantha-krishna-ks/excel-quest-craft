@@ -317,81 +317,61 @@ const EssayEvaluationDetail = () => {
                                 {question.stem}
                               </h3>
                             </div>
-                            {isEvaluated && question.feedback && (
-                              <div className="w-full space-y-3">
-                                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                                  <h4 className="text-xs font-semibold text-blue-900 mb-1">AI Feedback</h4>
-                                  <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{question.feedback}</p>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs font-medium text-gray-600">Max Score:</span>
-                                    <span className="text-sm font-bold text-purple-700">{question.maxScore}</span>
-                                  </div>
-                                  <div className="h-3 w-px bg-gray-300"></div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs font-medium text-gray-600">AI Score:</span>
-                                    <span className="text-sm font-bold text-green-700">{question.aiScore}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         </AccordionTrigger>
                         
-                        <div className="px-4 pb-4 space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium">
-                              Answer Response:
-                            </Label>
-                            <Textarea 
-                              id={`answer-${question.id}`}
-                              placeholder="Enter candidate's answer response..."
-                              className="min-h-[100px] bg-white border-purple-200"
-                              value={question.answer}
-                              onChange={(e) => updateQuestionAnswer(question.id, e.target.value)}
-                            />
-                          </div>
-                        </div>
+                         <div className="px-4 pb-4 space-y-4">
+                           <div className="space-y-2">
+                             <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium">
+                               Answer Response:
+                             </Label>
+                             <Textarea 
+                               id={`answer-${question.id}`}
+                               placeholder="Enter candidate's answer response..."
+                               className="min-h-[100px] bg-white border-purple-200"
+                               value={question.answer}
+                               onChange={(e) => updateQuestionAnswer(question.id, e.target.value)}
+                             />
+                           </div>
+                           
+                           {isEvaluated && question.feedback && (
+                             <div className="space-y-3">
+                               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                 <h4 className="text-sm font-semibold text-blue-900 mb-2">AI Feedback</h4>
+                                 <p className="text-sm text-gray-700 leading-relaxed">{question.feedback}</p>
+                               </div>
+                               <div className="flex items-center gap-4 py-2 px-4 bg-gray-50 rounded-lg">
+                                 <div className="flex items-center gap-2">
+                                   <span className="text-sm font-medium text-gray-600">Max Score:</span>
+                                   <span className="text-lg font-bold text-purple-700">{question.maxScore}</span>
+                                 </div>
+                                 <div className="h-4 w-px bg-gray-300"></div>
+                                 <div className="flex items-center gap-2">
+                                   <span className="text-sm font-medium text-gray-600">AI Score:</span>
+                                   <span className="text-lg font-bold text-green-700">{question.aiScore}</span>
+                                 </div>
+                               </div>
+                             </div>
+                           )}
+                         </div>
                         
-                        <AccordionContent className="px-4 pb-4">
-                          <div className="space-y-4">
-                            <div className="bg-purple-50 rounded-lg p-4">
-                              <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Answer</h4>
-                              <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
-                            </div>
-                            
-                            {isEvaluated && question.feedback && (
-                              <div className="bg-blue-50 rounded-lg p-4">
-                                <h4 className="text-sm font-semibold text-blue-900 mb-2">AI Feedback</h4>
-                                <p className="text-sm text-gray-700 leading-relaxed">{question.feedback}</p>
-                              </div>
-                            )}
-                            
-                            <div className="flex items-center justify-between py-2 px-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium text-gray-600">Max Score:</span>
-                                  <span className="text-lg font-bold text-purple-700">{question.maxScore}</span>
-                                </div>
-                                {isEvaluated && question.aiScore > 0 && (
-                                  <>
-                                    <div className="h-4 w-px bg-gray-300"></div>
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-sm font-medium text-gray-600">AI Score:</span>
-                                      <span className="text-lg font-bold text-green-700">{question.aiScore}</span>
-                                    </div>
-                                  </>
-                                )}
-                                <div className="h-4 w-px bg-gray-300"></div>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium text-gray-600">Reference:</span>
-                                  <span className="text-sm text-gray-700">{question.reference}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </AccordionContent>
+                         <AccordionContent className="px-4 pb-4">
+                           <div className="space-y-4">
+                             <div className="bg-purple-50 rounded-lg p-4">
+                               <h4 className="text-sm font-semibold text-purple-900 mb-2">Key Answer</h4>
+                               <p className="text-sm text-gray-700 leading-relaxed">{question.keyAnswer}</p>
+                             </div>
+                             
+                             <div className="flex items-center justify-between py-2 px-4 bg-gray-50 rounded-lg">
+                               <div className="flex items-center gap-4">
+                                 <div className="flex items-center gap-2">
+                                   <span className="text-sm font-medium text-gray-600">Reference:</span>
+                                   <span className="text-sm text-gray-700">{question.reference}</span>
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
+                         </AccordionContent>
                       </AccordionItem>
                     ))}
                   </Accordion>
