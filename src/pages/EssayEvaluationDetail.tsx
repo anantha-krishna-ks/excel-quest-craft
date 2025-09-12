@@ -433,31 +433,42 @@ const EssayEvaluationDetail = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex flex-col md:flex-row gap-4 items-end">
-                    <div className="flex-1">
-                      <Label htmlFor="userType" className="text-orange-800">User Type</Label>
-                      <Select defaultValue="me">
-                        <SelectTrigger className="bg-white border-orange-200">
-                          <SelectValue placeholder="Select user type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="me">Me</SelectItem>
-                          <SelectItem value="all">All Users</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex-1">
-                      <Label htmlFor="search" className="text-orange-800">Search</Label>
-                      <Input 
-                        id="search"
-                        placeholder="Search..."
-                        className="bg-white border-orange-200"
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="md:w-1/3">
+                      <img 
+                        src={essayEvaluationImage}
+                        alt="Essay Evaluation"
+                        className="w-full h-40 object-cover rounded-lg"
                       />
                     </div>
-                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
-                      Get Data
-                    </Button>
-                  </div>
+                    <div className="md:w-2/3">
+                       <div className="flex flex-col md:flex-row gap-4 items-end">
+                         <div className="flex-1">
+                           <Label htmlFor="userType" className="text-orange-800">User Type</Label>
+                           <Select defaultValue="me">
+                             <SelectTrigger className="bg-white border-orange-200">
+                               <SelectValue placeholder="Select user type" />
+                             </SelectTrigger>
+                             <SelectContent>
+                               <SelectItem value="me">Me</SelectItem>
+                               <SelectItem value="all">All Users</SelectItem>
+                             </SelectContent>
+                           </Select>
+                         </div>
+                         <div className="flex-1">
+                           <Label htmlFor="search" className="text-orange-800">Search</Label>
+                           <Input 
+                             id="search"
+                             placeholder="Search..."
+                             className="bg-white border-orange-200"
+                           />
+                         </div>
+                         <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                           Get Data
+                         </Button>
+                       </div>
+                     </div>
+                   </div>
 
                   <div className="bg-white rounded-lg border border-orange-200 overflow-hidden">
                     <div className="flex justify-between items-center p-4 border-b border-orange-200">
