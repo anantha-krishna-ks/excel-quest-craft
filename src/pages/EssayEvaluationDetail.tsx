@@ -113,9 +113,19 @@ const EssayEvaluationDetail = () => {
       <main className="p-6">
         <div className="max-w-6xl mx-auto space-y-8">
           <Tabs defaultValue="evaluate" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="evaluate">Evaluate Candidate</TabsTrigger>
-              <TabsTrigger value="review">Review Evaluation</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-1 rounded-xl shadow-sm border">
+              <TabsTrigger 
+                value="evaluate" 
+                className="rounded-lg py-3 px-6 font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:border data-[state=active]:border-blue-200 text-gray-600 hover:text-gray-800"
+              >
+                Evaluate Candidate
+              </TabsTrigger>
+              <TabsTrigger 
+                value="review"
+                className="rounded-lg py-3 px-6 font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-orange-700 data-[state=active]:border data-[state=active]:border-orange-200 text-gray-600 hover:text-gray-800"
+              >
+                Review Evaluation
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="evaluate" className="space-y-8">
