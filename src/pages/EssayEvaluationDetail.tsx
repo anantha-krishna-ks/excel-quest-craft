@@ -113,7 +113,7 @@ const EssayEvaluationDetail = () => {
       <main className="p-6">
         <div className="max-w-6xl mx-auto space-y-8">
           <Tabs defaultValue="evaluate" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-2 rounded-xl shadow-sm border gap-1">
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-3 rounded-xl shadow-sm border gap-1 h-16">
               <TabsTrigger 
                 value="evaluate" 
                 className="rounded-lg py-3 px-6 font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:border data-[state=active]:border-blue-200 text-gray-600 hover:text-gray-800"
