@@ -204,10 +204,16 @@ const EssayEvaluationDetail = () => {
                     {questions.map((question) => (
                       <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
                         <AccordionTrigger className="text-left px-4 hover:no-underline">
-                          <div className="flex flex-col items-start w-full">
-                            <div className="font-medium text-purple-800">Question ID: {question.id}</div>
-                            <div className="text-sm text-purple-600 mt-1">
-                              Question Stem: {question.stem}
+                          <div className="flex flex-col items-start w-full gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-md">
+                                Question {question.id}
+                              </span>
+                            </div>
+                            <div className="bg-white border border-purple-200 rounded-lg p-4 w-full">
+                              <h3 className="text-base font-semibold text-gray-900 leading-relaxed">
+                                {question.stem}
+                              </h3>
                             </div>
                           </div>
                         </AccordionTrigger>
