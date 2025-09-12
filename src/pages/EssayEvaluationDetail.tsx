@@ -652,65 +652,73 @@ const EssayEvaluationDetail = () => {
               </div>
 
               {/* Questions Details */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Questions & Responses</h3>
+              <div className="space-y-6">
                 {selectedEvaluation.questions.map((question: any, index: number) => (
-                  <Card key={question.id} className="border border-gray-200">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Question {index + 1}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <Label className="text-sm font-medium text-purple-800">Question:</Label>
-                        <p className="text-sm text-gray-700 mt-1 p-3 bg-purple-50 rounded-lg border-l-4 border-purple-400">
-                          {question.stem}
-                        </p>
+                  <div key={question.id} className="space-y-4">
+                    {/* Question Stem */}
+                    <div>
+                      <div className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-md mb-3">
+                        Question Stem
                       </div>
-                      
-                      {viewDialogExpanded && (
-                        <div>
-                          <Label className="text-sm font-medium text-purple-800">Key Answer:</Label>
-                          <p className="text-sm text-gray-700 mt-1 p-3 bg-purple-50 rounded-lg">
-                            {question.keyAnswer}
-                          </p>
-                        </div>
-                      )}
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label className="text-sm font-medium text-gray-600">Max Score:</Label>
-                          <p className="text-lg font-bold text-purple-700">{question.maxScore}</p>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-medium text-gray-600">AI Score:</Label>
-                          <p className="text-lg font-bold text-green-700">{question.aiScore}</p>
-                        </div>
+                      <div className="p-4 border-l-4 border-purple-400 bg-gray-50 rounded-lg">
+                        <p className="text-gray-900 font-medium leading-relaxed">{question.stem}</p>
                       </div>
-                      
-                      {viewDialogExpanded && (
-                        <div>
-                          <Label className="text-sm font-medium text-gray-600">Reference:</Label>
-                          <p className="text-sm text-gray-700 mt-1">{question.reference}</p>
-                        </div>
-                      )}
-                      
-                      <div>
-                        <Label className="text-sm font-medium text-blue-800">Answer Response:</Label>
-                        <p className="text-sm text-gray-700 mt-1 p-3 bg-blue-50 rounded-lg min-h-[60px]">
+                    </div>
+
+                    {/* Answer Response */}
+                    <div>
+                      <h4 className="text-purple-600 font-semibold mb-3">Answer Response:</h4>
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[120px]">
+                        <div className="text-gray-700 whitespace-pre-wrap">
                           {question.answer || 'No response provided'}
-                        </p>
-                      </div>
-                      
-                      {question.feedback && (
-                        <div>
-                          <Label className="text-sm font-medium text-green-800">AI Feedback:</Label>
-                          <p className="text-sm text-gray-700 mt-1 p-3 bg-green-50 rounded-lg border border-green-200">
-                            {question.feedback}
-                          </p>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                      </div>
+                    </div>
+
+                    {/* AI Feedback */}
+                    {question.feedback && (
+                      <div>
+                        <h4 className="text-blue-600 font-semibold mb-3">AI Feedback</h4>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <p className="text-gray-700 leading-relaxed">{question.feedback}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Scores */}
+                    <div className="flex gap-8 py-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-600 font-medium">Max Score:</span>
+                        <span className="text-2xl font-bold text-purple-600">{question.maxScore}</span>
+                      </div>
+                      <div className="h-6 w-px bg-gray-300"></div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-600 font-medium">AI Score:</span>
+                        <span className="text-2xl font-bold text-green-600">{question.aiScore}</span>
+                      </div>
+                    </div>
+
+                    {/* Key Answer (when expanded) */}
+                    {viewDialogExpanded && (
+                      <div>
+                        <h4 className="text-purple-600 font-semibold mb-3">Key Answer</h4>
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <p className="text-gray-700 leading-relaxed">{question.keyAnswer}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reference */}
+                    <div>
+                      <span className="text-gray-600 font-medium">Reference: </span>
+                      <span className="text-gray-700">{question.reference}</span>
+                    </div>
+
+                    {/* Separator between questions */}
+                    {index < selectedEvaluation.questions.length - 1 && (
+                      <div className="border-b border-gray-200 my-8"></div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
