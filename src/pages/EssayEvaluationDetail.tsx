@@ -204,14 +204,15 @@ const EssayEvaluationDetail = () => {
                     {questions.map((question) => (
                       <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
                         <AccordionTrigger className="text-left px-4 hover:no-underline">
-                          <div className="flex flex-col items-start">
+                          <div className="flex flex-col items-start w-full">
                             <div className="font-medium text-purple-800">Question ID: {question.id}</div>
                             <div className="text-sm text-purple-600 mt-1">
                               Question Stem: {question.stem}
                             </div>
                           </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 space-y-4">
+                        
+                        <div className="px-4 pb-4 space-y-4">
                           <div className="space-y-2">
                             <Label htmlFor={`answer-${question.id}`} className="text-purple-800 font-medium">
                               Answer Response:
@@ -223,7 +224,9 @@ const EssayEvaluationDetail = () => {
                               value={question.answer}
                             />
                           </div>
-                          
+                        </div>
+                        
+                        <AccordionContent className="px-4 pb-4 space-y-4">
                           <div className="bg-purple-50 p-4 rounded-lg space-y-3 border border-purple-100">
                             <div>
                               <h4 className="font-semibold text-purple-900 mb-2">Key Answer:</h4>
