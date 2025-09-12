@@ -300,16 +300,16 @@ const EssayEvaluationDetail = () => {
       <main className="p-6">
         <div className="max-w-6xl mx-auto space-y-8">
           <Tabs defaultValue="evaluate" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 bg-gradient-to-r from-purple-100 to-blue-100 p-2 rounded-2xl border border-purple-200/30 gap-1 h-14">
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 p-3 rounded-xl shadow-sm border gap-1 h-16">
               <TabsTrigger 
                 value="evaluate" 
-                className="rounded-xl py-3 px-6 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-700 data-[state=active]:text-white data-[state=active]:shadow-sm text-purple-700 hover:text-purple-800 hover:bg-white/50"
+                className="rounded-lg py-3 px-6 font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-700 data-[state=active]:border data-[state=active]:border-blue-200 text-gray-600 hover:text-gray-800"
               >
                 Evaluate Candidate
               </TabsTrigger>
               <TabsTrigger 
                 value="review"
-                className="rounded-xl py-3 px-6 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-purple-700 data-[state=active]:text-white data-[state=active]:shadow-sm text-purple-700 hover:text-purple-800 hover:bg-white/50"
+                className="rounded-lg py-3 px-6 font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-orange-700 data-[state=active]:border data-[state=active]:border-orange-200 text-gray-600 hover:text-gray-800"
               >
                 Review Evaluation
               </TabsTrigger>
