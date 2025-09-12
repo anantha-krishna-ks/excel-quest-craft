@@ -207,7 +207,7 @@ const EssayEvaluationDetail = () => {
                           <div className="flex flex-col items-start w-full gap-3">
                             <div className="flex items-center gap-2">
                               <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-md">
-                                Question {question.id}
+                                Question Stem {question.id}
                               </span>
                             </div>
                             <div className="w-full">
