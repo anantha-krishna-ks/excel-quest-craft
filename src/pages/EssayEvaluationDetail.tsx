@@ -32,14 +32,51 @@ const EssayEvaluationDetail = () => {
       candidateId: "GKa_002_2025-09-11 11:17:30.076024+00",
       evaluatedDate: "11/09/2025 04:47:30 PM",
       evaluatedBy: "Current User",
-      questions: []
+      courseDetails: "Bodily Injury Claims",
+      questions: [
+        {
+          id: 1,
+          stem: "Briefly describe the purpose and construction of the rib cage.",
+          keyAnswer: "Study 1, pp.11-12 – Verifying Facts—Importance of Visual Evidence – Any TEN (10) points required.",
+          markerNotes: "Key points are underlined. Marks to be awarded if the student adequately addresses the key points.",
+          maxScore: 10,
+          reference: "Study 1 - Investigating Bodily Injury Claims, pp.11-12",
+          answer: "• Number of ribs: There are 24 ribs, 12 on each side of the chest, that are connected to the vertebrae of the spine by costal cartilage.\n\n• Upper ribs: Fourteen of the upper true ribs are connected at the front of the chest to the sternum, or breastbone.\n\n• Lower ribs: Six of the lower false ribs are connected by cartilage to the rib above.",
+          feedback: "Based on the candidate's response, the answer demonstrates good understanding of the key concepts. The response addresses most of the required points with adequate detail and shows clear comprehension of the subject matter.",
+          aiScore: 6
+        },
+        {
+          id: 2,
+          stem: "Explain the role of medical experts in personal injury claims and discuss the importance of medical documentation.",
+          keyAnswer: "Study 2, pp.15-18 – Medical Evidence in Personal Injury Claims – Any EIGHT (8) points required.",
+          markerNotes: "Focus on the significance of medical experts and proper documentation.",
+          maxScore: 8,
+          reference: "Study 2 - Medical Evidence and Expert Testimony, pp.15-18",
+          answer: "Medical experts play a crucial role in personal injury claims by providing professional opinions on the extent and causation of injuries. They review medical records, conduct examinations, and provide testimony regarding the medical aspects of the case.",
+          feedback: "The response demonstrates excellent understanding of medical expert roles. Clear explanation of their functions and importance in establishing medical evidence for personal injury claims.",
+          aiScore: 7
+        }
+      ]
     },
     {
       id: 2,
       candidateId: "GKa_002_2025-09-12 04:42:57.930813+00", 
       evaluatedDate: "12/09/2025 10:12:57 AM",
       evaluatedBy: "Current User",
-      questions: []
+      courseDetails: "Settlement Negotiations",
+      questions: [
+        {
+          id: 3,
+          stem: "Analyze the process of settlement negotiations in personal injury cases and identify key factors that influence settlement amounts.",
+          keyAnswer: "Study 3, pp.22-25 – Settlement Negotiations and Valuation – Any TWELVE (12) points required.",
+          markerNotes: "Students should demonstrate understanding of negotiation strategies and valuation factors.",
+          maxScore: 12,
+          reference: "Study 3 - Settlement Negotiations and Case Valuation, pp.22-25",
+          answer: "Settlement negotiations involve multiple factors including liability assessment, damage quantification, and consideration of trial risks. Key influencing factors include the strength of medical evidence, precedent cases, insurance policy limits, and the client's willingness to settle versus proceed to trial.",
+          feedback: "Comprehensive response covering the main aspects of settlement negotiations. Good understanding of the various factors that influence settlement amounts and the negotiation process.",
+          aiScore: 10
+        }
+      ]
     }
   ])
 
@@ -79,6 +116,7 @@ const EssayEvaluationDetail = () => {
         candidateId: candidateId,
         evaluatedDate: new Date().toLocaleString(),
         evaluatedBy: "Current User",
+        courseDetails: courseDetails || "N/A",
         questions: questions
       }
       setSavedEvaluations([...savedEvaluations, newEvaluation])
