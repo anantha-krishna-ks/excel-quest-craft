@@ -466,7 +466,7 @@ const EssayEvaluationDetail = () => {
                   <Accordion 
                     type="multiple" 
                     className="w-full space-y-4"
-                    value={isExpanded ? questions.map(q => `question-${q.id}`) : []}
+                    value={isExpanded ? questions.map(q => `question-${q.id}`) : undefined}
                   >
                     {questions.map((question) => (
                       <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
@@ -727,7 +727,7 @@ const EssayEvaluationDetail = () => {
                 <Accordion 
                   type="multiple" 
                   className="w-full space-y-4"
-                  value={viewDialogExpanded ? selectedEvaluation?.questions?.map((q: any) => `question-${q.id}`) || [] : []}
+                  value={viewDialogExpanded ? selectedEvaluation?.questions?.map((q: any) => `question-${q.id}`) || [] : undefined}
                 >
                   {selectedEvaluation.questions.map((question: any, index: number) => (
                     <AccordionItem key={question.id} value={`question-${question.id}`} className="border border-purple-200 rounded-lg bg-white">
