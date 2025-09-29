@@ -13,7 +13,9 @@ import {
   Target,
   Trash2,
   Eye,
-  Settings
+  Settings,
+  Plus,
+  X
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -28,9 +30,7 @@ import { toast } from "@/hooks/use-toast"
 
 const ItemMetadata = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [customMetadata1, setCustomMetadata1] = useState("")
-  const [customMetadata2, setCustomMetadata2] = useState("")
-  const [customMetadata3, setCustomMetadata3] = useState("")
+  const [customMetadataList, setCustomMetadataList] = useState<string[]>(["", "", ""])
   const [showResults, setShowResults] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -47,15 +47,31 @@ const ItemMetadata = () => {
   ]
 
   // Filter out selected values from other dropdowns
-  const getAvailableOptions = (excludeValues: string[]) => {
+  const getAvailableOptions = (currentIndex: number) => {
+    const selectedValues = customMetadataList.filter((_, index) => index !== currentIndex)
     return metadataOptions.filter(option => 
-      option === "Select metadata" || !excludeValues.includes(option)
+      option === "Select metadata" || !selectedValues.includes(option)
     )
   }
 
-  const customMetadata1Options = getAvailableOptions([customMetadata2, customMetadata3])
-  const customMetadata2Options = getAvailableOptions([customMetadata1, customMetadata3])
-  const customMetadata3Options = getAvailableOptions([customMetadata1, customMetadata2])
+  const addMetadataField = () => {
+    if (customMetadataList.length < 5) {
+      setCustomMetadataList([...customMetadataList, ""])
+    }
+  }
+
+  const removeMetadataField = (index: number) => {
+    if (customMetadataList.length > 3) {
+      const newList = customMetadataList.filter((_, i) => i !== index)
+      setCustomMetadataList(newList)
+    }
+  }
+
+  const updateMetadataField = (index: number, value: string) => {
+    const newList = [...customMetadataList]
+    newList[index] = value
+    setCustomMetadataList(newList)
+  }
 
   const validateFile = (file: File) => {
     if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls') && !file.name.endsWith('.csv')) {
@@ -144,12 +160,14 @@ const ItemMetadata = () => {
       return
     }
 
-    if (!customMetadata1 || customMetadata1 === "Select metadata" || 
-        !customMetadata2 || customMetadata2 === "Select metadata" ||
-        !customMetadata3 || customMetadata3 === "Select metadata") {
+    const hasEmptyMetadata = customMetadataList.some(metadata => 
+      !metadata || metadata === "Select metadata"
+    )
+    
+    if (hasEmptyMetadata) {
       toast({
         title: "Missing metadata selection",
-        description: "Please select all three metadata types.",
+        description: "Please select all metadata types.",
         variant: "destructive"
       })
       return
@@ -173,23 +191,26 @@ const ItemMetadata = () => {
     {
       id: 1,
       question: "What is the sum of 5 + 3?",
-      metadata1: customMetadata1 === "Grade Level" ? "Grade 3" : "Basic Addition",
-      metadata2: customMetadata2 === "Topic" ? "Mathematics" : "Knowledge",
-      metadata3: customMetadata3 === "Bloom's Taxonomy Level" ? "Knowledge" : "Addition"
+      ...customMetadataList.reduce((acc, metadata, index) => {
+        acc[`metadata${index + 1}`] = metadata === "Grade Level" ? "Grade 3" : "Basic Addition"
+        return acc
+      }, {} as Record<string, string>)
     },
     {
       id: 2,
       question: "Identify the noun in this sentence: 'The dog runs fast.'",
-      metadata1: customMetadata1 === "Grade Level" ? "Grade 4" : "Grammar",
-      metadata2: customMetadata2 === "Topic" ? "English" : "Comprehension",
-      metadata3: customMetadata3 === "Bloom's Taxonomy Level" ? "Comprehension" : "Grammar"
+      ...customMetadataList.reduce((acc, metadata, index) => {
+        acc[`metadata${index + 1}`] = metadata === "Grade Level" ? "Grade 4" : "Grammar"
+        return acc
+      }, {} as Record<string, string>)
     },
     {
       id: 3,
       question: "What is the capital of France?",
-      metadata1: customMetadata1 === "Grade Level" ? "Grade 5" : "Geography",
-      metadata2: customMetadata2 === "Topic" ? "Social Studies" : "Knowledge",
-      metadata3: customMetadata3 === "Bloom's Taxonomy Level" ? "Knowledge" : "Geography"
+      ...customMetadataList.reduce((acc, metadata, index) => {
+        acc[`metadata${index + 1}`] = metadata === "Grade Level" ? "Grade 5" : "Geography"
+        return acc
+      }, {} as Record<string, string>)
     }
   ]
 
@@ -334,59 +355,56 @@ const ItemMetadata = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="custom-metadata-1" className="text-sm font-medium text-purple-800">
-                      Custom Metadata 1 <span className="text-red-500">*</span>
-                    </Label>
-                    <Select value={customMetadata1} onValueChange={setCustomMetadata1}>
-                      <SelectTrigger className="bg-white border-purple-200">
-                        <SelectValue placeholder="Select metadata" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customMetadata1Options.map((option) => (
-                          <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-purple-800">Custom Metadata Fields</h3>
+                    <Button
+                      onClick={addMetadataField}
+                      disabled={customMetadataList.length >= 5}
+                      variant="outline"
+                      size="sm"
+                      className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Field ({customMetadataList.length}/5)
+                    </Button>
                   </div>
-
-                  <div>
-                    <Label htmlFor="custom-metadata-2" className="text-sm font-medium text-purple-800">
-                      Custom Metadata 2 <span className="text-red-500">*</span>
-                    </Label>
-                    <Select value={customMetadata2} onValueChange={setCustomMetadata2}>
-                      <SelectTrigger className="bg-white border-purple-200">
-                        <SelectValue placeholder="Select metadata" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customMetadata2Options.map((option) => (
-                          <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="custom-metadata-3" className="text-sm font-medium text-purple-800">
-                      Custom Metadata 3 <span className="text-red-500">*</span>
-                    </Label>
-                    <Select value={customMetadata3} onValueChange={setCustomMetadata3}>
-                      <SelectTrigger className="bg-white border-purple-200">
-                        <SelectValue placeholder="Select metadata" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customMetadata3Options.map((option) => (
-                          <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  
+                  <div className="grid grid-cols-1 gap-4">
+                    {customMetadataList.map((metadata, index) => (
+                      <div key={index} className="flex items-end gap-3">
+                        <div className="flex-1">
+                          <Label className="text-sm font-medium text-purple-800">
+                            Custom Metadata {index + 1} <span className="text-red-500">*</span>
+                          </Label>
+                          <Select 
+                            value={metadata} 
+                            onValueChange={(value) => updateMetadataField(index, value)}
+                          >
+                            <SelectTrigger className="bg-white border-purple-200">
+                              <SelectValue placeholder="Select metadata" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getAvailableOptions(index).map((option) => (
+                                <SelectItem key={option} value={option} disabled={option === "Select metadata"}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {customMetadataList.length > 3 && (
+                          <Button
+                            onClick={() => removeMetadataField(index)}
+                            variant="outline"
+                            size="sm"
+                            className="border-red-200 text-red-600 hover:bg-red-50"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -410,10 +428,9 @@ const ItemMetadata = () => {
                     onClick={handleFilterAndGenerate} 
                     size="lg" 
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                    disabled={!customMetadata1 || !customMetadata2 || !customMetadata3 || 
-                             customMetadata1 === "Select metadata" || 
-                             customMetadata2 === "Select metadata" || 
-                             customMetadata3 === "Select metadata"}
+                    disabled={customMetadataList.some(metadata => 
+                      !metadata || metadata === "Select metadata"
+                    )}
                   >
                     <Filter className="h-4 w-4 mr-2" />
                     Generate Metadata Analysis
@@ -449,15 +466,11 @@ const ItemMetadata = () => {
                       <TableRow className="border-orange-100">
                         <TableHead className="w-16 font-semibold">Sl. No.</TableHead>
                         <TableHead className="font-semibold">Question</TableHead>
-                        <TableHead className="font-semibold">
-                          {customMetadata1 || "Metadata 1"}
-                        </TableHead>
-                        <TableHead className="font-semibold">
-                          {customMetadata2 || "Metadata 2"}
-                        </TableHead>
-                        <TableHead className="font-semibold">
-                          {customMetadata3 || "Metadata 3"}
-                        </TableHead>
+                         {customMetadataList.map((metadata, index) => (
+                           <TableHead key={index} className="font-semibold">
+                             {metadata || `Metadata ${index + 1}`}
+                           </TableHead>
+                         ))}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -465,21 +478,22 @@ const ItemMetadata = () => {
                         <TableRow key={item.id} className="hover:bg-orange-50">
                           <TableCell className="font-medium">{item.id}</TableCell>
                           <TableCell className="max-w-md text-sm">{item.question}</TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                              {item.metadata1}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">
-                              {item.metadata2}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                              {item.metadata3}
-                            </Badge>
-                          </TableCell>
+                           {customMetadataList.map((_, index) => (
+                             <TableCell key={index}>
+                               <Badge 
+                                 variant="secondary" 
+                                 className={`${
+                                   index === 0 ? 'bg-blue-100 text-blue-800' :
+                                   index === 1 ? 'bg-green-100 text-green-800' :
+                                   index === 2 ? 'bg-purple-100 text-purple-800' :
+                                   index === 3 ? 'bg-orange-100 text-orange-800' :
+                                   'bg-gray-100 text-gray-800'
+                                 }`}
+                               >
+                                 {(item as any)[`metadata${index + 1}`]}
+                               </Badge>
+                             </TableCell>
+                           ))}
                         </TableRow>
                       ))}
                     </TableBody>
