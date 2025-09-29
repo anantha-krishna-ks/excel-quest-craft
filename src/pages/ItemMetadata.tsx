@@ -234,7 +234,7 @@ const ItemMetadata = () => {
               <span className="text-sm font-medium text-blue-600">2,847 Tokens</span>
             </div>
             <Link to="/dashboard">
-              <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+              <Button variant="ghost" size="sm" className="hover:bg-gray-200 hover:text-gray-900 bg-transparent text-gray-700">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
