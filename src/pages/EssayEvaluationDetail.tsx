@@ -293,7 +293,7 @@ const EssayEvaluationDetail = () => {
           </div>
           <div className="flex items-center gap-4">
             <Link to="/essay-evaluation">
-              <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+              <Button variant="ghost" size="sm" className="hover:bg-accent hover:text-accent-foreground">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Essays
               </Button>
