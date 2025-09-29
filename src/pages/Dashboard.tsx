@@ -369,7 +369,7 @@ const Dashboard = () => {
                 className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm transition-all ${
                   activeTab === tab 
                     ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm" 
-                    : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-blue-300"
+                    : "bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground hover:border-accent"
                 }`}
               >
                 {tab}
