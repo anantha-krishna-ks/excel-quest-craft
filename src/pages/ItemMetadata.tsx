@@ -363,7 +363,7 @@ const ItemMetadata = () => {
                       disabled={customMetadataList.length >= 5}
                       variant="outline"
                       size="sm"
-                      className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                      className="border-purple-200 text-purple-700 hover:bg-purple-100 hover:border-purple-300 hover:text-purple-800 bg-white"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Field ({customMetadataList.length}/5)
