@@ -367,7 +367,7 @@ Assessment (10 minutes):
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar - Book Info */}
         <aside className="w-80 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-4 bg-muted/30">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-purple-600 text-white rounded-lg">
                 <BookOpen className="h-4 w-4" />
