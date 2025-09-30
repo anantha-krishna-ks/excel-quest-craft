@@ -392,7 +392,7 @@ Assessment (10 minutes):
 
             {/* Book Cover */}
             <div className="relative">
-              <img src={ncertBookImage} alt="NCERT Biology Class 11 Textbook" className="w-full h-64 object-cover rounded-lg shadow-lg" />
+              <img src={ncertBookImage} alt="NCERT Biology Class 11 Textbook" className="w-full h-64 object-cover rounded-lg shadow-lg border border-border" />
             </div>
 
             {/* Book Details */}
