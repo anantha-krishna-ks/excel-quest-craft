@@ -365,9 +365,85 @@ Assessment (10 minutes):
 
       {/* Main Content */}
       <main className="p-6">
-        <div className="max-w-5xl mx-auto">
-          <Card className="border-2 border-purple-100 shadow-lg">
-            <CardContent className="p-6 space-y-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Section - Book Info */}
+          <div className="lg:col-span-4">
+            <Card className="border-2 border-purple-100 shadow-lg sticky top-6">
+              <CardContent className="p-6 space-y-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-purple-600 text-white rounded-lg">
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">Book Information</h2>
+                    <p className="text-sm text-gray-600">NCERT Textbook</p>
+                  </div>
+                </div>
+
+                {/* Book Cover */}
+                <div className="relative">
+                  <div className="aspect-[3/4] bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 rounded-lg shadow-xl overflow-hidden">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white">
+                      <BookOpen className="h-16 w-16 mb-4 opacity-90" />
+                      <h3 className="text-xl font-bold text-center mb-2">NCERT Biology</h3>
+                      <p className="text-sm opacity-90 text-center">Class 11</p>
+                      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/50 to-transparent" />
+                      <div className="absolute bottom-4 left-0 right-0 text-center">
+                        <p className="text-xs opacity-75">National Council of Educational</p>
+                        <p className="text-xs opacity-75">Research and Training</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Book Details */}
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">Biology</h3>
+                    <p className="text-sm text-gray-600">Textbook for Class XI</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Publisher:</span>
+                      <span className="text-xs text-gray-600">NCERT, New Delhi</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Subject:</span>
+                      <span className="text-xs text-gray-600">Biology</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Class:</span>
+                      <span className="text-xs text-gray-600">XI (Eleventh)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Edition:</span>
+                      <span className="text-xs text-gray-600">2024-25</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Total Pages:</span>
+                      <span className="text-xs text-gray-600">368 pages</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Chapters:</span>
+                      <span className="text-xs text-gray-600">22 Chapters</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      This comprehensive biology textbook covers fundamental concepts including diversity in living organisms, structural organization, cell biology, plant physiology, and human physiology.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Section - Chat */}
+          <div className="lg:col-span-8">
+            <Card className="border-2 border-purple-100 shadow-lg">
+              <CardContent className="p-6 space-y-4">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-purple-600 text-white rounded-lg">
                   <MessageSquare className="h-5 w-5" />
@@ -437,6 +513,7 @@ Assessment (10 minutes):
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
       </main>
     </div>
