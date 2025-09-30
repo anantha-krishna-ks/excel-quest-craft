@@ -364,11 +364,11 @@ Assessment (10 minutes):
       </header>
 
       {/* Main Content */}
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <main className="h-[calc(100vh-73px)] overflow-hidden">
+        <div className="h-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-6">
           {/* Left Section - Book Info */}
-          <div className="lg:col-span-4">
-            <Card className="border-2 border-purple-100 shadow-lg sticky top-6">
+          <div className="lg:col-span-4 h-full overflow-y-auto">
+            <Card className="border-2 border-purple-100 shadow-lg">
               <CardContent className="p-6 space-y-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-purple-600 text-white rounded-lg">
@@ -441,10 +441,10 @@ Assessment (10 minutes):
           </div>
 
           {/* Right Section - Chat */}
-          <div className="lg:col-span-8">
-            <Card className="border-2 border-purple-100 shadow-lg">
-              <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
+          <div className="lg:col-span-8 h-full flex flex-col">
+            <Card className="border-2 border-purple-100 shadow-lg h-full flex flex-col">
+              <CardContent className="p-6 flex flex-col h-full space-y-4">
+              <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-600 text-white rounded-lg">
                   <MessageSquare className="h-5 w-5" />
                 </div>
@@ -454,7 +454,7 @@ Assessment (10 minutes):
                 </div>
               </div>
 
-              <ScrollArea className="h-[600px] w-full rounded-lg border bg-gradient-to-b from-gray-50 to-white p-4">
+              <ScrollArea className="flex-1 w-full rounded-lg border bg-gradient-to-b from-gray-50 to-white p-4">
                 <div className="space-y-4 pr-4">
                   {messages.map((message, index) => (
                     <div
