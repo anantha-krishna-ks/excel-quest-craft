@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/hooks/use-toast"
@@ -37,6 +37,17 @@ const DocChatNCERT = () => {
   ])
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const textareaRef = useState<HTMLTextAreaElement | null>(null)[0]
+
+  const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
+    element.style.height = 'auto'
+    element.style.height = `${Math.min(element.scrollHeight, 200)}px`
+  }
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputMessage(e.target.value)
+    adjustTextareaHeight(e.target)
+  }
 
   const detectIntentAndRespond = (userInput: string) => {
     const input = userInput.toLowerCase()
@@ -480,18 +491,24 @@ Assessment (10 minutes):
           
           {/* Chat Input - Fixed at Bottom */}
           <div className="px-6 py-4 border-t border-gray-200 bg-white">
-            <div className="max-w-4xl mx-auto flex gap-2">
-              <Input
+            <div className="max-w-4xl mx-auto flex gap-2 items-end">
+              <Textarea
                 placeholder="Ask about chapters, summaries, questions, or lesson plans..."
                 value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                className="flex-1"
+                onChange={handleTextareaChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSendMessage()
+                  }
+                }}
+                className="flex-1 min-h-[44px] max-h-[200px] resize-none"
+                rows={1}
               />
               <Button 
                 onClick={handleSendMessage} 
                 disabled={isLoading || !inputMessage.trim()}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="bg-purple-600 hover:bg-purple-700 text-white h-[44px]"
               >
                 <Send className="h-4 w-4" />
               </Button>
