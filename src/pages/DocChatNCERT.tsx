@@ -335,187 +335,148 @@ Assessment (10 minutes):
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">Doc Chat - NCERT</h1>
-              <p className="text-sm text-gray-500">Interactive AI-powered textbook assistant</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-2 bg-purple-50 rounded-lg border border-purple-200">
-              <Sparkles className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-600">3,241 Tokens</span>
-            </div>
-            <Link to="/dashboard">
-              <Button variant="ghost" size="sm" className="hover:bg-accent hover:text-accent-foreground">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
+    <div className="h-screen flex overflow-hidden bg-gray-50">
+      {/* Left Sidebar - Book Info */}
+      <div className="w-80 border-r border-gray-200 bg-white flex flex-col">
+        {/* Tokens */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Sparkles className="h-4 w-4 text-purple-600" />
+            <span className="font-medium">3,241 Tokens Remaining</span>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Section - Book Info */}
-          <div className="lg:col-span-4">
-            <Card className="border-2 border-purple-100 shadow-lg sticky top-6">
-              <CardContent className="p-6 space-y-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-purple-600 text-white rounded-lg">
-                    <BookOpen className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Book Information</h2>
-                    <p className="text-sm text-gray-600">NCERT Textbook</p>
-                  </div>
-                </div>
-
-                {/* Book Cover */}
-                <div className="relative">
-                  <div className="aspect-[3/4] bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 rounded-lg shadow-xl overflow-hidden">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white">
-                      <BookOpen className="h-16 w-16 mb-4 opacity-90" />
-                      <h3 className="text-xl font-bold text-center mb-2">NCERT Biology</h3>
-                      <p className="text-sm opacity-90 text-center">Class 11</p>
-                      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/50 to-transparent" />
-                      <div className="absolute bottom-4 left-0 right-0 text-center">
-                        <p className="text-xs opacity-75">National Council of Educational</p>
-                        <p className="text-xs opacity-75">Research and Training</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Book Details */}
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">Biology</h3>
-                    <p className="text-sm text-gray-600">Textbook for Class XI</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Publisher:</span>
-                      <span className="text-xs text-gray-600">NCERT, New Delhi</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Subject:</span>
-                      <span className="text-xs text-gray-600">Biology</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Class:</span>
-                      <span className="text-xs text-gray-600">XI (Eleventh)</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Edition:</span>
-                      <span className="text-xs text-gray-600">2024-25</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Total Pages:</span>
-                      <span className="text-xs text-gray-600">368 pages</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Chapters:</span>
-                      <span className="text-xs text-gray-600">22 Chapters</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      This comprehensive biology textbook covers fundamental concepts including diversity in living organisms, structural organization, cell biology, plant physiology, and human physiology.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Book Details */}
+        <div className="p-6 space-y-4">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Book Details:</h2>
+            <div className="space-y-2 mb-6">
+              <div>
+                <span className="text-sm font-semibold text-gray-700">Book Name:</span>
+                <p className="text-sm text-gray-600">Biology Class XI</p>
+              </div>
+              <div>
+                <span className="text-sm font-semibold text-gray-700">Author:</span>
+                <p className="text-sm text-gray-600">NCERT</p>
+              </div>
+            </div>
           </div>
 
-          {/* Right Section - Chat */}
-          <div className="lg:col-span-8">
-            <Card className="border-2 border-purple-100 shadow-lg">
-              <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-purple-600 text-white rounded-lg">
-                  <MessageSquare className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Chat with NCERT Textbook</h2>
-                  <p className="text-sm text-gray-600">Ask questions, generate summaries, or create study materials</p>
-                </div>
+          {/* Book Cover */}
+          <div className="aspect-[3/4] bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 rounded-lg shadow-lg overflow-hidden">
+            <div className="h-full flex flex-col items-center justify-center p-6 text-white">
+              <BookOpen className="h-12 w-12 mb-3 opacity-90" />
+              <h3 className="text-lg font-bold text-center mb-1">NCERT Biology</h3>
+              <p className="text-sm opacity-90 text-center">Class 11</p>
+              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/50 to-transparent" />
+              <div className="absolute bottom-3 left-0 right-0 text-center">
+                <p className="text-xs opacity-75">National Council of Educational</p>
+                <p className="text-xs opacity-75">Research and Training</p>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <ScrollArea className="h-[600px] w-full rounded-lg border bg-gradient-to-b from-gray-50 to-white p-4">
-                <div className="space-y-4 pr-4">
-                  {messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      {message.role === "assistant" && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0">
-                          <Bot className="h-4 w-4 text-white" />
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[85%] rounded-lg p-4 ${
-                          message.role === "user"
-                            ? "bg-blue-600 text-white"
-                            : "bg-white border border-gray-200 shadow-sm text-gray-900"
-                        }`}
-                      >
-                        {renderMessageContent(message)}
-                      </div>
-                      {message.role === "user" && (
-                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                          <User className="h-4 w-4 text-white" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex gap-3 justify-start">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-                        <Bot className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                        <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-              
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Ask about chapters, summaries, questions, or lesson plans..."
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={handleSendMessage} 
-                  disabled={isLoading || !inputMessage.trim()}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+        {/* Back Button */}
+        <div className="mt-auto p-4 border-t border-gray-200">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="sm" className="w-full justify-start">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Right Section - Chat */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Chat Header */}
+        <div className="p-4 border-b border-gray-200 bg-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-600 text-white rounded-lg">
+                <MessageSquare className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Chat</h2>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-xl font-bold">
+                <span className="text-blue-600">Document</span>
+                <span className="text-yellow-500">Chat</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Messages Area */}
+        <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-gray-50 to-white">
+          <div className="max-w-4xl mx-auto space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                {message.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0">
+                    <Bot className="h-4 w-4 text-white" />
+                  </div>
+                )}
+                <div
+                  className={`max-w-[75%] rounded-lg p-4 ${
+                    message.role === "user"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white border border-gray-200 shadow-sm text-gray-900"
+                  }`}
                 >
-                  <Send className="h-4 w-4" />
-                </Button>
+                  {renderMessageContent(message)}
+                </div>
+                {message.role === "user" && (
+                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                )}
               </div>
-            </CardContent>
-          </Card>
+            ))}
+            {isLoading && (
+              <div className="flex gap-3 justify-start">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-white" />
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Input Area */}
+        <div className="p-6 border-t border-gray-200 bg-white">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Your question"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleSendMessage} 
+                disabled={isLoading || !inputMessage.trim()}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
