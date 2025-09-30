@@ -10,7 +10,8 @@ import {
   Bot,
   User,
   Copy,
-  Download
+  Download,
+  Menu
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -18,6 +19,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/hooks/use-toast"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import ncertBookImage from "@/assets/ncert-biology-book.jpg"
 
 interface Message {
@@ -37,6 +45,7 @@ const DocChatNCERT = () => {
   ])
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const textareaRef = useState<HTMLTextAreaElement | null>(null)[0]
 
   const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
@@ -346,29 +355,100 @@ Assessment (10 minutes):
     return <p className="text-sm whitespace-pre-wrap">{message.content}</p>
   }
 
+  const BookDetailsContent = () => (
+    <div className="p-4 space-y-4 bg-muted">
+      <div className="flex items-center gap-2">
+        <div className="p-2 bg-purple-600 text-white rounded-lg">
+          <BookOpen className="h-4 w-4" />
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900">Book Information</h2>
+          <p className="text-xs text-gray-600">NCERT Textbook</p>
+        </div>
+      </div>
+
+      {/* Book Cover */}
+      <div className="relative">
+        <img src={ncertBookImage} alt="NCERT Biology Class 11 Textbook" className="w-full h-64 object-cover rounded-lg shadow-lg border border-border" />
+      </div>
+
+      {/* Book Details */}
+      <div className="space-y-3">
+        <div>
+          <h3 className="text-base font-bold text-gray-900 mb-0.5">Biology</h3>
+          <p className="text-xs text-gray-600">Textbook for Class XI</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-start gap-2">
+            <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Publisher:</span>
+            <span className="text-xs text-gray-600">NCERT, New Delhi</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Subject:</span>
+            <span className="text-xs text-gray-600">Biology</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Class:</span>
+            <span className="text-xs text-gray-600">XI (Eleventh)</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Edition:</span>
+            <span className="text-xs text-gray-600">2024-25</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Total Pages:</span>
+            <span className="text-xs text-gray-600">368 pages</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Chapters:</span>
+            <span className="text-xs text-gray-600">22 Chapters</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
+            {/* Hamburger Menu for Mobile */}
+            <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80 p-0">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Book Details</SheetTitle>
+                </SheetHeader>
+                <ScrollArea className="h-full">
+                  <BookDetailsContent />
+                </ScrollArea>
+              </SheetContent>
+            </Sheet>
+
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-semibold text-gray-900">Doc Chat - NCERT</h1>
-              <p className="text-xs text-gray-500">Interactive AI-powered textbook assistant</p>
+              <p className="text-xs text-gray-500 hidden sm:block">Interactive AI-powered textbook assistant</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-purple-50 rounded-lg border border-purple-200">
               <Sparkles className="h-4 w-4 text-purple-600" />
               <span className="text-sm font-medium text-purple-600">3,241 Tokens</span>
             </div>
             <Link to="/dashboard">
               <Button variant="ghost" size="sm" className="hover:bg-accent hover:text-accent-foreground">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                <ArrowLeft className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back</span>
               </Button>
             </Link>
           </div>
@@ -377,59 +457,9 @@ Assessment (10 minutes):
 
       {/* Main Content - Split Layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar - Book Info */}
-        <aside className="w-80 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
-          <div className="p-4 space-y-4 bg-muted">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-purple-600 text-white rounded-lg">
-                <BookOpen className="h-4 w-4" />
-              </div>
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900">Book Information</h2>
-                <p className="text-xs text-gray-600">NCERT Textbook</p>
-              </div>
-            </div>
-
-            {/* Book Cover */}
-            <div className="relative">
-              <img src={ncertBookImage} alt="NCERT Biology Class 11 Textbook" className="w-full h-64 object-cover rounded-lg shadow-lg border border-border" />
-            </div>
-
-            {/* Book Details */}
-            <div className="space-y-3">
-              <div>
-                <h3 className="text-base font-bold text-gray-900 mb-0.5">Biology</h3>
-                <p className="text-xs text-gray-600">Textbook for Class XI</p>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Publisher:</span>
-                  <span className="text-xs text-gray-600">NCERT, New Delhi</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Subject:</span>
-                  <span className="text-xs text-gray-600">Biology</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Class:</span>
-                  <span className="text-xs text-gray-600">XI (Eleventh)</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Edition:</span>
-                  <span className="text-xs text-gray-600">2024-25</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Total Pages:</span>
-                  <span className="text-xs text-gray-600">368 pages</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-gray-700 min-w-[70px]">Chapters:</span>
-                  <span className="text-xs text-gray-600">22 Chapters</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Left Sidebar - Book Info - Hidden on mobile */}
+        <aside className="hidden md:flex w-80 bg-white border-r border-gray-200 flex-col overflow-y-auto">
+          <BookDetailsContent />
         </aside>
 
         {/* Right Section - Chat Interface */}
