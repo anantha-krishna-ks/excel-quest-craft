@@ -364,74 +364,74 @@ Assessment (10 minutes):
       </header>
 
       {/* Main Content */}
-      <main className="h-[calc(100vh-73px)] overflow-hidden">
-        <div className="h-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 p-6">
+      <main className="h-[calc(100vh-73px)] overflow-hidden p-4">
+        <div className="h-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Left Section - Book Info */}
-          <div className="lg:col-span-4 h-full overflow-y-auto">
+          <div className="lg:col-span-4 h-full overflow-y-auto pr-2">
             <Card className="border-2 border-purple-100 shadow-lg">
-              <CardContent className="p-6 space-y-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-purple-600 text-white rounded-lg">
-                    <BookOpen className="h-5 w-5" />
+              <CardContent className="p-4 space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-1.5 bg-purple-600 text-white rounded-lg">
+                    <BookOpen className="h-4 w-4" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Book Information</h2>
-                    <p className="text-sm text-gray-600">NCERT Textbook</p>
+                    <h2 className="text-base font-semibold text-gray-900">Book Information</h2>
+                    <p className="text-xs text-gray-600">NCERT Textbook</p>
                   </div>
                 </div>
 
                 {/* Book Cover */}
                 <div className="relative">
-                  <div className="aspect-[3/4] bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 rounded-lg shadow-xl overflow-hidden">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white">
-                      <BookOpen className="h-16 w-16 mb-4 opacity-90" />
-                      <h3 className="text-xl font-bold text-center mb-2">NCERT Biology</h3>
-                      <p className="text-sm opacity-90 text-center">Class 11</p>
-                      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/50 to-transparent" />
-                      <div className="absolute bottom-4 left-0 right-0 text-center">
-                        <p className="text-xs opacity-75">National Council of Educational</p>
-                        <p className="text-xs opacity-75">Research and Training</p>
+                  <div className="aspect-[3/4] bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 rounded-lg shadow-lg overflow-hidden">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-white">
+                      <BookOpen className="h-12 w-12 mb-3 opacity-90" />
+                      <h3 className="text-lg font-bold text-center mb-1">NCERT Biology</h3>
+                      <p className="text-xs opacity-90 text-center">Class 11</p>
+                      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/50 to-transparent" />
+                      <div className="absolute bottom-3 left-0 right-0 text-center">
+                        <p className="text-[10px] opacity-75">National Council of Educational</p>
+                        <p className="text-[10px] opacity-75">Research and Training</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Book Details */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">Biology</h3>
-                    <p className="text-sm text-gray-600">Textbook for Class XI</p>
+                    <h3 className="text-base font-bold text-gray-900 mb-0.5">Biology</h3>
+                    <p className="text-xs text-gray-600">Textbook for Class XI</p>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Publisher:</span>
-                      <span className="text-xs text-gray-600">NCERT, New Delhi</span>
+                      <span className="text-[10px] font-semibold text-gray-700 min-w-[70px]">Publisher:</span>
+                      <span className="text-[10px] text-gray-600">NCERT, New Delhi</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Subject:</span>
-                      <span className="text-xs text-gray-600">Biology</span>
+                      <span className="text-[10px] font-semibold text-gray-700 min-w-[70px]">Subject:</span>
+                      <span className="text-[10px] text-gray-600">Biology</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Class:</span>
-                      <span className="text-xs text-gray-600">XI (Eleventh)</span>
+                      <span className="text-[10px] font-semibold text-gray-700 min-w-[70px]">Class:</span>
+                      <span className="text-[10px] text-gray-600">XI (Eleventh)</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Edition:</span>
-                      <span className="text-xs text-gray-600">2024-25</span>
+                      <span className="text-[10px] font-semibold text-gray-700 min-w-[70px]">Edition:</span>
+                      <span className="text-[10px] text-gray-600">2024-25</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Total Pages:</span>
-                      <span className="text-xs text-gray-600">368 pages</span>
+                      <span className="text-[10px] font-semibold text-gray-700 min-w-[70px]">Total Pages:</span>
+                      <span className="text-[10px] text-gray-600">368 pages</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-700 min-w-[80px]">Chapters:</span>
-                      <span className="text-xs text-gray-600">22 Chapters</span>
+                      <span className="text-[10px] font-semibold text-gray-700 min-w-[70px]">Chapters:</span>
+                      <span className="text-[10px] text-gray-600">22 Chapters</span>
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 leading-relaxed">
+                  <div className="pt-2 border-t border-gray-200">
+                    <p className="text-[10px] text-gray-600 leading-relaxed">
                       This comprehensive biology textbook covers fundamental concepts including diversity in living organisms, structural organization, cell biology, plant physiology, and human physiology.
                     </p>
                   </div>
@@ -443,18 +443,18 @@ Assessment (10 minutes):
           {/* Right Section - Chat */}
           <div className="lg:col-span-8 h-full flex flex-col">
             <Card className="border-2 border-purple-100 shadow-lg h-full flex flex-col">
-              <CardContent className="p-6 flex flex-col h-full space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-600 text-white rounded-lg">
-                  <MessageSquare className="h-5 w-5" />
+              <CardContent className="p-4 flex flex-col h-full">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-purple-600 text-white rounded-lg">
+                  <MessageSquare className="h-4 w-4" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Chat with NCERT Textbook</h2>
-                  <p className="text-sm text-gray-600">Ask questions, generate summaries, or create study materials</p>
+                  <h2 className="text-base font-semibold text-gray-900">Chat with NCERT Textbook</h2>
+                  <p className="text-xs text-gray-600">Ask questions, generate summaries, or create study materials</p>
                 </div>
               </div>
 
-              <ScrollArea className="flex-1 w-full rounded-lg border bg-gradient-to-b from-gray-50 to-white p-4">
+              <ScrollArea className="flex-1 w-full rounded-lg border bg-gradient-to-b from-gray-50 to-white p-3 mb-3">
                 <div className="space-y-4 pr-4">
                   {messages.map((message, index) => (
                     <div
