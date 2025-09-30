@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { 
   ArrowLeft, 
@@ -10,7 +10,8 @@ import {
   Bot,
   User,
   Copy,
-  Download
+  Download,
+  ArrowDown
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -37,7 +38,34 @@ const DocChatNCERT = () => {
   ])
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [showScrollButton, setShowScrollButton] = useState(false)
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
   const textareaRef = useState<HTMLTextAreaElement | null>(null)[0]
+
+  useEffect(() => {
+    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+    
+    const handleScroll = () => {
+      if (!viewport) return
+      const { scrollTop, scrollHeight, clientHeight } = viewport
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100
+      setShowScrollButton(!isAtBottom)
+    }
+
+    viewport?.addEventListener('scroll', handleScroll)
+    return () => viewport?.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const scrollToBottom = () => {
+    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+    if (viewport) {
+      viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' })
+    }
+  }
 
   const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
     element.style.height = 'auto'
@@ -448,8 +476,9 @@ Assessment (10 minutes):
           </div>
 
           {/* Chat Messages - Scrollable Area */}
-          <ScrollArea className="flex-1 px-6">
-            <div className="space-y-4 py-4 max-w-4xl mx-auto">
+          <div className="flex-1 relative">
+            <ScrollArea ref={scrollAreaRef} className="h-full px-6">
+              <div className="space-y-4 py-4 max-w-4xl mx-auto">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -486,8 +515,22 @@ Assessment (10 minutes):
                   </div>
                 </div>
               )}
-            </div>
-          </ScrollArea>
+              </div>
+            </ScrollArea>
+            
+            {/* Scroll to Bottom Button */}
+            {showScrollButton && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                <Button
+                  onClick={scrollToBottom}
+                  size="sm"
+                  className="rounded-full shadow-lg bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
           
           {/* Chat Input - Fixed at Bottom */}
           <div className="px-6 py-4 border-t border-gray-200 bg-white">
