@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { 
   ArrowLeft, 
@@ -10,7 +10,8 @@ import {
   Bot,
   User,
   Copy,
-  Download
+  Download,
+  ArrowDown
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -37,7 +38,9 @@ const DocChatNCERT = () => {
   ])
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [showScrollButton, setShowScrollButton] = useState(false)
   const textareaRef = useState<HTMLTextAreaElement | null>(null)[0]
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
 
   const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
     element.style.height = 'auto'
@@ -48,6 +51,38 @@ const DocChatNCERT = () => {
     setInputMessage(e.target.value)
     adjustTextareaHeight(e.target)
   }
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
+      if (viewport) {
+        viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' })
+      }
+    }
+  }
+
+  const handleScroll = () => {
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
+      if (viewport) {
+        const { scrollTop, scrollHeight, clientHeight } = viewport
+        const isAtBottom = scrollHeight - scrollTop - clientHeight < 100
+        setShowScrollButton(!isAtBottom)
+      }
+    }
+  }
+
+  useEffect(() => {
+    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+    if (viewport) {
+      viewport.addEventListener('scroll', handleScroll)
+      return () => viewport.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   const detectIntentAndRespond = (userInput: string) => {
     const input = userInput.toLowerCase()
@@ -448,7 +483,8 @@ Assessment (10 minutes):
           </div>
 
           {/* Chat Messages - Scrollable Area */}
-          <ScrollArea className="flex-1 px-6">
+          <div className="relative flex-1">
+            <ScrollArea ref={scrollAreaRef} className="h-full px-6">
             <div className="space-y-4 py-4 max-w-4xl mx-auto">
               {messages.map((message, index) => (
                 <div
@@ -487,7 +523,19 @@ Assessment (10 minutes):
                 </div>
               )}
             </div>
-          </ScrollArea>
+            </ScrollArea>
+            
+            {/* Scroll to Bottom Button */}
+            {showScrollButton && (
+              <button
+                onClick={scrollToBottom}
+                className="absolute bottom-4 right-8 p-2 bg-background border border-border rounded-full shadow-lg hover:bg-accent transition-colors animate-fade-in"
+                aria-label="Scroll to bottom"
+              >
+                <ArrowDown className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           
           {/* Chat Input - Fixed at Bottom */}
           <div className="px-6 py-4 border-t border-gray-200 bg-white">
