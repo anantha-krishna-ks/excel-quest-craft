@@ -427,12 +427,6 @@ Assessment (10 minutes):
                   <span className="text-xs text-gray-600">22 Chapters</span>
                 </div>
               </div>
-
-              <div className="pt-3 border-t border-gray-200">
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  This comprehensive biology textbook covers fundamental concepts including diversity in living organisms, structural organization, cell biology, plant physiology, and human physiology.
-                </p>
-              </div>
             </div>
           </div>
         </aside>
