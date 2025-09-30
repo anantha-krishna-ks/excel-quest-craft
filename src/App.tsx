@@ -16,6 +16,7 @@ import ItemMetadata from "./pages/ItemMetadata";
 import SpeechEvaluation from "./pages/SpeechEvaluation";
 import EssayEvaluation from "./pages/EssayEvaluation";
 import EssayEvaluationDetail from "./pages/EssayEvaluationDetail";
+import DocChatNCERT from "./pages/DocChatNCERT";
 import QuestionGenerator from "./pages/QuestionGenerator";
 import QuestionGenerationLoading from "./pages/QuestionGenerationLoading";
 import QuestionResults from "./pages/QuestionResults";
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/question-repository" element={<QuestionRepository />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/manage-users" element={<ManageUsers />} />
+          <Route path="/doc-chat-ncert" element={<DocChatNCERT />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
