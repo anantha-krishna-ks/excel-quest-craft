@@ -380,18 +380,7 @@ Assessment (10 minutes):
 
             {/* Book Cover */}
             <div className="relative">
-              <div className="aspect-[3/4] h-40 bg-gradient-to-br from-purple-600 via-blue-600 to-purple-800 rounded-lg shadow-lg overflow-hidden">
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-white">
-                  <BookOpen className="h-6 w-6 mb-2 opacity-90" />
-                  <h3 className="text-sm font-bold text-center mb-1">NCERT Biology</h3>
-                  <p className="text-xs opacity-90 text-center">Class 11</p>
-                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/50 to-transparent" />
-                  <div className="absolute bottom-1.5 left-0 right-0 text-center">
-                    <p className="text-[10px] opacity-75">National Council of Educational</p>
-                    <p className="text-[10px] opacity-75">Research and Training</p>
-                  </div>
-                </div>
-              </div>
+              <div className="w-full h-64 bg-muted rounded-lg" />
             </div>
 
             {/* Book Details */}
