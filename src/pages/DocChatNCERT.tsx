@@ -435,58 +435,6 @@ Assessment (10 minutes):
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
-
-              {/* Quick action suggestions */}
-              <div className="flex flex-wrap gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setInputMessage("Show me the chapter list")
-                    setTimeout(() => handleSendMessage(), 100)
-                  }}
-                  className="text-xs"
-                >
-                  <BookOpen className="h-3 w-3 mr-1" />
-                  Chapter List
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setInputMessage("Summarize chapter 1")
-                    setTimeout(() => handleSendMessage(), 100)
-                  }}
-                  className="text-xs"
-                >
-                  <MessageSquare className="h-3 w-3 mr-1" />
-                  Summarize
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setInputMessage("Generate practice questions")
-                    setTimeout(() => handleSendMessage(), 100)
-                  }}
-                  className="text-xs"
-                >
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Questions
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setInputMessage("Create a lesson plan")
-                    setTimeout(() => handleSendMessage(), 100)
-                  }}
-                  className="text-xs"
-                >
-                  <BookOpen className="h-3 w-3 mr-1" />
-                  Lesson Plan
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </div>
