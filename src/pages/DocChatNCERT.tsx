@@ -487,7 +487,7 @@ Assessment (10 minutes):
                 >
                   {message.role === "assistant" && (
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center flex-shrink-0">
-                      <Bot className="h-4 w-4 text-white" />
+                      <Sparkles className="h-4 w-4 text-white" />
                     </div>
                   )}
                   <div
@@ -509,7 +509,7 @@ Assessment (10 minutes):
               {isLoading && (
                 <div className="flex gap-3 justify-start">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-                    <Bot className="h-4 w-4 text-white" />
+                    <Sparkles className="h-4 w-4 text-white" />
                   </div>
                   <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                     <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
