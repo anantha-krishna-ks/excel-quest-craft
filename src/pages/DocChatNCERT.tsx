@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/hooks/use-toast"
+import ncertBookImage from "@/assets/ncert-biology-book.jpg"
 
 interface Message {
   role: "user" | "assistant"
@@ -380,7 +381,7 @@ Assessment (10 minutes):
 
             {/* Book Cover */}
             <div className="relative">
-              <div className="w-full h-64 bg-muted rounded-lg" />
+              <img src={ncertBookImage} alt="NCERT Biology Class 11 Textbook" className="w-full h-64 object-cover rounded-lg shadow-lg" />
             </div>
 
             {/* Book Details */}
