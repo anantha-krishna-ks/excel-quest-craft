@@ -356,7 +356,7 @@ Assessment (10 minutes):
   }
 
   const BookDetailsContent = () => (
-    <div className="p-4 space-y-4 bg-muted">
+    <div className="p-4 space-y-4 bg-muted h-full">
       <div className="flex items-center gap-2">
         <div className="p-2 bg-purple-600 text-white rounded-lg">
           <BookOpen className="h-4 w-4" />
