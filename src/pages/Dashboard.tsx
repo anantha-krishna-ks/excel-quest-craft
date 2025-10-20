@@ -24,6 +24,8 @@ import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("All")
   const [subscriptionFilter, setSubscriptionFilter] = useState("All")
+  const [hoveredTool, setHoveredTool] = useState<string | null>(null)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
   const tabs = [
     "All", "AI Generation", "Content Creation", "Education", 
@@ -379,58 +381,78 @@ const Dashboard = () => {
           </div>
 
           {/* AI Tools Grid */}
-          <TooltipProvider>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredTools.map((tool) => {
-                const IconComponent = tool.icon
-                return (
-                  <Tooltip key={tool.id}>
-                    <TooltipTrigger asChild>
-                      <Card className="group bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 cursor-help">
-                        <div className="relative">
-                          <img 
-                            src={tool.image} 
-                            alt={tool.title}
-                            className="w-full h-40 object-cover rounded-t-lg"
-                          />
-                          {/* Tool Icon Overlay */}
-                          <div className="absolute top-3 left-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm">
-                            <IconComponent className="h-4 w-4 text-gray-700" />
-                          </div>
-                          {tool.badge && (
-                            <div className={`absolute top-3 right-3 px-2 py-1 rounded-md text-xs text-white font-medium ${tool.badgeColor} shadow-sm`}>
-                              {tool.badge}
-                            </div>
-                          )}
-                          <div className="absolute bottom-3 right-3 px-2 py-1 rounded-md text-xs font-medium text-gray-700 bg-white/90 backdrop-blur-sm shadow-sm">
-                            {tool.category}
-                          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredTools.map((tool) => {
+              const IconComponent = tool.icon
+              return (
+                <div 
+                  key={tool.id}
+                  className="relative"
+                  onMouseEnter={() => setHoveredTool(tool.id)}
+                  onMouseLeave={() => setHoveredTool(null)}
+                  onMouseMove={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    setMousePosition({
+                      x: e.clientX - rect.left,
+                      y: e.clientY - rect.top
+                    })
+                  }}
+                >
+                  <Card className="group bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1">
+                    <div className="relative">
+                      <img 
+                        src={tool.image} 
+                        alt={tool.title}
+                        className="w-full h-40 object-cover rounded-t-lg"
+                      />
+                      {/* Tool Icon Overlay */}
+                      <div className="absolute top-3 left-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm">
+                        <IconComponent className="h-4 w-4 text-gray-700" />
+                      </div>
+                      {tool.badge && (
+                        <div className={`absolute top-3 right-3 px-2 py-1 rounded-md text-xs text-white font-medium ${tool.badgeColor} shadow-sm`}>
+                          {tool.badge}
                         </div>
-                        
-                        <CardContent className="p-6">
-                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{tool.title}</h3>
-                          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
-                          
-                          <Link to={tool.path}>
-                            <Button 
-                              className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 hover:scale-[1.02]"
-                              size="sm"
-                            >
-                              <Sparkles className="h-4 w-4 mr-2" />
-                              Launch App
-                            </Button>
-                          </Link>
-                        </CardContent>
-                      </Card>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-xs bg-gray-900 text-white px-3 py-2">
-                      <p className="text-sm font-medium">{tool.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              })}
-            </div>
-          </TooltipProvider>
+                      )}
+                      <div className="absolute bottom-3 right-3 px-2 py-1 rounded-md text-xs font-medium text-gray-700 bg-white/90 backdrop-blur-sm shadow-sm">
+                        {tool.category}
+                      </div>
+                    </div>
+                    
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{tool.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+                      
+                      <Link to={tool.path}>
+                        <Button 
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 hover:scale-[1.02]"
+                          size="sm"
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Launch App
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Custom cursor-following tooltip */}
+                  {hoveredTool === tool.id && (
+                    <div 
+                      className="absolute z-50 pointer-events-none"
+                      style={{
+                        left: `${mousePosition.x + 15}px`,
+                        top: `${mousePosition.y + 15}px`,
+                      }}
+                    >
+                      <div className="bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium whitespace-nowrap">
+                        {tool.title}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
 
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-gray-200 text-center">
