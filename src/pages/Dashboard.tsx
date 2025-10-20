@@ -384,10 +384,10 @@ const Dashboard = () => {
               {filteredTools.map((tool) => {
                 const IconComponent = tool.icon
                 return (
-                  <Card key={tool.id} className="group bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="relative cursor-help">
+                  <Tooltip key={tool.id}>
+                    <TooltipTrigger asChild>
+                      <Card className="group bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 cursor-help">
+                        <div className="relative">
                           <img 
                             src={tool.image} 
                             alt={tool.title}
@@ -406,34 +406,27 @@ const Dashboard = () => {
                             {tool.category}
                           </div>
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs bg-gray-900 text-white px-3 py-2">
-                        <p className="text-sm font-medium">{tool.title}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                    <CardContent className="p-6">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1 cursor-help">{tool.title}</h3>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-xs bg-gray-900 text-white px-3 py-2">
-                          <p className="text-sm font-medium">{tool.title}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
-                      
-                      <Link to={tool.path}>
-                        <Button 
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 hover:scale-[1.02]"
-                          size="sm"
-                        >
-                          <Sparkles className="h-4 w-4 mr-2" />
-                          Launch App
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
+                        
+                        <CardContent className="p-6">
+                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{tool.title}</h3>
+                          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+                          
+                          <Link to={tool.path}>
+                            <Button 
+                              className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 hover:scale-[1.02]"
+                              size="sm"
+                            >
+                              <Sparkles className="h-4 w-4 mr-2" />
+                              Launch App
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs bg-gray-900 text-white px-3 py-2">
+                      <p className="text-sm font-medium">{tool.title}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )
               })}
             </div>
