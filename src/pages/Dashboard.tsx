@@ -385,25 +385,32 @@ const Dashboard = () => {
                 const IconComponent = tool.icon
                 return (
                   <Card key={tool.id} className="group bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1">
-                    <div className="relative">
-                      <img 
-                        src={tool.image} 
-                        alt={tool.title}
-                        className="w-full h-40 object-cover rounded-t-lg"
-                      />
-                      {/* Tool Icon Overlay */}
-                      <div className="absolute top-3 left-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm">
-                        <IconComponent className="h-4 w-4 text-gray-700" />
-                      </div>
-                      {tool.badge && (
-                        <div className={`absolute top-3 right-3 px-2 py-1 rounded-md text-xs text-white font-medium ${tool.badgeColor} shadow-sm`}>
-                          {tool.badge}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="relative cursor-help">
+                          <img 
+                            src={tool.image} 
+                            alt={tool.title}
+                            className="w-full h-40 object-cover rounded-t-lg"
+                          />
+                          {/* Tool Icon Overlay */}
+                          <div className="absolute top-3 left-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm">
+                            <IconComponent className="h-4 w-4 text-gray-700" />
+                          </div>
+                          {tool.badge && (
+                            <div className={`absolute top-3 right-3 px-2 py-1 rounded-md text-xs text-white font-medium ${tool.badgeColor} shadow-sm`}>
+                              {tool.badge}
+                            </div>
+                          )}
+                          <div className="absolute bottom-3 right-3 px-2 py-1 rounded-md text-xs font-medium text-gray-700 bg-white/90 backdrop-blur-sm shadow-sm">
+                            {tool.category}
+                          </div>
                         </div>
-                      )}
-                      <div className="absolute bottom-3 right-3 px-2 py-1 rounded-md text-xs font-medium text-gray-700 bg-white/90 backdrop-blur-sm shadow-sm">
-                        {tool.category}
-                      </div>
-                    </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs bg-gray-900 text-white px-3 py-2">
+                        <p className="text-sm font-medium">{tool.title}</p>
+                      </TooltipContent>
+                    </Tooltip>
                     
                     <CardContent className="p-6">
                       <Tooltip>
