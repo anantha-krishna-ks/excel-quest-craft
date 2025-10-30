@@ -303,10 +303,10 @@ const EssayEvaluationZeroShot = () => {
                         key={index} 
                         className={`border border-gray-200 hover:border-purple-300 transition-all duration-300 hover:shadow-md bg-gradient-to-br ${getBgColor(percentage)}`}
                       >
-                        <CardContent className="p-5">
-                          <div className="flex items-start gap-4">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
                             {/* Left side - Rubric info */}
-                            <div className="flex-1 min-w-0 space-y-3">
+                            <div className="flex-1 min-w-0 space-y-2">
                               <div>
                                 <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Rubric</span>
                                 <h3 className="font-semibold text-gray-900 mt-1 flex items-center gap-2">
