@@ -263,62 +263,144 @@ const EssayEvaluationZeroShot = () => {
 
         {/* Evaluation Results */}
         {hasEvaluated && evaluationResults && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Rationale Section */}
-            <Card className="border border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Rationale</h2>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="font-semibold">Rubric</TableHead>
-                        <TableHead className="font-semibold">Score</TableHead>
-                        <TableHead className="font-semibold">Explanation</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {evaluationResults.rationale.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{item.rubric}</TableCell>
-                          <TableCell className="font-semibold text-blue-600">{item.score}</TableCell>
-                          <TableCell className="text-gray-600">{item.explanation}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+          <div className="space-y-8 animate-fade-in">
+            {/* Overall Score Card */}
+            <Card className="border-2 border-green-100 shadow-xl bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Overall Score</h2>
+                    <p className="text-gray-600">Average across all rubrics</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-2xl">
+                        <div className="text-center">
+                          <div className="text-5xl font-bold text-white">{evaluationResults.overallScore}</div>
+                          <div className="text-xl text-green-50 font-medium">/10</div>
+                        </div>
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
+                        <Sparkles className="w-6 h-6 text-yellow-800" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Evaluation Results Summary */}
-            <Card className="border border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Evaluation Results</h2>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="font-semibold">Criteria</TableHead>
-                        <TableHead className="font-semibold text-right">Score</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {evaluationResults.rationale.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{item.rubric}</TableCell>
-                          <TableCell className="text-right font-semibold text-blue-600">{item.score}</TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow className="bg-blue-50 font-bold">
-                        <TableCell>Overall Average Score</TableCell>
-                        <TableCell className="text-right text-blue-700">{evaluationResults.overallScore}/10</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+            {/* Detailed Rationale Section */}
+            <Card className="border-2 border-purple-100 shadow-xl bg-gradient-to-br from-white to-purple-50/20">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md">
+                    <PenTool className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-900">Detailed Rationale</h2>
+                </div>
+                
+                <div className="space-y-6">
+                  {evaluationResults.rationale.map((item, index) => {
+                    const scoreNum = parseInt(item.score.split('/')[0])
+                    const maxScore = parseInt(item.score.split('/')[1])
+                    const percentage = (scoreNum / maxScore) * 100
+                    
+                    let scoreColor = 'from-red-500 to-orange-500'
+                    let bgColor = 'from-red-50 to-orange-50'
+                    let borderColor = 'border-red-200'
+                    let badgeColor = 'bg-red-100 text-red-700'
+                    
+                    if (percentage >= 80) {
+                      scoreColor = 'from-green-500 to-emerald-600'
+                      bgColor = 'from-green-50 to-emerald-50'
+                      borderColor = 'border-green-200'
+                      badgeColor = 'bg-green-100 text-green-700'
+                    } else if (percentage >= 60) {
+                      scoreColor = 'from-blue-500 to-indigo-600'
+                      bgColor = 'from-blue-50 to-indigo-50'
+                      borderColor = 'border-blue-200'
+                      badgeColor = 'bg-blue-100 text-blue-700'
+                    }
+                    
+                    return (
+                      <div 
+                        key={index}
+                        className={`p-6 rounded-xl bg-gradient-to-br ${bgColor} border-2 ${borderColor} shadow-md hover:shadow-lg transition-all duration-300`}
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <Badge className={`${badgeColor} font-semibold text-sm px-3 py-1 mb-3`}>
+                              {item.rubric}
+                            </Badge>
+                            <p className="text-gray-700 leading-relaxed">{item.explanation}</p>
+                          </div>
+                          <div className={`ml-6 px-6 py-3 rounded-xl bg-gradient-to-br ${scoreColor} shadow-lg`}>
+                            <div className="text-center">
+                              <div className="text-3xl font-bold text-white">{scoreNum}</div>
+                              <div className="text-sm text-white/90 font-medium">/{maxScore}</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4">
+                          <div className="flex justify-between text-sm text-gray-600 mb-2">
+                            <span className="font-medium">Score Progress</span>
+                            <span className="font-semibold">{percentage.toFixed(0)}%</span>
+                          </div>
+                          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                            <div 
+                              className={`h-full bg-gradient-to-r ${scoreColor} transition-all duration-500 rounded-full shadow-sm`}
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </CardContent>
             </Card>
+
+            {/* Summary Statistics */}
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="border-2 border-blue-100 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-blue-50 to-indigo-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-gray-700">Rubrics Evaluated</h3>
+                  </div>
+                  <p className="text-4xl font-bold text-blue-600">{evaluationResults.rationale.length}</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-purple-50 to-pink-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+                      <PenTool className="w-4 h-4 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-gray-700">Highest Score</h3>
+                  </div>
+                  <p className="text-4xl font-bold text-purple-600">
+                    {Math.max(...evaluationResults.rationale.map(r => parseInt(r.score.split('/')[0])))}/10
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-emerald-100 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-emerald-50 to-teal-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-gray-700">Average Score</h3>
+                  </div>
+                  <p className="text-4xl font-bold text-emerald-600">{evaluationResults.overallScore}/10</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
       </div>
