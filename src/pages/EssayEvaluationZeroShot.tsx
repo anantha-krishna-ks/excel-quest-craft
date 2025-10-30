@@ -306,12 +306,18 @@ const EssayEvaluationZeroShot = () => {
                         <CardContent className="p-5">
                           <div className="flex items-start gap-4">
                             {/* Left side - Rubric info */}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 animate-pulse"></span>
-                                {item.rubric}
-                              </h3>
-                              <p className="text-sm text-gray-600 leading-relaxed">{item.explanation}</p>
+                            <div className="flex-1 min-w-0 space-y-3">
+                              <div>
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Rubric</span>
+                                <h3 className="font-semibold text-gray-900 mt-1 flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 animate-pulse"></span>
+                                  {item.rubric}
+                                </h3>
+                              </div>
+                              <div>
+                                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Explanation</span>
+                                <p className="text-sm text-gray-600 leading-relaxed mt-1">{item.explanation}</p>
+                              </div>
                             </div>
                             
                             {/* Right side - Score */}
