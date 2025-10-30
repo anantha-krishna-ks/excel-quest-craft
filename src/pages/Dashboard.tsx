@@ -20,6 +20,7 @@ import ocrImage from "@/assets/ocr.png"
 import comingSoonImage from "@/assets/coming-soon.png"
 import speechEvaluationImage from "@/assets/speech-evaluation-hero.jpg"
 import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
+import essayEvaluationZeroShotImage from "@/assets/essay-evaluation-zero-shot.jpg"
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("All")
@@ -188,10 +189,10 @@ const Dashboard = () => {
     },
     {
       id: "essay-evaluation-zero",
-      title: "Essay Evaluation - Zer...",
+      title: "Essay Evaluation - Zero Shot",
       description: "A paperless questions are evaluated using SBA and...",
       path: "/essay-evaluation-zero",
-      image: comingSoonImage,
+      image: essayEvaluationZeroShotImage,
       category: "Assessment",
       icon: BarChart3,
       subscriptionStatus: "pending"
