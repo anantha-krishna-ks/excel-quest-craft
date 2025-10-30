@@ -273,7 +273,7 @@ const EssayEvaluationZeroShot = () => {
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
+                    <h2 className="text-2xl font-bold text-gray-900">
                       Detailed Rationale
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">AI evaluation breakdown by rubric</p>
