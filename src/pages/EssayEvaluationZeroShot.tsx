@@ -115,196 +115,224 @@ const EssayEvaluationZeroShot = () => {
       </div>
 
       {/* Main Content */}
-      <div className="p-6 max-w-5xl mx-auto space-y-8">
-        {/* Page Title */}
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-            <PenTool className="w-4 h-4" />
-            Zero Shot Essay Assessment
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-purple-800 to-blue-800 bg-clip-text text-transparent">
-            Essay Evaluation - Zero Shot
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Evaluate essays using AI with custom rubrics, without needing predefined books or training data
-          </p>
-        </div>
-
-        {/* Essay Section */}
-        <Card className="border border-gray-200 shadow-sm">
-          <CardContent className="p-6 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Essay Question
-              </label>
-              <Input
-                placeholder="Enter your essay topic or question..."
-                value={essayQuestion}
-                onChange={(e) => setEssayQuestion(e.target.value)}
-                className="w-full"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Essay Answer
-                </label>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearAnswer}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="w-4 h-4 mr-1" />
-                  Clear Answer
-                </Button>
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Left Column - Input Section */}
+          <div className="space-y-6">
+            {/* Page Title */}
+            <div className="space-y-3 animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                <PenTool className="w-3 h-3" />
+                Zero Shot Assessment
               </div>
-              <Textarea
-                placeholder="Start writing your essay here..."
-                value={essayAnswer}
-                onChange={(e) => setEssayAnswer(e.target.value)}
-                className="w-full min-h-[200px] resize-y"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Rubrics Section */}
-        <Card className="border border-gray-200 shadow-sm">
-          <CardContent className="p-6 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Add Rubric Keywords
-              </label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add a rubric keyword and press Enter..."
-                  value={rubricInput}
-                  onChange={(e) => setRubricInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleAddRubric}
-                  variant="outline"
-                  size="sm"
-                  className="px-4"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add
-                </Button>
-              </div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-purple-800 to-blue-800 bg-clip-text text-transparent">
+                Essay Evaluation
+              </h1>
+              <p className="text-sm text-gray-600">
+                AI-powered evaluation with custom rubrics
+              </p>
             </div>
 
-            {rubrics.length > 0 && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Current Rubrics
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {rubrics.map((rubric, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="px-3 py-2 text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 flex items-center gap-2"
+            {/* Essay Section */}
+            <Card className="border border-gray-200 shadow-sm">
+              <CardContent className="p-5 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Essay Question
+                  </label>
+                  <Input
+                    placeholder="Enter your essay topic or question..."
+                    value={essayQuestion}
+                    onChange={(e) => setEssayQuestion(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Essay Answer
+                    </label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearAnswer}
+                      className="text-gray-500 hover:text-gray-700 h-auto py-1"
                     >
-                      {rubric}
-                      <button
-                        onClick={() => handleRemoveRubric(rubric)}
-                        className="hover:text-blue-900"
+                      <X className="w-3 h-3 mr-1" />
+                      Clear
+                    </Button>
+                  </div>
+                  <Textarea
+                    placeholder="Start writing your essay here..."
+                    value={essayAnswer}
+                    onChange={(e) => setEssayAnswer(e.target.value)}
+                    className="w-full min-h-[160px] resize-y"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Rubrics Section */}
+            <Card className="border border-gray-200 shadow-sm">
+              <CardContent className="p-5 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Evaluation Rubrics
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Add rubric keyword (e.g., Clarity, Grammar)..."
+                      value={rubricInput}
+                      onChange={(e) => setRubricInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={handleAddRubric}
+                      variant="outline"
+                      size="sm"
+                      className="px-3"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {rubrics.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {rubrics.map((rubric, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="px-3 py-1.5 text-sm bg-gradient-to-r from-blue-50 to-purple-50 text-gray-700 border border-blue-200 hover:border-purple-300 flex items-center gap-2 transition-all"
                       >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </Badge>
-                  ))}
+                        {rubric}
+                        <button
+                          onClick={() => handleRemoveRubric(rubric)}
+                          className="hover:text-red-600 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Submit Button */}
+            <Button
+              onClick={handleSubmitEvaluation}
+              disabled={isEvaluating}
+              className="w-full py-6 text-base bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              {isEvaluating ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Evaluating Essay...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Submit for Evaluation
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Right Column - Results Section */}
+          <div className="space-y-6">
+            {hasEvaluated && evaluationResults ? (
+              <div className="space-y-6 animate-fade-in">
+                {/* Overall Score Card */}
+                <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-blue-50 to-white shadow-lg">
+                  <CardContent className="p-6 text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-full text-xs font-medium text-purple-700 mb-3">
+                      <Sparkles className="w-3 h-3" />
+                      Overall Performance
+                    </div>
+                    <div className="text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                      {evaluationResults.overallScore}
+                      <span className="text-3xl text-gray-400">/10</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Average Score</p>
+                  </CardContent>
+                </Card>
+
+                {/* Detailed Rubric Scores */}
+                <Card className="border border-gray-200 shadow-sm">
+                  <CardContent className="p-5">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <div className="w-1 h-5 bg-gradient-to-b from-purple-600 to-blue-600 rounded-full"></div>
+                      Rubric Breakdown
+                    </h2>
+                    <div className="space-y-3">
+                      {evaluationResults.rationale.map((item, index) => {
+                        const scoreValue = parseInt(item.score.split('/')[0])
+                        const maxScore = 10
+                        const percentage = (scoreValue / maxScore) * 100
+                        const color = scoreValue >= 8 ? 'from-green-500 to-emerald-500' : 
+                                     scoreValue >= 6 ? 'from-blue-500 to-cyan-500' : 
+                                     'from-orange-500 to-red-500'
+                        
+                        return (
+                          <div key={index} className="group p-4 rounded-lg border border-gray-100 hover:border-purple-200 hover:shadow-sm transition-all bg-gradient-to-r from-white to-gray-50">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-semibold text-gray-900">{item.rubric}</span>
+                              <span className={`text-lg font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+                                {item.score}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2 mb-2 overflow-hidden">
+                              <div 
+                                className={`h-full bg-gradient-to-r ${color} rounded-full transition-all duration-500 animate-scale-in`}
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                            <p className="text-xs text-gray-600 leading-relaxed">{item.explanation}</p>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-purple-600 mb-1">
+                        {evaluationResults.rationale.length}
+                      </div>
+                      <div className="text-xs text-gray-600">Rubrics Evaluated</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-600 mb-1">
+                        {evaluationResults.rationale.filter(r => parseInt(r.score) >= 8).length}
+                      </div>
+                      <div className="text-xs text-gray-600">High Scores (8+)</div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Submit Button */}
-        <div className="flex justify-center">
-          <Button
-            onClick={handleSubmitEvaluation}
-            disabled={isEvaluating}
-            className="px-8 py-6 text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            {isEvaluating ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Evaluating...
-              </>
             ) : (
-              <>
-                <Sparkles className="w-5 h-5 mr-2" />
-                Submit for Evaluation
-              </>
+              <Card className="border-2 border-dashed border-gray-300 bg-gray-50">
+                <CardContent className="p-12 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-purple-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to Evaluate</h3>
+                  <p className="text-sm text-gray-600 max-w-sm mx-auto">
+                    Fill in your essay question, write your answer, add rubrics, and submit for AI-powered evaluation
+                  </p>
+                </CardContent>
+              </Card>
             )}
-          </Button>
-        </div>
-
-        {/* Evaluation Results */}
-        {hasEvaluated && evaluationResults && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Rationale Section */}
-            <Card className="border border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Rationale</h2>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="font-semibold">Rubric</TableHead>
-                        <TableHead className="font-semibold">Score</TableHead>
-                        <TableHead className="font-semibold">Explanation</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {evaluationResults.rationale.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{item.rubric}</TableCell>
-                          <TableCell className="font-semibold text-blue-600">{item.score}</TableCell>
-                          <TableCell className="text-gray-600">{item.explanation}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Evaluation Results Summary */}
-            <Card className="border border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Evaluation Results</h2>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="font-semibold">Criteria</TableHead>
-                        <TableHead className="font-semibold text-right">Score</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {evaluationResults.rationale.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{item.rubric}</TableCell>
-                          <TableCell className="text-right font-semibold text-blue-600">{item.score}</TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow className="bg-blue-50 font-bold">
-                        <TableCell>Overall Average Score</TableCell>
-                        <TableCell className="text-right text-blue-700">{evaluationResults.overallScore}/10</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )
