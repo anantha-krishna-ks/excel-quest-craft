@@ -7,6 +7,7 @@ import { Link } from "react-router-dom"
 import { ArrowLeft, PenTool, Sparkles, X, Plus, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
 
 const EssayEvaluationZeroShot = () => {
@@ -265,28 +266,67 @@ const EssayEvaluationZeroShot = () => {
         {hasEvaluated && evaluationResults && (
           <div className="space-y-6 animate-fade-in">
             {/* Rationale Section */}
-            <Card className="border border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Rationale</h2>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="font-semibold">Rubric</TableHead>
-                        <TableHead className="font-semibold">Score</TableHead>
-                        <TableHead className="font-semibold">Explanation</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {evaluationResults.rationale.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{item.rubric}</TableCell>
-                          <TableCell className="font-semibold text-blue-600">{item.score}</TableCell>
-                          <TableCell className="text-gray-600">{item.explanation}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+            <Card className="border-2 border-purple-100 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-gradient-to-br from-white to-purple-50/20">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md">
+                    <Sparkles className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
+                      Detailed Rationale
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-1">AI evaluation breakdown by rubric</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  {evaluationResults.rationale.map((item, index) => {
+                    const scoreValue = parseInt(item.score.split('/')[0])
+                    const maxScore = parseInt(item.score.split('/')[1])
+                    const percentage = (scoreValue / maxScore) * 100
+                    
+                    const getScoreColor = (pct: number) => {
+                      if (pct >= 80) return 'from-green-500 to-emerald-600'
+                      if (pct >= 60) return 'from-blue-500 to-blue-600'
+                      return 'from-orange-500 to-red-600'
+                    }
+                    
+                    const getBgColor = (pct: number) => {
+                      if (pct >= 80) return 'from-green-50 to-emerald-50/50'
+                      if (pct >= 60) return 'from-blue-50 to-blue-50/50'
+                      return 'from-orange-50 to-red-50/50'
+                    }
+
+                    return (
+                      <Card 
+                        key={index} 
+                        className={`border border-gray-200 hover:border-purple-300 transition-all duration-300 hover:shadow-md bg-gradient-to-br ${getBgColor(percentage)}`}
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between gap-4 mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge className="px-3 py-1 bg-white/80 text-gray-700 border border-gray-300 font-semibold">
+                                  {item.rubric}
+                                </Badge>
+                              </div>
+                              <p className="text-gray-700 leading-relaxed">{item.explanation}</p>
+                            </div>
+                            <div className="flex flex-col items-end gap-2 min-w-[100px]">
+                              <div className={`text-4xl font-bold bg-gradient-to-r ${getScoreColor(percentage)} bg-clip-text text-transparent`}>
+                                {item.score}
+                              </div>
+                              <Progress 
+                                value={percentage} 
+                                className="w-full h-2"
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
               </CardContent>
             </Card>
