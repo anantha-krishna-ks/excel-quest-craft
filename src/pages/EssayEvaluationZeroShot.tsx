@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Link } from "react-router-dom"
-import { ArrowLeft, PenTool, Sparkles, X, Plus, Loader2 } from "lucide-react"
+import { ArrowLeft, PenTool, Sparkles, X, Plus, Loader2, ClipboardCheck } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Progress } from "@/components/ui/progress"
@@ -326,9 +326,14 @@ const EssayEvaluationZeroShot = () => {
               </Card>
 
               {/* Evaluation Results Summary */}
-              <Card className="border border-gray-200 shadow-sm bg-white">
+              <Card className="border-2 border-orange-100 bg-gradient-to-br from-orange-50 to-orange-100">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-bold text-gray-900 mb-3">Evaluation Summary</h2>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-orange-600 text-white rounded-lg">
+                      <ClipboardCheck className="h-5 w-5" />
+                    </div>
+                    <h2 className="text-2xl font-semibold text-orange-800">Evaluation Summary</h2>
+                  </div>
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
