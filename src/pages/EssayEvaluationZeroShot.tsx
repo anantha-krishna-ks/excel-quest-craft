@@ -121,7 +121,7 @@ const EssayEvaluationZeroShot = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Essay Section */}
           <Card className="border border-gray-200 shadow-sm bg-white">
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-6 space-y-4 bg-purple-50/50 rounded-lg">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <PenTool className="w-4 h-4 text-white" />
@@ -168,7 +168,7 @@ const EssayEvaluationZeroShot = () => {
 
           {/* Rubrics Section */}
           <Card className="border border-gray-200 shadow-sm bg-white">
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-6 space-y-4 bg-blue-50/50 rounded-lg">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
