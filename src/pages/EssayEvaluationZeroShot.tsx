@@ -120,8 +120,8 @@ const EssayEvaluationZeroShot = () => {
         {/* Two-column layout for Essay and Rubrics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Essay Section */}
-          <Card className="border border-purple-200/50 shadow-sm bg-gradient-to-br from-purple-50/30 via-white to-purple-50/20">
-            <CardContent className="p-6 space-y-4 bg-white/50 backdrop-blur-sm rounded-lg">
+          <Card className="border border-gray-200 shadow-sm bg-white">
+            <CardContent className="p-6 space-y-4">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <PenTool className="w-4 h-4 text-white" />
@@ -167,8 +167,8 @@ const EssayEvaluationZeroShot = () => {
           </Card>
 
           {/* Rubrics Section */}
-          <Card className="border border-blue-200/50 shadow-sm bg-gradient-to-br from-blue-50/30 via-white to-blue-50/20">
-            <CardContent className="p-6 space-y-4 bg-white/50 backdrop-blur-sm rounded-lg">
+          <Card className="border border-gray-200 shadow-sm bg-white">
+            <CardContent className="p-6 space-y-4">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
@@ -251,8 +251,8 @@ const EssayEvaluationZeroShot = () => {
           {hasEvaluated && evaluationResults && (
             <div className="space-y-4 animate-fade-in">
               {/* Rationale Section */}
-              <Card className="border border-purple-200/50 shadow-sm bg-gradient-to-br from-purple-50/20 via-white to-indigo-50/20">
-                <CardContent className="p-6 bg-white/40 backdrop-blur-sm rounded-lg">
+              <Card className="border border-gray-200 shadow-sm bg-white">
+                <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                       <Sparkles className="w-5 h-5 text-white" />
@@ -323,8 +323,8 @@ const EssayEvaluationZeroShot = () => {
               </Card>
 
               {/* Evaluation Results Summary */}
-              <Card className="border border-blue-200/50 shadow-sm bg-gradient-to-br from-blue-50/20 via-white to-indigo-50/20">
-                <CardContent className="p-6 bg-white/40 backdrop-blur-sm rounded-lg">
+              <Card className="border border-gray-200 shadow-sm bg-white">
+                <CardContent className="p-6">
                   <h2 className="text-lg font-bold text-gray-900 mb-3">Evaluation Summary</h2>
                 <div className="overflow-x-auto">
                   <Table>
