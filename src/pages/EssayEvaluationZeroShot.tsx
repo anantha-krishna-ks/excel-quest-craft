@@ -326,13 +326,13 @@ const EssayEvaluationZeroShot = () => {
               </Card>
 
               {/* Evaluation Results Summary */}
-              <Card className="border-2 border-orange-100 bg-gradient-to-br from-orange-50 to-orange-100">
+              <Card className="border-2 border-slate-100 bg-gradient-to-br from-white to-slate-50">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-orange-600 text-white rounded-lg">
+                    <div className="p-2 bg-slate-500 text-white rounded-lg">
                       <ClipboardCheck className="h-5 w-5" />
                     </div>
-                    <h2 className="text-2xl font-semibold text-orange-800">Evaluation Summary</h2>
+                    <h2 className="text-2xl font-semibold text-slate-700">Evaluation Summary</h2>
                   </div>
                 <div className="overflow-x-auto">
                   <Table>
