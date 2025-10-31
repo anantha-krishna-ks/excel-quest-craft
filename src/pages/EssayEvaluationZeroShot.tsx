@@ -203,7 +203,7 @@ const EssayEvaluationZeroShot = () => {
                   <label className="block text-sm font-semibold text-gray-700">
                     Current Rubrics ({rubrics.length})
                   </label>
-                  <div className="flex flex-wrap gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100 min-h-[300px] content-start">
+                  <div className="flex flex-wrap gap-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100 min-h-[180px] content-start">
                     {rubrics.map((rubric, index) => (
                       <Badge
                         key={index}
