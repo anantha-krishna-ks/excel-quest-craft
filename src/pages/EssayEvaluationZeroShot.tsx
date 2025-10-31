@@ -281,7 +281,8 @@ const EssayEvaluationZeroShot = () => {
                       return (
                         <Card 
                           key={index} 
-                          className={`border border-gray-200 bg-gradient-to-br ${getBgColor(percentage)}`}
+                          className="border-l-4 bg-white shadow-sm"
+                          style={{ borderLeftColor: `hsl(${getScoreColor(percentage).includes('green') ? '142 76% 36%' : getScoreColor(percentage).includes('blue') ? '221 83% 53%' : '25 95% 53%'})` }}
                         >
                           <CardContent className="p-3">
                             <div className="flex items-start gap-3">
