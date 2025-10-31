@@ -118,7 +118,7 @@ const EssayEvaluationZeroShot = () => {
         <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Two-column layout for Essay and Rubrics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 via-blue-50/30 to-indigo-50/40 border border-purple-100/50">
           {/* Essay Section */}
           <Card className="border border-gray-200 shadow-sm bg-white">
             <CardContent className="p-6 space-y-4">
