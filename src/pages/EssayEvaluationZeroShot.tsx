@@ -290,7 +290,11 @@ const EssayEvaluationZeroShot = () => {
                               <div className="flex-1 min-w-0 space-y-1.5">
                                 <div>
                                   <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Rubric</span>
-                                  <h3 className="font-semibold text-gray-900 mt-0.5">{item.rubric}</h3>
+                                  <div className="mt-1">
+                                    <Badge className="px-3 py-1 text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-300/50">
+                                      {item.rubric}
+                                    </Badge>
+                                  </div>
                                 </div>
                                 <div>
                                   <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Explanation</span>
