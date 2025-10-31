@@ -334,37 +334,31 @@ const EssayEvaluationZeroShot = () => {
                     </div>
                     <h2 className="text-2xl font-semibold text-slate-700">Evaluation Summary</h2>
                   </div>
-                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200">
+                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 shadow-sm">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-slate-100 border-b-2 border-slate-200 hover:bg-slate-100">
-                        <TableHead className="font-bold text-slate-700 py-4">Criteria</TableHead>
-                        <TableHead className="font-bold text-slate-700 text-right py-4">Score</TableHead>
+                      <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
+                        <TableHead className="font-semibold text-slate-700 py-4 text-base">Criteria</TableHead>
+                        <TableHead className="font-semibold text-slate-700 text-right py-4 text-base">Score</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {evaluationResults.rationale.map((item, index) => (
-                        <TableRow key={index} className="hover:bg-slate-50 transition-colors">
+                        <TableRow key={index} className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-b-0">
                           <TableCell className="font-medium text-slate-900 py-4">
-                            <Badge variant="outline" className="bg-white border-slate-300 text-slate-700">
-                              {item.rubric}
-                            </Badge>
+                            {item.rubric}
                           </TableCell>
-                          <TableCell className="text-right py-4">
-                            <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 font-bold text-sm border border-blue-300/50">
-                              {item.score}
-                            </span>
+                          <TableCell className="text-right py-4 font-semibold text-slate-700 text-base">
+                            {item.score}
                           </TableCell>
                         </TableRow>
                       ))}
-                      <TableRow className="bg-gradient-to-r from-slate-100 to-slate-50 border-t-2 border-slate-300 hover:from-slate-100 hover:to-slate-50">
-                        <TableCell className="font-bold text-slate-800 py-5 text-lg">
+                      <TableRow className="bg-slate-100 border-t-2 border-slate-300 hover:bg-slate-100">
+                        <TableCell className="font-bold text-slate-900 py-5 text-base">
                           Overall Average Score
                         </TableCell>
-                        <TableCell className="text-right py-5">
-                          <span className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold text-lg shadow-md">
-                            {evaluationResults.overallScore}/10
-                          </span>
+                        <TableCell className="text-right py-5 font-bold text-green-600 text-xl">
+                          {evaluationResults.overallScore}/10
                         </TableCell>
                       </TableRow>
                     </TableBody>
