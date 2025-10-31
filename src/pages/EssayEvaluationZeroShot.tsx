@@ -284,33 +284,35 @@ const EssayEvaluationZeroShot = () => {
                       return (
                         <Card 
                           key={index} 
-                          className={`border border-gray-200 bg-gradient-to-br ${getBgColor(percentage)}`}
+                          className="border border-gray-200 bg-white"
                         >
-                          <CardContent className="p-3">
-                            <div className="flex items-start gap-3">
-                              {/* Left side - Rubric info */}
-                              <div className="flex-1 min-w-0 space-y-1.5">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              {/* Left side - Rubric and Feedback */}
+                              <div className="flex-1 min-w-0 space-y-3">
                                 <div>
-                                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Rubric</span>
-                                  <h3 className="font-semibold text-gray-900 mt-0.5">{item.rubric}</h3>
+                                  <span className="text-sm font-semibold text-purple-700">Rubric</span>
+                                  <h3 className="text-base font-semibold text-gray-900 mt-1">{item.rubric}</h3>
                                 </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Explanation</span>
-                                  <p className="text-sm text-gray-600 leading-relaxed mt-0.5">{item.explanation}</p>
+                                
+                                {/* AI Feedback Section */}
+                                <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                                  <h4 className="text-sm font-semibold text-blue-700 mb-2">AI Feedback</h4>
+                                  <p className="text-sm text-gray-700 leading-relaxed">{item.explanation}</p>
                                 </div>
                               </div>
                               
                               {/* Right side - Score */}
-                              <div className="flex flex-col items-center gap-1.5 min-w-[80px]">
-                                <div className={`text-2xl font-bold bg-gradient-to-br ${getScoreColor(percentage)} bg-clip-text text-transparent`}>
+                              <div className="flex flex-col items-center gap-2 min-w-[100px]">
+                                <div className={`text-3xl font-bold bg-gradient-to-br ${getScoreColor(percentage)} bg-clip-text text-transparent`}>
                                   {item.score}
                                 </div>
                                 <div className="w-full">
                                   <Progress 
                                     value={percentage} 
-                                    className="h-1.5 bg-gray-200"
+                                    className="h-2 bg-gray-200"
                                   />
-                                  <p className="text-xs text-gray-500 text-center mt-0.5">{percentage.toFixed(0)}%</p>
+                                  <p className="text-xs text-gray-500 text-center mt-1 font-medium">{percentage.toFixed(0)}%</p>
                                 </div>
                               </div>
                             </div>
