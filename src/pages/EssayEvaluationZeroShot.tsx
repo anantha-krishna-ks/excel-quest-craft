@@ -251,16 +251,13 @@ const EssayEvaluationZeroShot = () => {
           {hasEvaluated && evaluationResults && (
             <div className="space-y-4 animate-fade-in">
               {/* Rationale Section */}
-              <Card className="border border-gray-200 shadow-sm bg-white">
+              <Card className="border-2 border-green-100 bg-gradient-to-br from-green-50 to-green-100">
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-                      <Sparkles className="w-5 h-5 text-white" />
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2 bg-green-600 text-white rounded-lg">
+                      <Sparkles className="h-5 w-5" />
                     </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-gray-900">Detailed Rationale</h2>
-                      <p className="text-xs text-gray-600">AI evaluation breakdown by rubric</p>
-                    </div>
+                    <h2 className="text-2xl font-semibold text-green-800">Detailed Rationale</h2>
                   </div>
                   
                   <div className="space-y-3">
