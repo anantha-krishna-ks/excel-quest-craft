@@ -334,24 +334,38 @@ const EssayEvaluationZeroShot = () => {
                     </div>
                     <h2 className="text-2xl font-semibold text-slate-700">Evaluation Summary</h2>
                   </div>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead className="font-semibold">Criteria</TableHead>
-                        <TableHead className="font-semibold text-right">Score</TableHead>
+                      <TableRow className="bg-slate-100 border-b-2 border-slate-200 hover:bg-slate-100">
+                        <TableHead className="font-bold text-slate-700 py-4">Criteria</TableHead>
+                        <TableHead className="font-bold text-slate-700 text-right py-4">Score</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {evaluationResults.rationale.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">{item.rubric}</TableCell>
-                          <TableCell className="text-right font-semibold text-blue-600">{item.score}</TableCell>
+                        <TableRow key={index} className="hover:bg-slate-50 transition-colors">
+                          <TableCell className="font-medium text-slate-900 py-4">
+                            <Badge variant="outline" className="bg-white border-slate-300 text-slate-700">
+                              {item.rubric}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right py-4">
+                            <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 font-bold text-sm border border-blue-300/50">
+                              {item.score}
+                            </span>
+                          </TableCell>
                         </TableRow>
                       ))}
-                      <TableRow className="bg-blue-50 font-bold">
-                        <TableCell>Overall Average Score</TableCell>
-                        <TableCell className="text-right text-blue-700">{evaluationResults.overallScore}/10</TableCell>
+                      <TableRow className="bg-gradient-to-r from-slate-100 to-slate-50 border-t-2 border-slate-300 hover:from-slate-100 hover:to-slate-50">
+                        <TableCell className="font-bold text-slate-800 py-5 text-lg">
+                          Overall Average Score
+                        </TableCell>
+                        <TableCell className="text-right py-5">
+                          <span className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold text-lg shadow-md">
+                            {evaluationResults.overallScore}/10
+                          </span>
+                        </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
