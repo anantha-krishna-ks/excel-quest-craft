@@ -122,11 +122,11 @@ const EssayEvaluationZeroShot = () => {
           {/* Essay Section */}
           <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100">
             <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-                  <PenTool className="w-4 h-4 text-white" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-purple-600 text-white rounded-lg">
+                  <PenTool className="h-5 w-5" />
                 </div>
-                <h2 className="text-lg font-bold text-gray-900">Essay Content</h2>
+                <h2 className="text-lg font-bold text-purple-800">Essay Content</h2>
               </div>
               
               <div className="space-y-2">
@@ -169,11 +169,11 @@ const EssayEvaluationZeroShot = () => {
           {/* Rubrics Section */}
           <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100">
             <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-blue-600 text-white rounded-lg">
+                  <Sparkles className="h-5 w-5" />
                 </div>
-                <h2 className="text-lg font-bold text-gray-900">Evaluation Rubrics</h2>
+                <h2 className="text-lg font-bold text-blue-800">Evaluation Rubrics</h2>
               </div>
               
               <div className="space-y-2">
