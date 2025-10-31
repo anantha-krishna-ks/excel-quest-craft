@@ -126,7 +126,7 @@ const EssayEvaluationZeroShot = () => {
                 <div className="p-2 bg-purple-600 text-white rounded-lg">
                   <PenTool className="h-5 w-5" />
                 </div>
-                <h2 className="text-xl font-semibold text-purple-800">Essay Content</h2>
+                <h2 className="text-2xl font-semibold text-purple-800">Essay Content</h2>
               </div>
               
               <div className="space-y-2">
@@ -173,7 +173,7 @@ const EssayEvaluationZeroShot = () => {
                 <div className="p-2 bg-blue-600 text-white rounded-lg">
                   <Sparkles className="h-5 w-5" />
                 </div>
-                <h2 className="text-xl font-semibold text-blue-800">Evaluation Rubrics</h2>
+                <h2 className="text-2xl font-semibold text-blue-800">Evaluation Rubrics</h2>
               </div>
               
               <div className="space-y-2">
