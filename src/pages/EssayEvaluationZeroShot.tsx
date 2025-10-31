@@ -301,16 +301,17 @@ const EssayEvaluationZeroShot = () => {
                               </div>
                               
                               {/* Right side - Score */}
-                              <div className="flex flex-col items-center gap-1.5 min-w-[80px]">
-                                <div className={`text-2xl font-bold bg-gradient-to-br ${getScoreColor(percentage)} bg-clip-text text-transparent`}>
-                                  {item.score}
+                              <div className="flex flex-col items-center gap-2 min-w-[100px]">
+                                <div className={`relative w-20 h-20 rounded-full bg-gradient-to-br ${getScoreColor(percentage)} p-0.5 shadow-lg`}>
+                                  <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                                    <div className="text-center">
+                                      <div className="text-2xl font-bold text-gray-900">{item.score.split('/')[0]}</div>
+                                      <div className="text-xs text-gray-500 font-medium">out of {item.score.split('/')[1]}</div>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="w-full">
-                                  <Progress 
-                                    value={percentage} 
-                                    className="h-1.5 bg-gray-200"
-                                  />
-                                  <p className="text-xs text-gray-500 text-center mt-0.5">{percentage.toFixed(0)}%</p>
+                                <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getScoreColor(percentage)} shadow-sm`}>
+                                  <p className="text-xs font-bold text-white">{percentage.toFixed(0)}%</p>
                                 </div>
                               </div>
                             </div>
