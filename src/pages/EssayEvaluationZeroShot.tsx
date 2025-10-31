@@ -160,7 +160,7 @@ const EssayEvaluationZeroShot = () => {
                   placeholder="Start writing your essay here..."
                   value={essayAnswer}
                   onChange={(e) => setEssayAnswer(e.target.value)}
-                  className="w-full min-h-[300px] resize-y border-purple-200 focus:border-purple-400 focus:ring-purple-400/20"
+                  className="w-full min-h-[180px] resize-y border-purple-200 focus:border-purple-400 focus:ring-purple-400/20"
                 />
               </div>
             </CardContent>
