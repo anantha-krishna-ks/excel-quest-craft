@@ -226,13 +226,27 @@ const CheckSimilarity = () => {
                   <TableCell className="text-foreground font-mono text-sm">{question.identifier}</TableCell>
                   <TableCell className="text-foreground">{question.question}</TableCell>
                   <TableCell className="text-center">
-                    <span className={`font-semibold ${
-                      question.score >= 60 ? 'text-green-600' : 
-                      question.score >= 40 ? 'text-orange-600' : 
-                      'text-red-600'
-                    }`}>
-                      {question.score}
-                    </span>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="relative w-16">
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all ${
+                              question.score >= 60 ? 'bg-green-500' : 
+                              question.score >= 40 ? 'bg-orange-500' : 
+                              'bg-red-500'
+                            }`}
+                            style={{ width: `${question.score}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div className={`inline-flex items-center justify-center min-w-[3rem] px-2.5 py-1 rounded-full border-2 ${
+                        question.score >= 60 ? 'bg-green-50 border-green-200 text-green-700' : 
+                        question.score >= 40 ? 'bg-orange-50 border-orange-200 text-orange-700' : 
+                        'bg-red-50 border-red-200 text-red-700'
+                      }`}>
+                        <span className="font-bold text-sm">{question.score}</span>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="text-center">
                     <Button
