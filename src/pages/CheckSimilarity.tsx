@@ -247,7 +247,7 @@ const CheckSimilarity = () => {
 
       {/* Preview Dialog */}
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[85vh] p-0">
+        <DialogContent className="max-w-6xl max-h-[90vh] p-0">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b">
             <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
               <FileQuestion className="w-5 h-5 text-primary" />
@@ -256,7 +256,7 @@ const CheckSimilarity = () => {
           </div>
           
           {previewQuestion && (
-            <ScrollArea className="h-[calc(85vh-80px)]">
+            <ScrollArea className="h-[calc(90vh-140px)]">
               <div className="px-8 py-6 space-y-6">
                 {/* Question Identifier & Score */}
                 <div className="flex items-start justify-between gap-4">
@@ -390,6 +390,15 @@ const CheckSimilarity = () => {
               </div>
             </ScrollArea>
           )}
+          
+          {/* Close Button */}
+          <div className="border-t bg-card px-6 py-4">
+            <div className="flex justify-end">
+              <Button onClick={() => setIsPreviewDialogOpen(false)} size="lg">
+                Close
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
