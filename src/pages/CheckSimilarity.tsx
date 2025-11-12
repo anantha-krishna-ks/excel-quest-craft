@@ -257,24 +257,24 @@ const CheckSimilarity = () => {
           
           {previewQuestion && (
             <ScrollArea className="h-[calc(85vh-80px)]">
-              <div className="px-6 py-4 space-y-4">
+              <div className="px-8 py-6 space-y-6">
                 {/* Question Identifier & Score */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Hash className="w-4 h-4 text-primary" />
-                      <span className="text-xs font-medium text-muted-foreground">Question Identifier</span>
+                      <Hash className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-medium text-muted-foreground">Question Identifier</span>
                     </div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-md">
-                      <span className="font-mono text-xs font-medium text-primary">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-md">
+                      <span className="font-mono text-sm font-medium text-primary">
                         {previewQuestion.identifier}
                       </span>
                     </div>
                   </div>
                   
                   <div className="text-right">
-                    <span className="text-xs font-medium text-muted-foreground block mb-1">Similarity Score</span>
-                    <div className={`text-3xl font-bold ${
+                    <span className="text-sm font-medium text-muted-foreground block mb-2">Similarity Score</span>
+                    <div className={`text-4xl font-bold ${
                       previewQuestion.score >= 60 ? 'text-green-600' : 
                       previewQuestion.score >= 40 ? 'text-orange-600' : 
                       'text-red-600'
@@ -286,12 +286,12 @@ const CheckSimilarity = () => {
 
                 {/* Question Stem */}
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    <span className="text-xs font-medium text-muted-foreground">Question Stem</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    <span className="text-sm font-medium text-muted-foreground">Question Stem</span>
                   </div>
-                  <div className="p-3 bg-gradient-to-br from-purple-50/50 to-blue-50/50 rounded-md border border-purple-100">
-                    <p className="text-sm text-foreground leading-relaxed">
+                  <div className="p-4 bg-gradient-to-br from-purple-50/50 to-blue-50/50 rounded-md border border-purple-100">
+                    <p className="text-base text-foreground leading-relaxed">
                       {previewQuestion.question}
                     </p>
                   </div>
@@ -299,17 +299,17 @@ const CheckSimilarity = () => {
 
                 {/* Options */}
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <ListChecks className="w-4 h-4 text-blue-600" />
-                    <span className="text-xs font-medium text-muted-foreground">Answer Options</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <ListChecks className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm font-medium text-muted-foreground">Answer Options</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {['A', 'B', 'C', 'D', 'E', 'F'].map((option) => (
-                      <div key={option} className="flex gap-2.5 p-2.5 bg-card rounded-md border border-border">
-                        <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
-                          <span className="font-bold text-white text-xs">{option}</span>
+                      <div key={option} className="flex gap-3 p-3 bg-card rounded-md border border-border">
+                        <div className="flex-shrink-0 w-7 h-7 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                          <span className="font-bold text-white text-sm">{option}</span>
                         </div>
-                        <span className="text-xs text-foreground leading-relaxed flex-1">
+                        <span className="text-sm text-foreground leading-relaxed flex-1">
                           [Option {option} text placeholder]
                         </span>
                       </div>
@@ -319,12 +319,12 @@ const CheckSimilarity = () => {
 
                 {/* Correct Answer */}
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    <span className="text-xs font-medium text-muted-foreground">Correct Answer</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    <span className="text-sm font-medium text-muted-foreground">Correct Answer</span>
                   </div>
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                    <p className="text-sm text-foreground font-medium">
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                    <p className="text-base text-foreground font-medium">
                       A. [Correct answer text placeholder]
                     </p>
                   </div>
@@ -332,14 +332,14 @@ const CheckSimilarity = () => {
 
                 {/* Feedback */}
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-4 h-4 text-orange-600" />
-                    <span className="text-xs font-medium text-muted-foreground">Feedback</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-5 h-5 text-orange-600" />
+                    <span className="text-sm font-medium text-muted-foreground">Feedback</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {['A', 'B', 'C', 'D', 'E', 'F'].map((option) => (
-                      <div key={option} className="p-2.5 bg-muted/30 rounded-md border border-border/50">
-                        <p className="text-xs text-foreground">
+                      <div key={option} className="p-3 bg-muted/30 rounded-md border border-border/50">
+                        <p className="text-sm text-foreground">
                           <span className="font-semibold">Option {option}:</span> [Feedback for option {option}]
                         </p>
                       </div>
@@ -348,43 +348,43 @@ const CheckSimilarity = () => {
                 </div>
 
                 {/* Metadata Grid */}
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="p-3 bg-card rounded-md border border-border">
-                    <span className="text-xs font-medium text-muted-foreground block mb-1">Type</span>
-                    <Badge variant="secondary" className="text-xs">Multiple Choice</Badge>
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  <div className="p-4 bg-card rounded-md border border-border">
+                    <span className="text-sm font-medium text-muted-foreground block mb-2">Type</span>
+                    <Badge variant="secondary" className="text-sm">Multiple Choice</Badge>
                   </div>
                   
-                  <div className="p-3 bg-card rounded-md border border-border">
-                    <span className="text-xs font-medium text-muted-foreground block mb-1">Taxonomy</span>
-                    <Badge variant="secondary" className="text-xs">Analyze</Badge>
+                  <div className="p-4 bg-card rounded-md border border-border">
+                    <span className="text-sm font-medium text-muted-foreground block mb-2">Taxonomy</span>
+                    <Badge variant="secondary" className="text-sm">Analyze</Badge>
                   </div>
                   
-                  <div className="col-span-2 p-3 bg-card rounded-md border border-border">
-                    <div className="flex items-center gap-2 mb-1">
-                      <BookOpen className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-xs font-medium text-muted-foreground">Book Name</span>
+                  <div className="col-span-2 p-4 bg-card rounded-md border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium text-muted-foreground">Book Name</span>
                     </div>
-                    <p className="text-xs text-foreground font-medium">BUSINESS AND TECHNOLOGY</p>
+                    <p className="text-sm text-foreground font-medium">BUSINESS AND TECHNOLOGY</p>
                   </div>
                   
-                  <div className="col-span-2 p-3 bg-card rounded-md border border-border">
-                    <span className="text-xs font-medium text-muted-foreground block mb-1">Source</span>
-                    <p className="text-xs text-foreground">Accounting and Finance Functions</p>
+                  <div className="col-span-2 p-4 bg-card rounded-md border border-border">
+                    <span className="text-sm font-medium text-muted-foreground block mb-2">Source</span>
+                    <p className="text-sm text-foreground">Accounting and Finance Functions</p>
                   </div>
                   
-                  <div className="col-span-2 p-3 bg-card rounded-md border border-border">
-                    <span className="text-xs font-medium text-muted-foreground block mb-1">Learning Objectives</span>
-                    <p className="text-xs text-foreground leading-relaxed">
+                  <div className="col-span-2 p-4 bg-card rounded-md border border-border">
+                    <span className="text-sm font-medium text-muted-foreground block mb-2">Learning Objectives</span>
+                    <p className="text-sm text-foreground leading-relaxed">
                       2.e. Describe the main audit and assurance roles in business
                     </p>
                   </div>
                   
-                  <div className="p-3 bg-card rounded-md border border-border">
-                    <div className="flex items-center gap-2 mb-1">
-                      <User className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-xs font-medium text-muted-foreground">User Name</span>
+                  <div className="p-4 bg-card rounded-md border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium text-muted-foreground">User Name</span>
                     </div>
-                    <p className="text-xs text-foreground font-medium">esiguser3</p>
+                    <p className="text-sm text-foreground font-medium">esiguser3</p>
                   </div>
                 </div>
               </div>
