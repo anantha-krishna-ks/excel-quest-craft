@@ -90,29 +90,26 @@ const CheckSimilarity = () => {
         <h1 className="text-3xl font-bold text-foreground mb-8">Check Similarity</h1>
 
         {/* Selected Question Details */}
-        <Card className="overflow-hidden bg-card border shadow-sm mb-8 animate-fade-in hover-glow">
-          {/* Header with icon and gradient */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md">
-                <FileQuestion className="w-5 h-5 text-primary-foreground" />
+        <Card className="overflow-hidden bg-card border shadow-sm mb-6 animate-fade-in">
+          {/* Compact Header */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-5 py-3 border-b">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <FileQuestion className="w-4 h-4 text-primary-foreground" />
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">Question Details</h2>
-                <p className="text-sm text-muted-foreground">Selected question for similarity check</p>
-              </div>
+              <h2 className="text-lg font-semibold text-foreground">Question Details</h2>
             </div>
           </div>
           
-          <div className="p-6 space-y-6">
+          <div className="p-5 space-y-4">
             {/* Question ID Badge */}
             <div className="animate-scale-in">
-              <div className="flex items-center gap-2 mb-2">
-                <Hash className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-muted-foreground">Question ID</span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Hash className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs font-medium text-muted-foreground">Question ID</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg">
-                <span className="font-mono text-sm font-medium text-primary">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-md">
+                <span className="font-mono text-xs font-medium text-primary">
                   {selectedQuestion?.identifier || "C20_V2024_S11_L00_MC_L2_EN_ID2426"}
                 </span>
               </div>
@@ -120,62 +117,61 @@ const CheckSimilarity = () => {
 
             {/* Question Text */}
             <div className="animate-scale-in" style={{ animationDelay: '0.1s' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-4 h-4 text-purple-600" />
-                <span className="text-sm font-medium text-muted-foreground">Question</span>
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span className="text-xs font-medium text-muted-foreground">Question</span>
               </div>
-              <div className="p-4 bg-gradient-to-br from-purple-50/50 to-blue-50/50 rounded-lg border border-purple-100">
-                <p className="text-foreground leading-relaxed">
+              <div className="p-3 bg-gradient-to-br from-purple-50/50 to-blue-50/50 rounded-md border border-purple-100">
+                <p className="text-sm text-foreground leading-relaxed">
                   {selectedQuestion?.text || "What characteristic of pure risk makes it more acceptable for insurers to cover compared to speculative risk?"}
                 </p>
               </div>
             </div>
 
-            {/* Options with enhanced visual design */}
+            {/* Options - More compact */}
             <div className="animate-scale-in" style={{ animationDelay: '0.2s' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-medium text-muted-foreground">Answer Options</span>
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                <span className="text-xs font-medium text-muted-foreground">Answer Options</span>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {selectedQuestion?.options ? (
-                  selectedQuestion.options.map((option: any, index: number) => (
+                  selectedQuestion.options.map((option: any) => (
                     <div 
                       key={option.id} 
-                      className="group flex gap-3 p-3 bg-card rounded-lg border border-border hover:border-primary/50 hover:bg-blue-50/30 transition-all duration-200 hover-scale"
-                      style={{ animationDelay: `${0.3 + index * 0.05}s` }}
+                      className="flex gap-2.5 p-2.5 bg-card rounded-md border border-border"
                     >
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-md flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                        <span className="font-bold text-white text-sm">{option.id}</span>
+                      <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                        <span className="font-bold text-white text-xs">{option.id}</span>
                       </div>
-                      <span className="text-foreground leading-relaxed flex-1">{option.text}</span>
+                      <span className="text-sm text-foreground leading-relaxed flex-1">{option.text}</span>
                     </div>
                   ))
                 ) : (
                   <>
-                    <div className="group flex gap-3 p-3 bg-card rounded-lg border border-border hover:border-primary/50 hover:bg-blue-50/30 transition-all duration-200 hover-scale">
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-md flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                        <span className="font-bold text-white text-sm">A</span>
+                    <div className="flex gap-2.5 p-2.5 bg-card rounded-md border border-border">
+                      <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                        <span className="font-bold text-white text-xs">A</span>
                       </div>
-                      <span className="text-foreground leading-relaxed flex-1">Pure risk only involves potential loss or no loss, making it predictable</span>
+                      <span className="text-sm text-foreground leading-relaxed flex-1">Pure risk only involves potential loss or no loss, making it predictable</span>
                     </div>
-                    <div className="group flex gap-3 p-3 bg-card rounded-lg border border-border hover:border-primary/50 hover:bg-blue-50/30 transition-all duration-200 hover-scale">
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-md flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                        <span className="font-bold text-white text-sm">B</span>
+                    <div className="flex gap-2.5 p-2.5 bg-card rounded-md border border-border">
+                      <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                        <span className="font-bold text-white text-xs">B</span>
                       </div>
-                      <span className="text-foreground leading-relaxed flex-1">Pure risk offers the possibility of gain</span>
+                      <span className="text-sm text-foreground leading-relaxed flex-1">Pure risk offers the possibility of gain</span>
                     </div>
-                    <div className="group flex gap-3 p-3 bg-card rounded-lg border border-border hover:border-primary/50 hover:bg-blue-50/30 transition-all duration-200 hover-scale">
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-md flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                        <span className="font-bold text-white text-sm">C</span>
+                    <div className="flex gap-2.5 p-2.5 bg-card rounded-md border border-border">
+                      <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                        <span className="font-bold text-white text-xs">C</span>
                       </div>
-                      <span className="text-foreground leading-relaxed flex-1">Speculative risk is more measurable</span>
+                      <span className="text-sm text-foreground leading-relaxed flex-1">Speculative risk is more measurable</span>
                     </div>
-                    <div className="group flex gap-3 p-3 bg-card rounded-lg border border-border hover:border-primary/50 hover:bg-blue-50/30 transition-all duration-200 hover-scale">
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-md flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                        <span className="font-bold text-white text-sm">D</span>
+                    <div className="flex gap-2.5 p-2.5 bg-card rounded-md border border-border">
+                      <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                        <span className="font-bold text-white text-xs">D</span>
                       </div>
-                      <span className="text-foreground leading-relaxed flex-1">Pure risk always results in loss</span>
+                      <span className="text-sm text-foreground leading-relaxed flex-1">Pure risk always results in loss</span>
                     </div>
                   </>
                 )}
