@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import { ArrowLeft, Eye, Search, FileQuestion, Hash, CheckCircle2, Sparkles } from "lucide-react"
+import { ArrowLeft, Eye, Search, FileQuestion, Hash, CheckCircle2, Sparkles, BookOpen, User, Target, ListChecks } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
 
 const CheckSimilarity = () => {
   const navigate = useNavigate()
@@ -245,40 +247,148 @@ const CheckSimilarity = () => {
 
       {/* Preview Dialog */}
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Question Preview</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[85vh] p-0">
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b">
+            <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <FileQuestion className="w-5 h-5 text-primary" />
+              Question Preview
+            </DialogTitle>
+          </div>
           
           {previewQuestion && (
-            <div className="space-y-4">
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">Question ID:</span>
-                <p className="text-foreground mt-1 font-mono">{previewQuestion.identifier}</p>
-              </div>
+            <ScrollArea className="h-[calc(85vh-80px)]">
+              <div className="px-6 py-4 space-y-4">
+                {/* Question Identifier & Score */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Hash className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-medium text-muted-foreground">Question Identifier</span>
+                    </div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-md">
+                      <span className="font-mono text-xs font-medium text-primary">
+                        {previewQuestion.identifier}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <span className="text-xs font-medium text-muted-foreground block mb-1">Similarity Score</span>
+                    <div className={`text-3xl font-bold ${
+                      previewQuestion.score >= 60 ? 'text-green-600' : 
+                      previewQuestion.score >= 40 ? 'text-orange-600' : 
+                      'text-red-600'
+                    }`}>
+                      {previewQuestion.score}%
+                    </div>
+                  </div>
+                </div>
 
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">Question:</span>
-                <p className="text-foreground mt-2">{previewQuestion.question}</p>
-              </div>
+                {/* Question Stem */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    <span className="text-xs font-medium text-muted-foreground">Question Stem</span>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-purple-50/50 to-blue-50/50 rounded-md border border-purple-100">
+                    <p className="text-sm text-foreground leading-relaxed">
+                      {previewQuestion.question}
+                    </p>
+                  </div>
+                </div>
 
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">Similarity Score:</span>
-                <p className={`text-2xl font-bold mt-1 ${
-                  previewQuestion.score >= 60 ? 'text-green-600' : 
-                  previewQuestion.score >= 40 ? 'text-orange-600' : 
-                  'text-red-600'
-                }`}>
-                  {previewQuestion.score}%
-                </p>
-              </div>
+                {/* Options */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <ListChecks className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-medium text-muted-foreground">Answer Options</span>
+                  </div>
+                  <div className="space-y-2">
+                    {['A', 'B', 'C', 'D', 'E', 'F'].map((option) => (
+                      <div key={option} className="flex gap-2.5 p-2.5 bg-card rounded-md border border-border">
+                        <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-blue-600 rounded flex items-center justify-center">
+                          <span className="font-bold text-white text-xs">{option}</span>
+                        </div>
+                        <span className="text-xs text-foreground leading-relaxed flex-1">
+                          [Option {option} text placeholder]
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-              <div className="flex justify-end pt-4">
-                <Button onClick={() => setIsPreviewDialogOpen(false)}>
-                  Close
-                </Button>
+                {/* Correct Answer */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    <span className="text-xs font-medium text-muted-foreground">Correct Answer</span>
+                  </div>
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                    <p className="text-sm text-foreground font-medium">
+                      A. [Correct answer text placeholder]
+                    </p>
+                  </div>
+                </div>
+
+                {/* Feedback */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-4 h-4 text-orange-600" />
+                    <span className="text-xs font-medium text-muted-foreground">Feedback</span>
+                  </div>
+                  <div className="space-y-2">
+                    {['A', 'B', 'C', 'D', 'E', 'F'].map((option) => (
+                      <div key={option} className="p-2.5 bg-muted/30 rounded-md border border-border/50">
+                        <p className="text-xs text-foreground">
+                          <span className="font-semibold">Option {option}:</span> [Feedback for option {option}]
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Metadata Grid */}
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="p-3 bg-card rounded-md border border-border">
+                    <span className="text-xs font-medium text-muted-foreground block mb-1">Type</span>
+                    <Badge variant="secondary" className="text-xs">Multiple Choice</Badge>
+                  </div>
+                  
+                  <div className="p-3 bg-card rounded-md border border-border">
+                    <span className="text-xs font-medium text-muted-foreground block mb-1">Taxonomy</span>
+                    <Badge variant="secondary" className="text-xs">Analyze</Badge>
+                  </div>
+                  
+                  <div className="col-span-2 p-3 bg-card rounded-md border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <BookOpen className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-xs font-medium text-muted-foreground">Book Name</span>
+                    </div>
+                    <p className="text-xs text-foreground font-medium">BUSINESS AND TECHNOLOGY</p>
+                  </div>
+                  
+                  <div className="col-span-2 p-3 bg-card rounded-md border border-border">
+                    <span className="text-xs font-medium text-muted-foreground block mb-1">Source</span>
+                    <p className="text-xs text-foreground">Accounting and Finance Functions</p>
+                  </div>
+                  
+                  <div className="col-span-2 p-3 bg-card rounded-md border border-border">
+                    <span className="text-xs font-medium text-muted-foreground block mb-1">Learning Objectives</span>
+                    <p className="text-xs text-foreground leading-relaxed">
+                      2.e. Describe the main audit and assurance roles in business
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 bg-card rounded-md border border-border">
+                    <div className="flex items-center gap-2 mb-1">
+                      <User className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-xs font-medium text-muted-foreground">User Name</span>
+                    </div>
+                    <p className="text-xs text-foreground font-medium">esiguser3</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            </ScrollArea>
           )}
         </DialogContent>
       </Dialog>
