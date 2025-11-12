@@ -25,7 +25,10 @@ import {
   User,
   MoreVertical,
   Star,
-  GitCompare
+  GitCompare,
+  ThumbsUp,
+  ThumbsDown,
+  X
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -34,6 +37,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const formSchema = z.object({
   studyDomain: z.string().min(1, "Study domain is required"),
@@ -50,6 +54,10 @@ const QuestionGenerator = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("generate")
   const [generationMode, setGenerationMode] = useState(true) // true for LLM, false for Knowledge Base
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false)
+  const [selectedQuestion, setSelectedQuestion] = useState<string>("")
+  const [selectedRating, setSelectedRating] = useState<"up" | "down" | null>(null)
+  const [feedbackText, setFeedbackText] = useState("")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -68,6 +76,18 @@ const QuestionGenerator = () => {
     // This function only runs if validation passes
     console.log("Form submitted with values:", values)
     navigate("/question-generation-loading")
+  }
+
+  const handleRateQuestion = (questionText: string) => {
+    setSelectedQuestion(questionText)
+    setSelectedRating(null)
+    setFeedbackText("")
+    setRatingDialogOpen(true)
+  }
+
+  const handleSubmitFeedback = () => {
+    console.log("Submitting feedback:", { question: selectedQuestion, rating: selectedRating, feedback: feedbackText })
+    setRatingDialogOpen(false)
   }
 
   return (
@@ -672,7 +692,7 @@ const QuestionGenerator = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleRateQuestion("What characteristic of pure risk makes it more acceptable for insurer...")}>
                                   <Star className="h-4 w-4 mr-2" />
                                   Rate Question
                                 </DropdownMenuItem>
@@ -731,7 +751,7 @@ const QuestionGenerator = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleRateQuestion("Pure risk always results in a loss or no loss situation.")}>
                                   <Star className="h-4 w-4 mr-2" />
                                   Rate Question
                                 </DropdownMenuItem>
@@ -790,7 +810,7 @@ const QuestionGenerator = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleRateQuestion("Explain the relationship between risk assessment and cybersecurity f...")}>
                                   <Star className="h-4 w-4 mr-2" />
                                   Rate Question
                                 </DropdownMenuItem>
@@ -831,6 +851,93 @@ const QuestionGenerator = () => {
           </div>
         </div>
       </div>
+
+      {/* Rating Dialog */}
+      <Dialog open={ratingDialogOpen} onOpenChange={setRatingDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-semibold">Share feedback</DialogTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setRatingDialogOpen(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-6 pt-4">
+            {/* Question Display */}
+            <div>
+              <p className="text-base text-foreground leading-relaxed">
+                <span className="font-semibold">1.</span> {selectedQuestion}
+              </p>
+            </div>
+
+            {/* Rating Buttons */}
+            <div className="flex items-center justify-center gap-8">
+              <button
+                onClick={() => setSelectedRating("up")}
+                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                  selectedRating === "up"
+                    ? "bg-green-500 scale-110"
+                    : "bg-green-500 hover:scale-105"
+                }`}
+              >
+                <ThumbsUp className="h-10 w-10 text-white" fill="white" />
+              </button>
+              <button
+                onClick={() => setSelectedRating("down")}
+                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                  selectedRating === "down"
+                    ? "bg-red-500 scale-110"
+                    : "bg-red-500 hover:scale-105"
+                }`}
+              >
+                <ThumbsDown className="h-10 w-10 text-white" fill="white" />
+              </button>
+            </div>
+
+            {/* Description Textarea */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Description:</label>
+              <Textarea
+                placeholder="Enter your feedback."
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                className="min-h-[150px] resize-none"
+              />
+            </div>
+
+            {/* Note */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <p className="text-sm text-amber-700 italic leading-relaxed">
+                Note: This feedback will be triaged by Development team and will be accounted for further training the model.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setRatingDialogOpen(false)}
+                className="px-8"
+              >
+                Close
+              </Button>
+              <Button
+                onClick={handleSubmitFeedback}
+                className="px-8 bg-amber-500 hover:bg-amber-600 text-white"
+              >
+                Submit
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
