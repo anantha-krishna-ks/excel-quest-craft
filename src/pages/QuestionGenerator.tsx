@@ -58,6 +58,14 @@ const QuestionGenerator = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<string>("")
   const [selectedRating, setSelectedRating] = useState<"up" | "down" | null>(null)
   const [feedbackText, setFeedbackText] = useState("")
+  const [refinementDialogOpen, setRefinementDialogOpen] = useState(false)
+  const [refinementType, setRefinementType] = useState("rewrite")
+  const [refinementQuestionType, setRefinementQuestionType] = useState("multiple-choice")
+  const [refinementNumQuestions, setRefinementNumQuestions] = useState("1")
+  const [refinementTaxonomy, setRefinementTaxonomy] = useState("apply")
+  const [refinementCreativity, setRefinementCreativity] = useState("moderate")
+  const [refinementNumOptions, setRefinementNumOptions] = useState("4")
+  const [refinementSourceType, setRefinementSourceType] = useState("original")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -88,6 +96,25 @@ const QuestionGenerator = () => {
   const handleSubmitFeedback = () => {
     console.log("Submitting feedback:", { question: selectedQuestion, rating: selectedRating, feedback: feedbackText })
     setRatingDialogOpen(false)
+  }
+
+  const handleOpenRefinement = (questionText: string) => {
+    setSelectedQuestion(questionText)
+    setRefinementDialogOpen(true)
+  }
+
+  const handleRewriteQuestion = () => {
+    console.log("Rewriting question with params:", {
+      question: selectedQuestion,
+      type: refinementType,
+      questionType: refinementQuestionType,
+      numQuestions: refinementNumQuestions,
+      taxonomy: refinementTaxonomy,
+      creativity: refinementCreativity,
+      numOptions: refinementNumOptions,
+      sourceType: refinementSourceType
+    })
+    setRefinementDialogOpen(false)
   }
 
   return (
@@ -700,7 +727,7 @@ const QuestionGenerator = () => {
                                   <GitCompare className="h-4 w-4 mr-2" />
                                   Check Similarity
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleOpenRefinement("What characteristic of pure risk makes it more acceptable for insurer...")}>
                                   <Sparkles className="h-4 w-4 mr-2" />
                                   Question Refinement
                                 </DropdownMenuItem>
@@ -759,7 +786,7 @@ const QuestionGenerator = () => {
                                   <GitCompare className="h-4 w-4 mr-2" />
                                   Check Similarity
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleOpenRefinement("Pure risk always results in a loss or no loss situation.")}>
                                   <Sparkles className="h-4 w-4 mr-2" />
                                   Question Refinement
                                 </DropdownMenuItem>
@@ -818,7 +845,7 @@ const QuestionGenerator = () => {
                                   <GitCompare className="h-4 w-4 mr-2" />
                                   Check Similarity
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleOpenRefinement("Explain the relationship between risk assessment and cybersecurity f...")}>
                                   <Sparkles className="h-4 w-4 mr-2" />
                                   Question Refinement
                                 </DropdownMenuItem>
@@ -929,6 +956,154 @@ const QuestionGenerator = () => {
                 className="px-6"
               >
                 Submit
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Question Refinement Dialog */}
+      <Dialog open={refinementDialogOpen} onOpenChange={setRefinementDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              <DialogTitle className="text-xl font-semibold">Question Refinement</DialogTitle>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <p className="text-sm text-muted-foreground">
+              Choose the target question type and specify how many variations you'd like to generate.
+            </p>
+
+            {/* Question Refinement Type */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Question Refinement Type</label>
+              <Select value={refinementType} onValueChange={setRefinementType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rewrite">Rewrite</SelectItem>
+                  <SelectItem value="simplify">Simplify</SelectItem>
+                  <SelectItem value="enhance">Enhance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Question Type */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Question Type</label>
+              <Select value={refinementQuestionType} onValueChange={setRefinementQuestionType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
+                  <SelectItem value="true-false">True/False</SelectItem>
+                  <SelectItem value="short-answer">Short Answer</SelectItem>
+                  <SelectItem value="essay">Essay</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Number of Questions */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Number of Questions</label>
+              <Select value={refinementNumQuestions} onValueChange={setRefinementNumQuestions}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1</SelectItem>
+                  <SelectItem value="2">2</SelectItem>
+                  <SelectItem value="3">3</SelectItem>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Taxonomy */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Taxonomy</label>
+              <Select value={refinementTaxonomy} onValueChange={setRefinementTaxonomy}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="remember">Remember</SelectItem>
+                  <SelectItem value="understand">Understand</SelectItem>
+                  <SelectItem value="apply">Apply</SelectItem>
+                  <SelectItem value="analyze">Analyze</SelectItem>
+                  <SelectItem value="evaluate">Evaluate</SelectItem>
+                  <SelectItem value="create">Create</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Creativity Level */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Creativity Level</label>
+              <Select value={refinementCreativity} onValueChange={setRefinementCreativity}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="moderate">Moderate</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Number of Response Options */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Number of Response Options</label>
+              <Select value={refinementNumOptions} onValueChange={setRefinementNumOptions}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">2</SelectItem>
+                  <SelectItem value="3">3</SelectItem>
+                  <SelectItem value="4">4</SelectItem>
+                  <SelectItem value="5">5</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Source Type */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Source Type</label>
+              <Select value={refinementSourceType} onValueChange={setRefinementSourceType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="original">Original</SelectItem>
+                  <SelectItem value="textbook">Textbook</SelectItem>
+                  <SelectItem value="research">Research Paper</SelectItem>
+                  <SelectItem value="web">Web Content</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setRefinementDialogOpen(false)}
+                className="px-6"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleRewriteQuestion}
+                className="px-6 bg-amber-500 hover:bg-amber-600 text-white"
+              >
+                Rewrite
               </Button>
             </div>
           </div>
