@@ -254,9 +254,9 @@ const CheckSimilarity = () => {
 
       {/* Preview Dialog */}
       <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] p-0">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b">
-            <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+        <DialogContent className="max-w-6xl max-h-[90vh] w-[calc(100vw-2rem)] p-0">
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-4 sm:px-6 py-4 border-b">
+            <DialogTitle className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
               <FileQuestion className="w-5 h-5 text-primary" />
               Question Preview
             </DialogTitle>
@@ -264,7 +264,7 @@ const CheckSimilarity = () => {
           
           {previewQuestion && (
             <ScrollArea className="h-[calc(90vh-140px)]">
-              <div className="px-8 py-6 space-y-6">
+              <div className="px-4 sm:px-6 md:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
                 {/* Question Identifier & Score */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -399,7 +399,7 @@ const CheckSimilarity = () => {
           )}
           
           {/* Close Button */}
-          <div className="border-t bg-card px-6 py-4">
+          <div className="border-t bg-card px-4 sm:px-6 py-4">
             <div className="flex justify-end">
               <Button onClick={() => setIsPreviewDialogOpen(false)} size="lg">
                 Close
