@@ -28,7 +28,8 @@ import {
   GitCompare,
   ThumbsUp,
   ThumbsDown,
-  X
+  X,
+  Search
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -723,8 +724,26 @@ const QuestionGenerator = () => {
                                   <Star className="h-4 w-4 mr-2" />
                                   Rate Question
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <GitCompare className="h-4 w-4 mr-2" />
+                                <DropdownMenuItem 
+                                  className="cursor-pointer"
+                                  onClick={() => {
+                                    navigate('/check-similarity', { 
+                                      state: { 
+                                        question: {
+                                          identifier: "C20_V2024_S11_L00_MC_L2_EN_ID2426",
+                                          text: "What characteristic of pure risk makes it more acceptable for insurers to cover compared to speculative risk?",
+                                          options: [
+                                            { id: "A", text: "Pure risk only involves potential loss or no loss, making it predictable" },
+                                            { id: "B", text: "Pure risk offers the possibility of gain" },
+                                            { id: "C", text: "Speculative risk is more measurable" },
+                                            { id: "D", text: "Pure risk always results in loss" }
+                                          ]
+                                        }
+                                      }
+                                    })
+                                  }}
+                                >
+                                  <Search className="h-4 w-4 mr-2" />
                                   Check Similarity
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleOpenRefinement("What characteristic of pure risk makes it more acceptable for insurer...")}>

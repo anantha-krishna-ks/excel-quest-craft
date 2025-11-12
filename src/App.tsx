@@ -22,6 +22,7 @@ import QuestionGenerator from "./pages/QuestionGenerator";
 import QuestionGenerationLoading from "./pages/QuestionGenerationLoading";
 import QuestionResults from "./pages/QuestionResults";
 import QuestionRepository from "./pages/QuestionRepository";
+import CheckSimilarity from "./pages/CheckSimilarity";
 import Reports from "./pages/Reports";
 import ManageUsers from "./pages/ManageUsers";
 import NotFound from "./pages/NotFound";
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/question-generation-loading" element={<QuestionGenerationLoading />} />
           <Route path="/question-results" element={<QuestionResults />} />
           <Route path="/question-repository" element={<QuestionRepository />} />
+          <Route path="/check-similarity" element={<CheckSimilarity />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/manage-users" element={<ManageUsers />} />
           <Route path="/doc-chat-ncert" element={<DocChatNCERT />} />
