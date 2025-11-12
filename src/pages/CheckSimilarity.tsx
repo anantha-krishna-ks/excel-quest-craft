@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import { ArrowLeft, Eye, Search, FileQuestion, Hash, CheckCircle2, Sparkles, BookOpen, User, Target, ListChecks } from "lucide-react"
+import { ArrowLeft, Eye, GitCompare, FileQuestion, Hash, CheckCircle2, Sparkles, BookOpen, User, Target, ListChecks } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -91,7 +91,7 @@ const CheckSimilarity = () => {
       <div className="p-6 max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8 pb-4 border-b-2 border-primary/20">
           <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-            <Search className="w-6 h-6 text-primary" />
+            <GitCompare className="w-6 h-6 text-primary" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">Check Similarity</h1>
         </div>
