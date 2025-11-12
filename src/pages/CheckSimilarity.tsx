@@ -226,25 +226,13 @@ const CheckSimilarity = () => {
                   <TableCell className="text-foreground font-mono text-sm">{question.identifier}</TableCell>
                   <TableCell className="text-foreground">{question.question}</TableCell>
                   <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="relative w-16">
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full transition-all ${
-                              question.score >= 60 ? 'bg-green-500' : 
-                              question.score >= 40 ? 'bg-orange-500' : 
-                              'bg-red-500'
-                            }`}
-                            style={{ width: `${question.score}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className={`inline-flex items-center justify-center min-w-[3rem] px-2.5 py-1 rounded-full border-2 ${
-                        question.score >= 60 ? 'bg-green-50 border-green-200 text-green-700' : 
-                        question.score >= 40 ? 'bg-orange-50 border-orange-200 text-orange-700' : 
-                        'bg-red-50 border-red-200 text-red-700'
+                    <div className="flex items-center justify-center">
+                      <div className={`inline-flex items-center justify-center min-w-[3.5rem] px-3 py-1.5 rounded-full font-bold text-sm ${
+                        question.score >= 60 ? 'bg-green-600 text-white' : 
+                        question.score >= 40 ? 'bg-orange-600 text-white' : 
+                        'bg-red-600 text-white'
                       }`}>
-                        <span className="font-bold text-sm">{question.score}</span>
+                        {question.score}%
                       </div>
                     </div>
                   </TableCell>
