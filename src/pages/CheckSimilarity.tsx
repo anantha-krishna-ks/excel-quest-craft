@@ -211,7 +211,7 @@ const CheckSimilarity = () => {
         <Card className="bg-card border shadow-sm">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent bg-muted/50">
+              <TableRow className="hover:bg-transparent bg-muted">
                 <TableHead className="font-semibold text-foreground">Sl No</TableHead>
                 <TableHead className="font-semibold text-foreground">Question Identifier</TableHead>
                 <TableHead className="font-semibold text-foreground w-[50%]">Question</TableHead>
