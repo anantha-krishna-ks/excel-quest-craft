@@ -22,7 +22,10 @@ import {
   Eye,
   Edit3,
   Trash2,
-  User
+  User,
+  MoreVertical,
+  Star,
+  GitCompare
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -30,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 
 const formSchema = z.object({
   studyDomain: z.string().min(1, "Study domain is required"),
@@ -661,9 +665,32 @@ const QuestionGenerator = () => {
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                               <Edit3 className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Star className="h-4 w-4 mr-2" />
+                                  Rate Question
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <GitCompare className="h-4 w-4 mr-2" />
+                                  Check Similarity
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Sparkles className="h-4 w-4 mr-2" />
+                                  Question Refinement
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-red-600">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </td>
                       </tr>
@@ -697,9 +724,32 @@ const QuestionGenerator = () => {
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                               <Edit3 className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Star className="h-4 w-4 mr-2" />
+                                  Rate Question
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <GitCompare className="h-4 w-4 mr-2" />
+                                  Check Similarity
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Sparkles className="h-4 w-4 mr-2" />
+                                  Question Refinement
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-red-600">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </td>
                       </tr>
@@ -733,9 +783,32 @@ const QuestionGenerator = () => {
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                               <Edit3 className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Star className="h-4 w-4 mr-2" />
+                                  Rate Question
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <GitCompare className="h-4 w-4 mr-2" />
+                                  Check Similarity
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Sparkles className="h-4 w-4 mr-2" />
+                                  Question Refinement
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-red-600">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </td>
                       </tr>
