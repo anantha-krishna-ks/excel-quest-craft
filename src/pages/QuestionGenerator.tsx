@@ -59,13 +59,13 @@ const QuestionGenerator = () => {
   const [selectedRating, setSelectedRating] = useState<"up" | "down" | null>(null)
   const [feedbackText, setFeedbackText] = useState("")
   const [refinementDialogOpen, setRefinementDialogOpen] = useState(false)
-  const [refinementType, setRefinementType] = useState("rewrite")
+  const [refinementType, setRefinementType] = useState("Rewrite")
   const [refinementQuestionType, setRefinementQuestionType] = useState("multiple-choice")
   const [refinementNumQuestions, setRefinementNumQuestions] = useState("1")
   const [refinementTaxonomy, setRefinementTaxonomy] = useState("apply")
   const [refinementCreativity, setRefinementCreativity] = useState("moderate")
   const [refinementNumOptions, setRefinementNumOptions] = useState("4")
-  const [refinementSourceType, setRefinementSourceType] = useState("original")
+  const [refinementSourceType, setRefinementSourceType] = useState("Book")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -985,9 +985,9 @@ const QuestionGenerator = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="rewrite">Rewrite</SelectItem>
-                  <SelectItem value="simplify">Simplify</SelectItem>
-                  <SelectItem value="enhance">Enhance</SelectItem>
+                  <SelectItem value="Rewrite">Rewrite</SelectItem>
+                  <SelectItem value="Generate Similar">Generate Similar</SelectItem>
+                  <SelectItem value="Language Conversion">Language Conversion</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1082,10 +1082,8 @@ const QuestionGenerator = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="original">Original</SelectItem>
-                  <SelectItem value="textbook">Textbook</SelectItem>
-                  <SelectItem value="research">Research Paper</SelectItem>
-                  <SelectItem value="web">Web Content</SelectItem>
+                  <SelectItem value="Book">Book</SelectItem>
+                  <SelectItem value="LLM">LLM</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1101,7 +1099,7 @@ const QuestionGenerator = () => {
               </Button>
               <Button
                 onClick={handleRewriteQuestion}
-                className="px-6 bg-amber-500 hover:bg-amber-600 text-white"
+                className="px-6 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Rewrite
               </Button>
