@@ -129,7 +129,7 @@ const CheckSimilarity = () => {
                 <span className="text-sm font-medium text-muted-foreground">Question</span>
               </div>
               <div className="p-4 bg-gradient-to-br from-purple-50/50 to-blue-50/50 rounded-md border border-purple-100">
-                <p className="text-sm text-foreground leading-relaxed">
+                <p className="text-sm text-foreground leading-relaxed font-semibold">
                   {selectedQuestion?.text || "What characteristic of pure risk makes it more acceptable for insurers to cover compared to speculative risk?"}
                 </p>
               </div>
