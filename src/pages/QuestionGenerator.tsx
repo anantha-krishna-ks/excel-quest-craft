@@ -854,50 +854,46 @@ const QuestionGenerator = () => {
 
       {/* Rating Dialog */}
       <Dialog open={ratingDialogOpen} onOpenChange={setRatingDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-2xl font-semibold">Share feedback</DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                onClick={() => setRatingDialogOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-xl font-semibold">Share feedback</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 pt-4">
+          <div className="space-y-6 pt-2">
             {/* Question Display */}
             <div>
-              <p className="text-base text-foreground leading-relaxed">
+              <p className="text-sm text-foreground leading-relaxed">
                 <span className="font-semibold">1.</span> {selectedQuestion}
               </p>
             </div>
 
             {/* Rating Buttons */}
-            <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center justify-center gap-6">
               <button
                 onClick={() => setSelectedRating("up")}
-                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all border-2 ${
                   selectedRating === "up"
-                    ? "bg-green-500 scale-110"
-                    : "bg-green-500 hover:scale-105"
+                    ? "bg-green-500 border-green-600 scale-110 shadow-lg"
+                    : "bg-white border-gray-300 hover:border-green-400 hover:scale-105"
                 }`}
               >
-                <ThumbsUp className="h-10 w-10 text-white" fill="white" />
+                <ThumbsUp 
+                  className={`h-8 w-8 ${selectedRating === "up" ? "text-white" : "text-gray-400"}`} 
+                  fill={selectedRating === "up" ? "white" : "none"}
+                />
               </button>
               <button
                 onClick={() => setSelectedRating("down")}
-                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all border-2 ${
                   selectedRating === "down"
-                    ? "bg-red-500 scale-110"
-                    : "bg-red-500 hover:scale-105"
+                    ? "bg-red-500 border-red-600 scale-110 shadow-lg"
+                    : "bg-white border-gray-300 hover:border-red-400 hover:scale-105"
                 }`}
               >
-                <ThumbsDown className="h-10 w-10 text-white" fill="white" />
+                <ThumbsDown 
+                  className={`h-8 w-8 ${selectedRating === "down" ? "text-white" : "text-gray-400"}`} 
+                  fill={selectedRating === "down" ? "white" : "none"}
+                />
               </button>
             </div>
 
@@ -908,29 +904,29 @@ const QuestionGenerator = () => {
                 placeholder="Enter your feedback."
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
-                className="min-h-[150px] resize-none"
+                className="min-h-[120px] resize-none"
               />
             </div>
 
             {/* Note */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <p className="text-sm text-amber-700 italic leading-relaxed">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="text-sm text-amber-800 italic leading-relaxed">
                 Note: This feedback will be triaged by Development team and will be accounted for further training the model.
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3">
               <Button
                 variant="outline"
                 onClick={() => setRatingDialogOpen(false)}
-                className="px-8"
+                className="px-6"
               >
                 Close
               </Button>
               <Button
                 onClick={handleSubmitFeedback}
-                className="px-8 bg-amber-500 hover:bg-amber-600 text-white"
+                className="px-6"
               >
                 Submit
               </Button>
