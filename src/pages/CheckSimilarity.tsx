@@ -89,7 +89,12 @@ const CheckSimilarity = () => {
 
       {/* Main Content */}
       <div className="p-6 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-8">Check Similarity</h1>
+        <div className="flex items-center gap-3 mb-8 pb-4 border-b-2 border-primary/20">
+          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+            <Search className="w-6 h-6 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold text-foreground">Check Similarity</h1>
+        </div>
 
         {/* Selected Question Details */}
         <Card className="overflow-hidden bg-card border shadow-sm mb-6 animate-fade-in">
