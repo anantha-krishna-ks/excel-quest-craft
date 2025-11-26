@@ -71,16 +71,14 @@ const KnowledgeBase = () => {
 
         {/* Page Title Section */}
         <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                 <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <div>
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Knowledge Base System</h2>
-              </div>
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">Knowledge Base System</h2>
             </div>
-            <Button variant="outline" size="sm" className="text-gray-600 hover:text-gray-900 w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="text-gray-600 hover:text-gray-900 flex-shrink-0">
               <FileText className="w-4 h-4 mr-2" />
               Knowledge Base Manual
             </Button>
