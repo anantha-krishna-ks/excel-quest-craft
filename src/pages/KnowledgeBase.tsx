@@ -67,13 +67,6 @@ const KnowledgeBase = () => {
                 <span className="text-xs sm:text-sm text-blue-600 font-medium whitespace-nowrap">4,651</span>
               </div>
               
-              <Link to="/dashboard" className="hidden sm:block">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-              </Link>
-              
               <ProfileDropdown />
             </div>
           </div>
