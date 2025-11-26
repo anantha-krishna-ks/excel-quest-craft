@@ -215,38 +215,39 @@ const KnowledgeBase = () => {
 
                 {/* Input Area - Fixed at bottom */}
                 <div className="bg-white rounded-2xl border border-gray-200 p-3">
-                  <div className="flex items-center gap-3">
-                    <Select value={selectedModel} onValueChange={setSelectedModel}>
-                      <SelectTrigger className="w-40 bg-white border-none focus:ring-0 flex-shrink-0 h-10">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="GPT-4o">GPT-4o</SelectItem>
-                        <SelectItem value="GPT-4">GPT-4</SelectItem>
-                        <SelectItem value="GPT-3.5">GPT-3.5</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="flex flex-col gap-3">
+                    <Textarea 
+                      placeholder="Message AI..."
+                      value={chatInput}
+                      onChange={handleTextareaChange}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      className="bg-white border-none focus:ring-0 resize-none min-h-[40px] max-h-[200px] py-2 overflow-y-auto placeholder:text-gray-400"
+                      rows={1}
+                      style={{ height: 'auto' }}
+                    />
                     
-                    <div className="flex-1 relative">
-                      <Textarea 
-                        placeholder="Message AI..."
-                        value={chatInput}
-                        onChange={handleTextareaChange}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSendMessage();
-                          }
-                        }}
-                        className="bg-white border-none focus:ring-0 resize-none min-h-[40px] max-h-[200px] pr-12 py-2 overflow-y-auto placeholder:text-gray-400"
-                        rows={1}
-                        style={{ height: 'auto' }}
-                      />
-                      <Button 
+                    <div className="flex items-center justify-between gap-3">
+                      <Select value={selectedModel} onValueChange={setSelectedModel}>
+                        <SelectTrigger className="w-40 bg-white border-none focus:ring-0 flex-shrink-0 h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white">
+                          <SelectItem value="GPT-4o">GPT-4o</SelectItem>
+                          <SelectItem value="GPT-4">GPT-4</SelectItem>
+                          <SelectItem value="GPT-3.5">GPT-3.5</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <Button
                         size="icon"
                         onClick={handleSendMessage}
                         disabled={!chatInput.trim()}
-                        className="absolute right-1 bottom-1 h-8 w-8 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+                        className="h-9 w-9 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex-shrink-0"
                       >
                         <Send className="h-4 w-4 text-white" />
                       </Button>
