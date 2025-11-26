@@ -1,11 +1,11 @@
-import { useState } from "react"
-import { Search, Sparkles, ArrowRight, BarChart, Clock, Star, Users, FileText, Brain, Database, BookOpen, RefreshCw, GitCompare, Image, MessageSquare, ScanLine, PenTool, BarChart3, Bot, Mic, Menu } from "lucide-react"
+import React, { useState } from "react"
+import { Search, Sparkles, ArrowRight, BarChart, Clock, Star, Users, FileText, Brain, Database, BookOpen, RefreshCw, GitCompare, Image, MessageSquare, ScanLine, PenTool, BarChart3, Bot, Mic, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { AppSidebar } from "@/components/AppSidebar"
 import { ProfileDropdown } from "@/components/ProfileDropdown"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -24,6 +24,7 @@ import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 import essayEvaluationZeroShotImage from "@/assets/essay-evaluation-zero-shot.jpg"
 
 const Dashboard = () => {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("All")
   const [subscriptionFilter, setSubscriptionFilter] = useState("All")
   const [hoveredTool, setHoveredTool] = useState<string | null>(null)
@@ -253,7 +254,13 @@ const Dashboard = () => {
       subscriptionFilter === "All" || 
       (subscriptionFilter === "Active Subscriptions" && tool.subscriptionStatus === "active") ||
       (subscriptionFilter === "Yet to Subscribe" && tool.subscriptionStatus === "pending")
-    return matchesCategory && matchesSubscription
+    
+    const matchesSearch = searchQuery.trim() === "" || 
+      tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.category.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    return matchesCategory && matchesSubscription && matchesSearch
   })
 
   return (
@@ -272,25 +279,81 @@ const Dashboard = () => {
 
       {/* Mobile Search Sheet */}
       <Sheet open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
-        <SheetContent side="top" className="h-auto">
-          <div className="space-y-4 pt-6">
-            <h2 className="text-lg font-semibold text-gray-900">Search AI Tools</h2>
+        <SheetContent side="top" className="h-auto max-h-[80vh] flex flex-col">
+          <div className="space-y-4 pt-6 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Search AI Tools</h2>
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSearchQuery("")}
+                  className="h-8 text-xs"
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input 
-                placeholder="Type to search..." 
-                className="pl-10 h-12 text-base border-gray-200"
+                placeholder="Search by name, description, or category..." 
+                className="pl-10 h-12 text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
               />
             </div>
             {searchQuery && (
-              <div className="text-sm text-gray-500">
-                Searching for "{searchQuery}"...
-              </div>
+              <p className="text-sm text-muted-foreground">
+                {filteredTools.length} {filteredTools.length === 1 ? 'result' : 'results'} found
+              </p>
             )}
           </div>
+          
+          {/* Search Results Preview */}
+          {searchQuery && (
+            <div className="mt-4 flex-1 overflow-y-auto">
+              {filteredTools.length > 0 ? (
+                <div className="space-y-2">
+                  {filteredTools.slice(0, 5).map((tool) => (
+                    <div
+                      key={tool.id}
+                      onClick={() => {
+                        setMobileSearchOpen(false)
+                        navigate(tool.path)
+                      }}
+                      className="p-3 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
+                          {React.createElement(getIconForTool(tool.id), {
+                            className: "h-5 w-5 text-primary"
+                          })}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm mb-1">{tool.title}</h3>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {tool.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredTools.length > 5 && (
+                    <p className="text-xs text-center text-muted-foreground py-2">
+                      +{filteredTools.length - 5} more results
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No tools found</p>
+                  <p className="text-sm text-muted-foreground mt-1">Try a different search term</p>
+                </div>
+              )}
+            </div>
+          )}
         </SheetContent>
       </Sheet>
       
@@ -334,11 +397,21 @@ const Dashboard = () => {
               
               {/* Desktop Search */}
               <div className="relative hidden lg:block">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="Search AI tools..." 
-                  className="pl-10 w-60 border-gray-200"
+                  className="pl-10 pr-8 w-64 h-9"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
               <ProfileDropdown />
             </div>
@@ -440,9 +513,26 @@ const Dashboard = () => {
             ))}
           </div>
 
+          {/* Search Results Info */}
+          {searchQuery && (
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-muted-foreground">
+                Found {filteredTools.length} {filteredTools.length === 1 ? 'result' : 'results'} for "{searchQuery}"
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSearchQuery("")}
+              >
+                Clear search
+              </Button>
+            </div>
+          )}
+
           {/* AI Tools Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredTools.map((tool) => {
+          {filteredTools.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredTools.map((tool) => {
               const IconComponent = tool.icon
               return (
                 <div 
@@ -512,7 +602,21 @@ const Dashboard = () => {
                 </div>
               )
             })}
-          </div>
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                <Search className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No tools found</h3>
+              <p className="text-muted-foreground mb-4">
+                We couldn't find any tools matching your search
+              </p>
+              <Button variant="outline" onClick={() => setSearchQuery("")}>
+                Clear search
+              </Button>
+            </div>
+          )}
 
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-gray-200 text-center">
