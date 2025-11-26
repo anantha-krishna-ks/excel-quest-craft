@@ -121,19 +121,19 @@ const KnowledgeBase = () => {
                       {/* Book Level Option */}
                       <button
                         onClick={() => setLevelType("book")}
-                        className={`relative p-5 rounded-lg border-2 text-left transition-all ${
+                        className={`relative p-3 rounded-lg border-2 text-left transition-all ${
                           levelType === "book"
                             ? "border-purple-600 bg-white shadow-md"
                             : "border-purple-200 bg-white hover:border-purple-300"
                         }`}
                       >
-                        <div className="flex items-start gap-4">
-                          <div className={`p-3 rounded-lg transition-colors ${
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg transition-colors ${
                             levelType === "book"
                               ? "bg-purple-600 text-white"
                               : "bg-purple-100 text-purple-600"
                           }`}>
-                            <Library className="h-6 w-6" />
+                            <Library className="h-5 w-5" />
                           </div>
                           <div className="flex-1">
                             <h4 className={`font-semibold transition-colors ${
@@ -157,19 +157,19 @@ const KnowledgeBase = () => {
                       {/* Study Level Option */}
                       <button
                         onClick={() => setLevelType("study")}
-                        className={`relative p-5 rounded-lg border-2 text-left transition-all ${
+                        className={`relative p-3 rounded-lg border-2 text-left transition-all ${
                           levelType === "study"
                             ? "border-purple-600 bg-white shadow-md"
                             : "border-purple-200 bg-white hover:border-purple-300"
                         }`}
                       >
-                        <div className="flex items-start gap-4">
-                          <div className={`p-3 rounded-lg transition-colors ${
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg transition-colors ${
                             levelType === "study"
                               ? "bg-purple-600 text-white"
                               : "bg-purple-100 text-purple-600"
                           }`}>
-                            <GraduationCap className="h-6 w-6" />
+                            <GraduationCap className="h-5 w-5" />
                           </div>
                           <div className="flex-1">
                             <h4 className={`font-semibold transition-colors ${
