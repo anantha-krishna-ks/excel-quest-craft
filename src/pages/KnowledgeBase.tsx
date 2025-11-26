@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle } from "lucide-react";
+import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle, ScrollText } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -27,6 +27,8 @@ const KnowledgeBase = () => {
   const [isCreatingStudyLO, setIsCreatingStudyLO] = useState(false);
   const [levelType, setLevelType] = useState<"book" | "study">("book");
   const [selectedBook, setSelectedBook] = useState("");
+  const [isViewingGuidelines, setIsViewingGuidelines] = useState(false);
+  const [selectedKBForGuidelines, setSelectedKBForGuidelines] = useState<{ id: number; name: string } | null>(null);
 
   const filteredKnowledgeBases = knowledgeBases.filter((kb) =>
     kb.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -80,13 +82,15 @@ const KnowledgeBase = () => {
         <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 sm:gap-3">
-              {(isCreating || isCreatingStudyLO) && (
+              {(isCreating || isCreatingStudyLO || isViewingGuidelines) && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => {
                     setIsCreating(false);
                     setIsCreatingStudyLO(false);
+                    setIsViewingGuidelines(false);
+                    setSelectedKBForGuidelines(null);
                   }}
                   className="flex-shrink-0"
                 >
@@ -97,7 +101,7 @@ const KnowledgeBase = () => {
                 <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-                {isCreating ? "Create New Knowledge Base" : isCreatingStudyLO ? "Create Study LO" : "Knowledge Base System"}
+                {isCreating ? "Create New Knowledge Base" : isCreatingStudyLO ? "Create Study LO" : isViewingGuidelines ? "Guideline Data" : "Knowledge Base System"}
               </h2>
             </div>
             {isCreatingStudyLO ? (
@@ -116,7 +120,177 @@ const KnowledgeBase = () => {
         {/* Main Content */}
         <main className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {isCreatingStudyLO ? (
+            {isViewingGuidelines ? (
+              /* Guidelines View */
+              <>
+                {/* Knowledge Base Info */}
+                <Card className="border-2 border-blue-100 bg-blue-50">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-gray-700">
+                      <span className="font-semibold">Knowledgebase Name:</span> {selectedKBForGuidelines?.name}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Add New Guideline Card */}
+                <Card className="border-2 border-teal-100 bg-teal-50">
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Add New Guideline</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-900">
+                          Guideline Type <span className="text-red-500">*</span>
+                        </Label>
+                        <Select>
+                          <SelectTrigger className="bg-white border-gray-300">
+                            <SelectValue placeholder="Select guideline type" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="content">Content</SelectItem>
+                            <SelectItem value="validation">Validation</SelectItem>
+                            <SelectItem value="generation">Question Generation</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-900">Guideline Subtype</Label>
+                        <Select>
+                          <SelectTrigger className="bg-white border-gray-300">
+                            <SelectValue placeholder="Select subtype" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="specific">Specific</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-900">
+                          Guideline Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input 
+                          placeholder="Enter guideline name" 
+                          className="bg-white border-gray-300"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-900">Guideline to follow</Label>
+                      <Textarea 
+                        placeholder="Enter guidelines here..." 
+                        className="bg-white border-gray-300 min-h-[120px]"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-900">
+                        Guideline Document (.txt or .pdf, max 5MB)
+                      </Label>
+                      <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 text-center space-y-3 hover:border-gray-400 transition-colors">
+                        <div className="flex justify-center">
+                          <div className="p-3 bg-yellow-100 rounded-lg">
+                            <FileText className="h-8 w-8 text-yellow-600" />
+                          </div>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">Drag guideline file here or click to select</p>
+                          <p className="text-sm text-gray-600 mt-1">.txt or .pdf, max 5MB</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-start">
+                      <Button className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                        Upload Guideline
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* All Guidelines Card */}
+                <Card className="border-2 border-purple-100 bg-purple-50">
+                  <CardContent className="p-6 space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">All Guidelines</h3>
+                    
+                    <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-gray-50 border-b-2 border-gray-200 hover:bg-gray-50">
+                              <TableHead className="font-semibold text-gray-900 py-4">Guideline Name</TableHead>
+                              <TableHead className="font-semibold text-gray-900 py-4">Guideline Type</TableHead>
+                              <TableHead className="font-semibold text-gray-900 py-4">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                              <TableCell className="font-medium text-gray-900 py-4">Content</TableCell>
+                              <TableCell className="text-gray-700 py-4">Content</TableCell>
+                              <TableCell className="py-4">
+                                <div className="flex items-center gap-2">
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                    <Edit className="h-4 w-4 text-blue-600" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                              <TableCell className="font-medium text-gray-900 py-4">CREATE_Validation</TableCell>
+                              <TableCell className="text-gray-700 py-4">Validation</TableCell>
+                              <TableCell className="py-4">
+                                <div className="flex items-center gap-2">
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                    <Edit className="h-4 w-4 text-blue-600" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                              <TableCell className="font-medium text-gray-900 py-4">General rule validation</TableCell>
+                              <TableCell className="text-gray-700 py-4">Validation</TableCell>
+                              <TableCell className="py-4">
+                                <div className="flex items-center gap-2">
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                    <Edit className="h-4 w-4 text-blue-600" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0">
+                              <TableCell className="font-medium text-gray-900 py-4">Multiple Choice Question</TableCell>
+                              <TableCell className="text-gray-700 py-4">Question Generation</TableCell>
+                              <TableCell className="py-4">
+                                <div className="flex items-center gap-2">
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                    <Edit className="h-4 w-4 text-blue-600" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : isCreatingStudyLO ? (
               /* Create Study LO Form */
               <>
                 {/* Select Book Card */}
@@ -702,9 +876,13 @@ const KnowledgeBase = () => {
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  className="h-9 w-9 hover:bg-gray-100 transition-colors"
+                                  className="h-9 w-9 hover:bg-purple-100 transition-colors"
+                                  onClick={() => {
+                                    setSelectedKBForGuidelines({ id: kb.id, name: kb.name });
+                                    setIsViewingGuidelines(true);
+                                  }}
                                 >
-                                  <Eye className="h-4 w-4 text-gray-600" />
+                                  <ScrollText className="h-4 w-4 text-purple-600" />
                                 </Button>
                                 <Button 
                                   variant="ghost" 
