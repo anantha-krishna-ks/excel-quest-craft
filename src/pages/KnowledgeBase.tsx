@@ -318,7 +318,7 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Retrieval Strategy
-                          <span className="text-orange-600 text-xs">ⓘ</span>
+                          <span className="text-orange-600 text-sm">ⓘ</span>
                         </label>
                         <Select defaultValue="mmr">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -334,7 +334,7 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Number of Reranking Candidates (k)
-                          <span className="text-orange-600 text-xs">ⓘ</span>
+                          <span className="text-orange-600 text-sm">ⓘ</span>
                         </label>
                         <Input 
                           type="number" 
@@ -346,7 +346,7 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Chunk Size
-                          <span className="text-orange-600 text-xs">ⓘ</span>
+                          <span className="text-orange-600 text-sm">ⓘ</span>
                         </label>
                         <Select defaultValue="1000">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -363,7 +363,7 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Overlap Percentage
-                          <span className="text-orange-600 text-xs">ⓘ</span>
+                          <span className="text-orange-600 text-sm">ⓘ</span>
                         </label>
                         <Select defaultValue="20">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -380,7 +380,7 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Chunking Strategy
-                          <span className="text-orange-600 text-xs">ⓘ</span>
+                          <span className="text-orange-600 text-sm">ⓘ</span>
                         </label>
                         <Select defaultValue="recursive">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -396,7 +396,7 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Database Type
-                          <span className="text-orange-600 text-xs">ⓘ</span>
+                          <span className="text-orange-600 text-sm">ⓘ</span>
                         </label>
                         <Select defaultValue="faiss">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -412,7 +412,7 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Embedding Model
-                          <span className="text-orange-600 text-xs">ⓘ</span>
+                          <span className="text-orange-600 text-sm">ⓘ</span>
                         </label>
                         <Select defaultValue="openai">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
