@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import Index from "./pages/Index";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import SuperAdminReports from "./pages/SuperAdminReports";
 import ItemGenerator from "./pages/ItemGenerator";
 import ItemGeneration from "./pages/ItemGeneration";
 import ItemRewriter from "./pages/ItemRewriter";
@@ -42,6 +44,8 @@ const App = () => (
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/superadmin-reports" element={<SuperAdminReports />} />
           <Route path="/item-generator" element={<ItemGenerator />} />
           <Route path="/item-generation" element={<ItemGeneration />} />
           <Route path="/item-rewriter" element={<ItemRewriter />} />
