@@ -24,6 +24,7 @@ const KnowledgeBase = () => {
   const [typeFilter, setTypeFilter] = useState("All");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingStudyLO, setIsCreatingStudyLO] = useState(false);
   const [levelType, setLevelType] = useState<"book" | "study">("book");
   const [selectedBook, setSelectedBook] = useState("");
 
@@ -79,11 +80,14 @@ const KnowledgeBase = () => {
         <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 sm:gap-3">
-              {isCreating && (
+              {(isCreating || isCreatingStudyLO) && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setIsCreating(false)}
+                  onClick={() => {
+                    setIsCreating(false);
+                    setIsCreatingStudyLO(false);
+                  }}
                   className="flex-shrink-0"
                 >
                   <ArrowLeft className="w-5 h-5" />
@@ -93,10 +97,14 @@ const KnowledgeBase = () => {
                 <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-                {isCreating ? "Create New Knowledge Base" : "Knowledge Base System"}
+                {isCreating ? "Create New Knowledge Base" : isCreatingStudyLO ? "Create Study LO" : "Knowledge Base System"}
               </h2>
             </div>
-            {!isCreating && (
+            {isCreatingStudyLO ? (
+              <Button className="bg-yellow-600 hover:bg-yellow-700 text-white flex-shrink-0">
+                Download Template
+              </Button>
+            ) : !isCreating && (
               <Button variant="outline" size="sm" className="text-gray-600 hover:text-gray-900 flex-shrink-0">
                 <FileText className="w-4 h-4 mr-2" />
                 Knowledge Base Manual
@@ -108,7 +116,65 @@ const KnowledgeBase = () => {
         {/* Main Content */}
         <main className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {isCreating ? (
+            {isCreatingStudyLO ? (
+              /* Create Study LO Form */
+              <>
+                {/* Select Book Card */}
+                <Card className="border-2 border-blue-100 bg-blue-50">
+                  <CardContent className="p-6 space-y-3">
+                    <h3 className="text-lg font-semibold text-blue-900">Select Book</h3>
+                    <Select value={selectedBook} onValueChange={setSelectedBook}>
+                      <SelectTrigger className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20">
+                        <SelectValue placeholder="Choose a book" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white z-50">
+                        <SelectItem value="book1">Book 1</SelectItem>
+                        <SelectItem value="book2">Book 2</SelectItem>
+                        <SelectItem value="book3">Book 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </CardContent>
+                </Card>
+
+                {/* Upload Study LO Documents Card */}
+                <Card className="border-2 border-teal-100 bg-teal-50">
+                  <CardContent className="p-6 space-y-3">
+                    <h3 className="text-lg font-semibold text-teal-900">Upload Study LO Documents</h3>
+                    <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-12 text-center space-y-4 hover:border-teal-300 transition-colors">
+                      <div className="flex justify-center">
+                        <div className="p-4 bg-yellow-100 rounded-lg">
+                          <FileText className="h-10 w-10 text-yellow-600" />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 text-lg">Drag file here or click to select file</p>
+                        <p className="text-sm text-gray-600 mt-2">
+                          Attach study LO document (CSV), file should not exceed 30mb
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Action Buttons Card */}
+                <Card className="border-2 border-gray-200 bg-white">
+                  <CardContent className="p-6">
+                    <div className="flex justify-end gap-3">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsCreatingStudyLO(false)}
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                      >
+                        Cancel
+                      </Button>
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                        Create Study LO
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : isCreating ? (
               /* Create Form */
               <>
                 {/* Level Type Selection Card */}
@@ -558,7 +624,10 @@ const KnowledgeBase = () => {
                     <Plus className="w-4 h-4 mr-2" />
                     Create New Knowledge Base
                   </Button>
-                  <Button className="px-6 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white">
+                  <Button 
+                    onClick={() => setIsCreatingStudyLO(true)}
+                    className="px-6 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     Create Study LO
                   </Button>
