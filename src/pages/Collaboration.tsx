@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Search, Edit, Trash2, Bell, Menu, Plus, Users as UsersIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Search, Edit, Trash2, Bell, Menu, Plus, Users as UsersIcon, X } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 
@@ -22,6 +24,35 @@ const Collaboration = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    userName: "",
+    password: "",
+    confirmPassword: "",
+    contactNumber: "",
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveUser = () => {
+    // TODO: Add validation and save logic
+    console.log("Saving user:", formData);
+    setIsAddingUser(false);
+    // Reset form
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      userName: "",
+      password: "",
+      confirmPassword: "",
+      contactNumber: "",
+    });
+  };
 
   const filteredUsers = users.filter((user) =>
     user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -95,6 +126,107 @@ const Collaboration = () => {
             </Button>
           </div>
         </div>
+
+        {/* Add User Dialog */}
+        <Dialog open={isAddingUser} onOpenChange={setIsAddingUser}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-900">Create User</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-5 py-4">
+              <div className="space-y-2">
+                <Label className="text-base font-semibold text-gray-900">
+                  First Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  placeholder="First Name"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange("firstName", e.target.value)}
+                  className="bg-white border-gray-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-base font-semibold text-gray-900">Last Name</Label>
+                <Input
+                  placeholder="Last Name"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  className="bg-white border-gray-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-base font-semibold text-gray-900">
+                  Email <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  className="bg-white border-gray-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-base font-semibold text-gray-900">
+                  User Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  placeholder="Username"
+                  value={formData.userName}
+                  onChange={(e) => handleInputChange("userName", e.target.value)}
+                  className="bg-white border-gray-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-base font-semibold text-gray-900">
+                  Password <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  className="bg-white border-gray-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-base font-semibold text-gray-900">
+                  Confirm Password <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                  className="bg-white border-gray-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-base font-semibold text-gray-900">Contact Number</Label>
+                <Input
+                  placeholder="+91-00000-00000"
+                  value={formData.contactNumber}
+                  onChange={(e) => handleInputChange("contactNumber", e.target.value)}
+                  className="bg-white border-gray-300"
+                />
+              </div>
+
+              <Button 
+                onClick={handleSaveUser}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 text-base font-semibold"
+              >
+                Save
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Main Content */}
         <main className="p-6">
