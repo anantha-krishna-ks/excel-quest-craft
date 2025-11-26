@@ -129,101 +129,141 @@ const Collaboration = () => {
 
         {/* Add User Dialog */}
         <Dialog open={isAddingUser} onOpenChange={setIsAddingUser}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-gray-900">Create User</DialogTitle>
             </DialogHeader>
             
-            <div className="space-y-5 py-4">
-              <div className="space-y-2">
-                <Label className="text-base font-semibold text-gray-900">
-                  First Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange("firstName", e.target.value)}
-                  className="bg-white border-gray-300"
-                />
+            <div className="space-y-6 py-4">
+              {/* Personal Information Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                  <div className="w-1 h-5 bg-blue-600 rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-900">
+                      First Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      placeholder="Enter first name"
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      className="bg-white border-gray-300"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-900">Last Name</Label>
+                    <Input
+                      placeholder="Enter last name"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      className="bg-white border-gray-300"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-900">Contact Number</Label>
+                  <Input
+                    placeholder="+91-00000-00000"
+                    value={formData.contactNumber}
+                    onChange={(e) => handleInputChange("contactNumber", e.target.value)}
+                    className="bg-white border-gray-300"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-base font-semibold text-gray-900">Last Name</Label>
-                <Input
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange("lastName", e.target.value)}
-                  className="bg-white border-gray-300"
-                />
+              {/* Account Information Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                  <div className="w-1 h-5 bg-green-600 rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-gray-900">Account Information</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-900">
+                      Email <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="email"
+                      placeholder="Enter email address"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      className="bg-white border-gray-300"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-900">
+                      User Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      placeholder="Enter username"
+                      value={formData.userName}
+                      onChange={(e) => handleInputChange("userName", e.target.value)}
+                      className="bg-white border-gray-300"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-base font-semibold text-gray-900">
-                  Email <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="bg-white border-gray-300"
-                />
+              {/* Security Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                  <div className="w-1 h-5 bg-purple-600 rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-gray-900">Security</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-900">
+                      Password <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="password"
+                      placeholder="Enter password"
+                      value={formData.password}
+                      onChange={(e) => handleInputChange("password", e.target.value)}
+                      className="bg-white border-gray-300"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-gray-900">
+                      Confirm Password <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="password"
+                      placeholder="Confirm password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                      className="bg-white border-gray-300"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-base font-semibold text-gray-900">
-                  User Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  placeholder="Username"
-                  value={formData.userName}
-                  onChange={(e) => handleInputChange("userName", e.target.value)}
-                  className="bg-white border-gray-300"
-                />
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsAddingUser(false)}
+                  className="flex-1 h-11 text-base font-medium"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSaveUser}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-11 text-base font-semibold"
+                >
+                  Save User
+                </Button>
               </div>
-
-              <div className="space-y-2">
-                <Label className="text-base font-semibold text-gray-900">
-                  Password <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                  className="bg-white border-gray-300"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-base font-semibold text-gray-900">
-                  Confirm Password <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                  className="bg-white border-gray-300"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-base font-semibold text-gray-900">Contact Number</Label>
-                <Input
-                  placeholder="+91-00000-00000"
-                  value={formData.contactNumber}
-                  onChange={(e) => handleInputChange("contactNumber", e.target.value)}
-                  className="bg-white border-gray-300"
-                />
-              </div>
-
-              <Button 
-                onClick={handleSaveUser}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 text-base font-semibold"
-              >
-                Save
-              </Button>
             </div>
           </DialogContent>
         </Dialog>
