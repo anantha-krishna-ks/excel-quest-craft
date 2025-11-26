@@ -24,6 +24,7 @@ const KnowledgeBase = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [levelType, setLevelType] = useState<"book" | "study">("book");
+  const [selectedBook, setSelectedBook] = useState("");
 
   const filteredKnowledgeBases = knowledgeBases.filter((kb) =>
     kb.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -206,21 +207,47 @@ const KnowledgeBase = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-blue-900">
-                          Book Name <span className="text-red-500">*</span>
+                          {levelType === "book" ? "Book Name" : "Book"} <span className="text-red-500">*</span>
                         </label>
-                        <Input 
-                          placeholder="Enter Book name" 
-                          className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
-                        />
+                        {levelType === "book" ? (
+                          <Input 
+                            placeholder="Enter Book name" 
+                            className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                          />
+                        ) : (
+                          <Select value={selectedBook} onValueChange={setSelectedBook}>
+                            <SelectTrigger className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20">
+                              <SelectValue placeholder="Select a book" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white z-50">
+                              <SelectItem value="book1">Book 1</SelectItem>
+                              <SelectItem value="book2">Book 2</SelectItem>
+                              <SelectItem value="book3">Book 3</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-blue-900">
-                          Knowledge Base Name <span className="text-red-500">*</span>
+                          {levelType === "book" ? "Knowledge Base Name" : "Study"} <span className="text-red-500">*</span>
                         </label>
-                        <Input 
-                          placeholder="Enter knowledge base name" 
-                          className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
-                        />
+                        {levelType === "book" ? (
+                          <Input 
+                            placeholder="Enter knowledge base name" 
+                            className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                          />
+                        ) : (
+                          <Select disabled={!selectedBook}>
+                            <SelectTrigger className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                              <SelectValue placeholder="Select a study" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white z-50">
+                              <SelectItem value="study1">Study 1</SelectItem>
+                              <SelectItem value="study2">Study 2</SelectItem>
+                              <SelectItem value="study3">Study 3</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -236,7 +263,7 @@ const KnowledgeBase = () => {
                       <h3 className="text-lg font-semibold text-teal-800">File Uploads</h3>
                     </div>
                     
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className={`grid ${levelType === "book" ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"} gap-6`}>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-teal-900">
                           Document Upload <span className="text-red-500">*</span>
@@ -255,22 +282,24 @@ const KnowledgeBase = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-teal-900">Cover Image Upload</label>
-                        <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
-                          <div className="flex justify-center">
-                            <div className="p-3 bg-teal-100 rounded-lg">
-                              <FileText className="h-8 w-8 text-teal-600" />
+                      {levelType === "book" && (
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-teal-900">Cover Image Upload</label>
+                          <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
+                            <div className="flex justify-center">
+                              <div className="p-3 bg-teal-100 rounded-lg">
+                                <FileText className="h-8 w-8 text-teal-600" />
+                              </div>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">Drag images here or click to select images</p>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
+                              </p>
                             </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-gray-900">Drag images here or click to select images</p>
-                            <p className="text-sm text-gray-600 mt-1">
-                              Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
-                            </p>
-                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
