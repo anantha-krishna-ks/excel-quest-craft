@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search, Sparkles, ArrowRight, BarChart, Clock, Star, Users, FileText, Brain, Database, BookOpen, RefreshCw, GitCompare, Image, MessageSquare, ScanLine, PenTool, BarChart3, Bot, Mic } from "lucide-react"
+import { Search, Sparkles, ArrowRight, BarChart, Clock, Star, Users, FileText, Brain, Database, BookOpen, RefreshCw, GitCompare, Image, MessageSquare, ScanLine, PenTool, BarChart3, Bot, Mic, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/AppSidebar"
 import { ProfileDropdown } from "@/components/ProfileDropdown"
 import { Link } from "react-router-dom"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 // Import tool images
 import itemGenerationImage from "@/assets/item-generation.png"
@@ -27,6 +28,7 @@ const Dashboard = () => {
   const [subscriptionFilter, setSubscriptionFilter] = useState("All")
   const [hoveredTool, setHoveredTool] = useState<string | null>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const tabs = [
     "All", "AI Generation", "Content Creation", "Education", 
@@ -254,13 +256,32 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AppSidebar />
+      {/* Desktop Sidebar */}
+      <div className="fixed left-0 top-0 h-full w-52 z-40 hidden lg:block">
+        <AppSidebar />
+      </div>
+
+      {/* Mobile Menu Sheet */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="w-64 p-0">
+          <AppSidebar onNavigate={() => setMobileMenuOpen(false)} />
+        </SheetContent>
+      </Sheet>
       
       <div className="ml-0 lg:ml-52 min-h-screen flex flex-col">
         {/* Header */}
         <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
           <div className="flex h-16 items-center justify-between px-6">
             <div className="flex items-center gap-4">
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">Welcome Back, Robert Jones!</h1>
                 <p className="text-xs text-gray-600">Explore AI-powered tools to enhance your educational content creation</p>

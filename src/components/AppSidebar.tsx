@@ -1,7 +1,6 @@
-import { LayoutDashboard, Sparkles, BookOpen, BarChart3, Users, LogOut, Menu } from "lucide-react"
+import { LayoutDashboard, Sparkles, BookOpen, BarChart3, Users, LogOut } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 
 const items = [
@@ -32,7 +31,11 @@ const items = [
   },
 ]
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  onNavigate?: () => void
+}
+
+export function AppSidebar({ onNavigate }: AppSidebarProps = {}) {
   const location = useLocation()
   const currentPath = location.pathname
 
@@ -49,7 +52,7 @@ export function AppSidebar() {
   }
 
   return (
-    <div className="fixed left-0 top-0 h-full w-52 bg-white/95 backdrop-blur-xl border-r border-border/20 shadow-xl z-40 hidden lg:block">
+    <div className="h-full w-full bg-white/95 backdrop-blur-xl border-r border-border/20 shadow-xl">
       <div className="p-6 border-b border-border/20">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -69,6 +72,7 @@ export function AppSidebar() {
             <Link
               key={item.title}
               to={item.url}
+              onClick={onNavigate}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-primary/10 hover:scale-105 ${
                 isActive(item.url) 
                   ? 'bg-primary/15 text-primary shadow-lg border border-primary/20' 
@@ -84,3 +88,5 @@ export function AppSidebar() {
     </div>
   )
 }
+
+export { items }
