@@ -55,7 +55,7 @@ const KnowledgeBase = () => {
                 <Menu className="h-5 w-5" />
               </Button>
               <div className="min-w-0 flex items-center gap-3 flex-1">
-                <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">Knowledge Base System</h1>
+                <h1 className="text-base sm:text-xl font-semibold text-gray-900 truncate">Knowledge Base System</h1>
               </div>
             </div>
             
