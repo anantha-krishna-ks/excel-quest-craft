@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle, ScrollText, RefreshCw, Send, Bot, User } from "lucide-react";
+import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle, ScrollText, RefreshCw, Send, Bot, User, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -40,6 +40,8 @@ const KnowledgeBase = () => {
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [kbToDelete, setKbToDelete] = useState<{ id: number; name: string; bookName: string } | null>(null);
+  const [documentFiles, setDocumentFiles] = useState<File[]>([]);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
 
   const handleRefreshGuidelines = async () => {
     setIsRefreshing(true);
@@ -82,6 +84,27 @@ const KnowledgeBase = () => {
     // Auto-resize textarea
     e.target.style.height = 'auto';
     e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+  };
+
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setDocumentFiles(prev => [...prev, ...filesArray]);
+    }
+  };
+
+  const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCoverImage(e.target.files[0]);
+    }
+  };
+
+  const removeDocumentFile = (index: number) => {
+    setDocumentFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeCoverImage = () => {
+    setCoverImage(null);
   };
 
   const filteredKnowledgeBases = knowledgeBases.filter((kb) =>
@@ -702,11 +725,18 @@ const KnowledgeBase = () => {
                     </div>
                     
                     <div className={`grid ${levelType === "book" ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"} gap-6`}>
-                      <div className="space-y-2">
+                      <div className="space-y-2 flex-1">
                         <label className="text-sm font-medium text-teal-900">
                           Document Upload <span className="text-red-500">*</span>
                         </label>
-                        <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
+                        <label className="block bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors cursor-pointer h-[200px] flex flex-col items-center justify-center">
+                          <input
+                            type="file"
+                            multiple
+                            accept=".pdf,.docx,.txt,.html,.csv,.json"
+                            onChange={handleDocumentUpload}
+                            className="hidden"
+                          />
                           <div className="flex justify-center">
                             <div className="p-3 bg-teal-100 rounded-lg">
                               <FileText className="h-8 w-8 text-teal-600" />
@@ -718,12 +748,44 @@ const KnowledgeBase = () => {
                               Upload PDF, DOCX, TXT, HTML, CSV, or JSON files up to 30 MB.
                             </p>
                           </div>
-                        </div>
+                        </label>
+                        
+                        {documentFiles.length > 0 && (
+                          <div className="bg-white border border-teal-200 rounded-lg p-4 space-y-2">
+                            <p className="text-sm font-medium text-gray-900 mb-2">{documentFiles.length} file(s) uploaded:</p>
+                            {documentFiles.map((file, index) => (
+                              <div key={index} className="flex items-center justify-between bg-teal-50 px-3 py-2 rounded">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <FileText className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                                  <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                                  <span className="text-xs text-gray-500 flex-shrink-0">
+                                    ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                  </span>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeDocumentFile(index)}
+                                  className="h-7 w-7 flex-shrink-0 hover:bg-red-100 ml-2"
+                                >
+                                  <X className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       {levelType === "book" && (
-                        <div className="space-y-2">
+                        <div className="space-y-2 flex-1">
                           <label className="text-sm font-medium text-teal-900">Cover Image Upload</label>
-                          <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
+                          <label className="block bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors cursor-pointer h-[200px] flex flex-col items-center justify-center">
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/gif,image/webp"
+                              onChange={handleCoverImageUpload}
+                              className="hidden"
+                            />
                             <div className="flex justify-center">
                               <div className="p-3 bg-teal-100 rounded-lg">
                                 <FileText className="h-8 w-8 text-teal-600" />
@@ -735,7 +797,31 @@ const KnowledgeBase = () => {
                                 Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
                               </p>
                             </div>
-                          </div>
+                          </label>
+                          
+                          {coverImage && (
+                            <div className="bg-white border border-teal-200 rounded-lg p-4">
+                              <p className="text-sm font-medium text-gray-900 mb-2">Uploaded image:</p>
+                              <div className="flex items-center justify-between bg-teal-50 px-3 py-2 rounded">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <FileText className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                                  <span className="text-sm text-gray-700 truncate">{coverImage.name}</span>
+                                  <span className="text-xs text-gray-500 flex-shrink-0">
+                                    ({(coverImage.size / 1024 / 1024).toFixed(2)} MB)
+                                  </span>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={removeCoverImage}
+                                  className="h-7 w-7 flex-shrink-0 hover:bg-red-100 ml-2"
+                                >
+                                  <X className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
