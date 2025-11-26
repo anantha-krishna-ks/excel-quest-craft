@@ -29,6 +29,21 @@ const KnowledgeBase = () => {
   const [selectedBook, setSelectedBook] = useState("");
   const [isViewingGuidelines, setIsViewingGuidelines] = useState(false);
   const [selectedKBForGuidelines, setSelectedKBForGuidelines] = useState<{ id: number; name: string } | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefreshGuidelines = async () => {
+    setIsRefreshing(true);
+    try {
+      // TODO: Replace with actual API call to fetch guidelines
+      // const { data, error } = await supabase.from('guidelines').select('*');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      console.log('Guidelines refreshed');
+    } catch (error) {
+      console.error('Error refreshing guidelines:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const filteredKnowledgeBases = knowledgeBases.filter((kb) =>
     kb.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -220,9 +235,11 @@ const KnowledgeBase = () => {
                         variant="outline"
                         size="sm"
                         className="gap-2"
+                        onClick={handleRefreshGuidelines}
+                        disabled={isRefreshing}
                       >
-                        <RefreshCw className="h-4 w-4" />
-                        Refresh
+                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        {isRefreshing ? 'Refreshing...' : 'Refresh'}
                       </Button>
                     </div>
                     
