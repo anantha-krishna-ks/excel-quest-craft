@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 
 const knowledgeBases = [
   { id: 1, name: "agex", bookName: "agex", type: "Book Level" },
@@ -18,6 +19,7 @@ const KnowledgeBase = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("ACCA");
   const [typeFilter, setTypeFilter] = useState("All");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const filteredKnowledgeBases = knowledgeBases.filter((kb) =>
     kb.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -26,52 +28,60 @@ const KnowledgeBase = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile Navigation Menu */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="fixed top-4 left-4 z-[60] lg:hidden bg-white border border-gray-200 shadow-sm hover:bg-gray-50"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-64 z-[70]">
-          <AppSidebar onNavigate={() => {}} />
+      {/* Desktop Sidebar */}
+      <div className="fixed left-0 top-0 h-full w-52 z-40 hidden lg:block">
+        <AppSidebar />
+      </div>
+
+      {/* Mobile Menu Sheet */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="w-64 p-0">
+          <AppSidebar onNavigate={() => setMobileMenuOpen(false)} />
         </SheetContent>
       </Sheet>
 
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 lg:gap-3 pl-12 lg:pl-0">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-white" />
+      <div className="ml-0 lg:ml-52 min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+          <div className="flex h-16 items-center justify-between px-3 sm:px-6 gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden flex-shrink-0"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <div className="min-w-0 flex items-center gap-3 flex-1">
+                <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">Knowledge Base System</h1>
+              </div>
             </div>
-            <div>
-              <h1 className="text-base lg:text-lg font-semibold text-gray-900">Knowledge Base System</h1>
-              <p className="text-xs text-gray-500 hidden sm:block">Manage and organize your knowledge repositories</p>
+            
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
+                  <span className="text-white text-xs">✦</span>
+                </div>
+                <span className="text-xs sm:text-sm text-blue-600 font-medium whitespace-nowrap">4,651</span>
+              </div>
+              
+              <Link to="/dashboard" className="hidden sm:block">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
+              
+              <ProfileDropdown />
             </div>
           </div>
-          
-          <Link to="/dashboard" className="hidden sm:block">
-            <Button variant="ghost" size="sm" className="text-gray-600">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </Link>
-          <Link to="/dashboard" className="sm:hidden">
-            <Button variant="ghost" size="icon" className="text-gray-600">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+        {/* Main Content */}
+        <main className="p-6">
+          <div className="max-w-7xl mx-auto space-y-6">
           {/* Customer Selection Card */}
           <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100">
             <CardContent className="p-6">
@@ -219,7 +229,8 @@ const KnowledgeBase = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
