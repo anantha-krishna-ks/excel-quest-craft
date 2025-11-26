@@ -444,50 +444,50 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="px-6 pb-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="p-6 bg-blue-50 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                  <Sparkles className="h-4 w-4 text-blue-600" />
+        <div className="px-3 sm:px-6 pb-4 sm:pb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            <Card className="p-4 sm:p-6 bg-blue-50 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                  <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
                 </div>
-                <span className="font-medium text-gray-700">Available Tools</span>
+                <span className="font-medium text-sm sm:text-base text-gray-700">Available Tools</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">16</div>
-              <div className="text-sm font-medium text-blue-600">AI-Powered Solutions</div>
+              <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1">16</div>
+              <div className="text-xs sm:text-sm font-medium text-blue-600">AI-Powered Solutions</div>
             </Card>
 
-            <Card className="p-6 bg-green-50 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                  <Star className="h-4 w-4 text-green-600" />
+            <Card className="p-4 sm:p-6 bg-green-50 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                  <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
                 </div>
-                <span className="font-medium text-gray-700">Active Access</span>
+                <span className="font-medium text-sm sm:text-base text-gray-700">Active Access</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">12</div>
-              <div className="text-sm font-medium text-green-600">Tools Subscribed</div>
+              <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1">12</div>
+              <div className="text-xs sm:text-sm font-medium text-green-600">Tools Subscribed</div>
             </Card>
 
-            <Card className="p-6 bg-purple-50 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+            <Card className="p-4 sm:p-6 bg-purple-50 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                  <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-600" />
                 </div>
-                <span className="font-medium text-gray-700">Explore More</span>
+                <span className="font-medium text-sm sm:text-base text-gray-700">Explore More</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">4</div>
-              <div className="text-sm font-medium text-purple-600">Advanced Features</div>
+              <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1">4</div>
+              <div className="text-xs sm:text-sm font-medium text-purple-600">Advanced Features</div>
             </Card>
 
-            <Card className="p-6 bg-orange-50 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                  <Clock className="h-4 w-4 text-orange-600" />
+            <Card className="p-4 sm:p-6 bg-orange-50 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-600" />
                 </div>
-                <span className="font-medium text-gray-700">Today's Usage</span>
+                <span className="font-medium text-sm sm:text-base text-gray-700">Today's Usage</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">847</div>
-              <div className="text-sm font-medium text-orange-600">Tokens Generated</div>
+              <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1">847</div>
+              <div className="text-xs sm:text-sm font-medium text-orange-600">Tokens Generated</div>
             </Card>
           </div>
         </div>
