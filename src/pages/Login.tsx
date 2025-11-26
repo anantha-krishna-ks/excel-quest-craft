@@ -56,9 +56,10 @@ const Login = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmail = emailRegex.test(formData.username);
     
-    // Simulate login validation with demo account
+    // Simulate login validation with demo accounts
     const validAccounts = [
-      { username: "demo@example.com", password: "password123", type: "email" }
+      { username: "demo@example.com", password: "password123", type: "email", role: "user" },
+      { username: "superadmin@excelindia.com", password: "school", type: "email", role: "superadmin" }
     ];
     
     const matchedAccount = validAccounts.find(account => 
@@ -85,8 +86,15 @@ const Login = () => {
       return;
     }
     
-    // Successful login
-    navigate("/dashboard");
+    // Successful login - store user role and navigate
+    localStorage.setItem("userRole", matchedAccount.role);
+    localStorage.setItem("userEmail", matchedAccount.username);
+    
+    if (matchedAccount.role === "superadmin") {
+      navigate("/superadmin-dashboard");
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   const canSubmit = () => {
@@ -250,9 +258,10 @@ const Login = () => {
 
                   {/* Help section with demo credentials */}
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-xs font-medium text-blue-800 mb-2">Demo Account (for testing):</p>
-                    <div className="text-xs text-blue-700">
-                      <div><strong>Email:</strong> demo@example.com / password123</div>
+                    <p className="text-xs font-medium text-blue-800 mb-2">Demo Accounts (for testing):</p>
+                    <div className="text-xs text-blue-700 space-y-1">
+                      <div><strong>User:</strong> demo@example.com / password123</div>
+                      <div><strong>Super Admin:</strong> superadmin@excelindia.com / school</div>
                     </div>
                   </div>
 
