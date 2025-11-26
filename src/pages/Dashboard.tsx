@@ -29,6 +29,8 @@ const Dashboard = () => {
   const [hoveredTool, setHoveredTool] = useState<string | null>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const tabs = [
     "All", "AI Generation", "Content Creation", "Education", 
@@ -267,6 +269,30 @@ const Dashboard = () => {
           <AppSidebar onNavigate={() => setMobileMenuOpen(false)} />
         </SheetContent>
       </Sheet>
+
+      {/* Mobile Search Sheet */}
+      <Sheet open={mobileSearchOpen} onOpenChange={setMobileSearchOpen}>
+        <SheetContent side="top" className="h-auto">
+          <div className="space-y-4 pt-6">
+            <h2 className="text-lg font-semibold text-gray-900">Search AI Tools</h2>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input 
+                placeholder="Type to search..." 
+                className="pl-10 h-12 text-base border-gray-200"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+            </div>
+            {searchQuery && (
+              <div className="text-sm text-gray-500">
+                Searching for "{searchQuery}"...
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
       
       <div className="ml-0 lg:ml-52 min-h-screen flex flex-col">
         {/* Header */}
@@ -295,6 +321,18 @@ const Dashboard = () => {
                 </div>
                 <span className="text-xs sm:text-sm text-blue-600 font-medium whitespace-nowrap">4,651</span>
               </div>
+              
+              {/* Mobile Search Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileSearchOpen(true)}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+              
+              {/* Desktop Search */}
               <div className="relative hidden lg:block">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input 
