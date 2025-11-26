@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { ArrowLeft, BookOpen, FileText, Search, Menu, HelpCircle, Library, GraduationCap } from "lucide-react";
+import { ArrowLeft, BookOpen, FileText, Search, Menu, HelpCircle, Library, GraduationCap, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -38,7 +38,7 @@ const EditKnowledgeBase = () => {
   const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      setDocumentFiles(filesArray);
+      setDocumentFiles(prev => [...prev, ...filesArray]);
     }
   };
 
@@ -46,6 +46,14 @@ const EditKnowledgeBase = () => {
     if (e.target.files && e.target.files[0]) {
       setCoverImage(e.target.files[0]);
     }
+  };
+
+  const removeDocumentFile = (index: number) => {
+    setDocumentFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeCoverImage = () => {
+    setCoverImage(null);
   };
 
   return (
@@ -293,23 +301,38 @@ const EditKnowledgeBase = () => {
                         </div>
                       </div>
                       <div>
-                        {documentFiles.length > 0 ? (
-                          <>
-                            <p className="font-medium text-gray-900">{documentFiles.length} file(s) selected</p>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {documentFiles.map(f => f.name).join(', ')}
-                            </p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="font-medium text-gray-900">Drag files here or click to select files</p>
-                            <p className="text-sm text-gray-600 mt-1">
-                              Upload PDF, DOCX, TXT, HTML, CSV, or JSON files up to 30 MB.
-                            </p>
-                          </>
-                        )}
+                        <p className="font-medium text-gray-900">Drag files here or click to select files</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Upload PDF, DOCX, TXT, HTML, CSV, or JSON files up to 30 MB.
+                        </p>
                       </div>
                     </label>
+                    
+                    {documentFiles.length > 0 && (
+                      <div className="bg-white border border-teal-200 rounded-lg p-4 space-y-2">
+                        <p className="text-sm font-medium text-gray-900 mb-2">{documentFiles.length} file(s) uploaded:</p>
+                        {documentFiles.map((file, index) => (
+                          <div key={index} className="flex items-center justify-between bg-teal-50 px-3 py-2 rounded">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <FileText className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                              <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                              <span className="text-xs text-gray-500 flex-shrink-0">
+                                ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeDocumentFile(index)}
+                              className="h-7 w-7 flex-shrink-0 hover:bg-red-100 ml-2"
+                            >
+                              <X className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   {levelType === "book" && (
                     <div className="space-y-2 flex-1">
@@ -327,21 +350,36 @@ const EditKnowledgeBase = () => {
                           </div>
                         </div>
                         <div>
-                          {coverImage ? (
-                            <>
-                              <p className="font-medium text-gray-900">Image selected</p>
-                              <p className="text-sm text-gray-600 mt-1">{coverImage.name}</p>
-                            </>
-                          ) : (
-                            <>
-                              <p className="font-medium text-gray-900">Drag images here or click to select images</p>
-                              <p className="text-sm text-gray-600 mt-1">
-                                Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
-                              </p>
-                            </>
-                          )}
+                          <p className="font-medium text-gray-900">Drag images here or click to select images</p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
+                          </p>
                         </div>
                       </label>
+                      
+                      {coverImage && (
+                        <div className="bg-white border border-teal-200 rounded-lg p-4">
+                          <p className="text-sm font-medium text-gray-900 mb-2">Uploaded image:</p>
+                          <div className="flex items-center justify-between bg-teal-50 px-3 py-2 rounded">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <FileText className="h-4 w-4 text-teal-600 flex-shrink-0" />
+                              <span className="text-sm text-gray-700 truncate">{coverImage.name}</span>
+                              <span className="text-xs text-gray-500 flex-shrink-0">
+                                ({(coverImage.size / 1024 / 1024).toFixed(2)} MB)
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={removeCoverImage}
+                              className="h-7 w-7 flex-shrink-0 hover:bg-red-100 ml-2"
+                            >
+                              <X className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
