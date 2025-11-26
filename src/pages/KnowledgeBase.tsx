@@ -136,14 +136,11 @@ const KnowledgeBase = () => {
                             <Library className="h-6 w-6" />
                           </div>
                           <div className="flex-1">
-                            <h4 className={`font-semibold mb-1 transition-colors ${
+                            <h4 className={`font-semibold transition-colors ${
                               levelType === "book" ? "text-purple-900" : "text-gray-900"
                             }`}>
                               Book Level
                             </h4>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                              Organize content by books, chapters, and topics. Best for structured educational material.
-                            </p>
                           </div>
                           {levelType === "book" && (
                             <div className="absolute top-3 right-3">
@@ -175,14 +172,11 @@ const KnowledgeBase = () => {
                             <GraduationCap className="h-6 w-6" />
                           </div>
                           <div className="flex-1">
-                            <h4 className={`font-semibold mb-1 transition-colors ${
+                            <h4 className={`font-semibold transition-colors ${
                               levelType === "study" ? "text-purple-900" : "text-gray-900"
                             }`}>
                               Study Level
                             </h4>
-                            <p className="text-sm text-gray-600 leading-relaxed">
-                              Group by study levels, subjects, and difficulty. Ideal for exam preparation and courses.
-                            </p>
                           </div>
                           {levelType === "study" && (
                             <div className="absolute top-3 right-3">
