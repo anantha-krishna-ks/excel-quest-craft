@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Search, Edit, Trash2, Package, Menu, Plus, Users as UsersIcon, X } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -26,6 +27,8 @@ const Collaboration = () => {
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [deletingUser, setDeletingUser] = useState<typeof users[0] | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -40,10 +43,29 @@ const Collaboration = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleEditUser = (user: typeof users[0]) => {
+    setEditingUserId(user.id);
+    setFormData({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.emailId,
+      userName: user.loginName,
+      password: "",
+      confirmPassword: "",
+      contactNumber: "",
+    });
+    setIsAddingUser(true);
+  };
+
   const handleSaveUser = () => {
     // TODO: Add validation and save logic
-    console.log("Saving user:", formData);
+    if (editingUserId) {
+      console.log("Updating user:", editingUserId, formData);
+    } else {
+      console.log("Creating user:", formData);
+    }
     setIsAddingUser(false);
+    setEditingUserId(null);
     // Reset form
     setFormData({
       firstName: "",
@@ -54,6 +76,14 @@ const Collaboration = () => {
       confirmPassword: "",
       contactNumber: "",
     });
+  };
+
+  const handleDeleteUser = () => {
+    if (deletingUser) {
+      console.log("Deleting user:", deletingUser.id);
+      // TODO: Implement actual delete logic
+      setDeletingUser(null);
+    }
   };
 
   const filteredUsers = users.filter((user) =>
@@ -129,11 +159,16 @@ const Collaboration = () => {
           </div>
         </div>
 
-        {/* Add User Dialog */}
-        <Dialog open={isAddingUser} onOpenChange={setIsAddingUser}>
+        {/* Add/Edit User Dialog */}
+        <Dialog open={isAddingUser} onOpenChange={(open) => {
+          setIsAddingUser(open);
+          if (!open) setEditingUserId(null);
+        }}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-900">Create User</DialogTitle>
+              <DialogTitle className="text-2xl font-bold text-gray-900">
+                {editingUserId ? "Edit User" : "Create User"}
+              </DialogTitle>
             </DialogHeader>
             
             <div className="space-y-6 py-4">
@@ -254,7 +289,10 @@ const Collaboration = () => {
               <div className="flex gap-3 pt-4">
                 <Button 
                   variant="outline"
-                  onClick={() => setIsAddingUser(false)}
+                  onClick={() => {
+                    setIsAddingUser(false);
+                    setEditingUserId(null);
+                  }}
                   className="flex-1 h-11 text-base font-medium"
                 >
                   Cancel
@@ -263,7 +301,7 @@ const Collaboration = () => {
                   onClick={handleSaveUser}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-11 text-base font-semibold"
                 >
-                  Save User
+                  {editingUserId ? "Update User" : "Save User"}
                 </Button>
               </div>
             </div>
@@ -318,6 +356,34 @@ const Collaboration = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deletingUser} onOpenChange={(open) => !open && setDeletingUser(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete User</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+                {deletingUser && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-2 text-gray-900">
+                    <p><span className="font-semibold">Name:</span> {deletingUser.firstName} {deletingUser.lastName}</p>
+                    <p><span className="font-semibold">Login Name:</span> {deletingUser.loginName}</p>
+                    <p><span className="font-semibold">Email:</span> {deletingUser.emailId}</p>
+                  </div>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteUser}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Main Content */}
         <main className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
@@ -361,7 +427,7 @@ const Collaboration = () => {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              onClick={() => console.log('Edit user:', user.id)}
+                              onClick={() => handleEditUser(user)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -369,7 +435,7 @@ const Collaboration = () => {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => console.log('Delete user:', user.id)}
+                              onClick={() => setDeletingUser(user)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
