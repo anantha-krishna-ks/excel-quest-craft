@@ -17,6 +17,8 @@ const EditKnowledgeBase = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [levelType, setLevelType] = useState<"book" | "study">("book");
   const [selectedBook, setSelectedBook] = useState("book1");
+  const [documentFiles, setDocumentFiles] = useState<File[]>([]);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
 
   // TODO: Fetch knowledge base data by id
   const knowledgeBase = {
@@ -31,6 +33,19 @@ const EditKnowledgeBase = () => {
     chunkingStrategy: "recursive",
     databaseType: "faiss",
     embeddingModel: "openai"
+  };
+
+  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setDocumentFiles(filesArray);
+    }
+  };
+
+  const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCoverImage(e.target.files[0]);
+    }
   };
 
   return (
@@ -260,40 +275,73 @@ const EditKnowledgeBase = () => {
                 </div>
                 
                 <div className={`grid ${levelType === "book" ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"} gap-6`}>
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex-1">
                     <Label className="text-sm font-medium text-teal-900">
                       Document Upload <span className="text-red-500">*</span>
                     </Label>
-                    <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
+                    <label className="block bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors cursor-pointer h-[200px] flex flex-col items-center justify-center">
+                      <input
+                        type="file"
+                        multiple
+                        accept=".pdf,.docx,.txt,.html,.csv,.json"
+                        onChange={handleDocumentUpload}
+                        className="hidden"
+                      />
                       <div className="flex justify-center">
                         <div className="p-3 bg-teal-100 rounded-lg">
                           <FileText className="h-8 w-8 text-teal-600" />
                         </div>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">Drag files here or click to select files</p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Upload PDF, DOCX, TXT, HTML, CSV, or JSON files up to 30 MB.
-                        </p>
+                        {documentFiles.length > 0 ? (
+                          <>
+                            <p className="font-medium text-gray-900">{documentFiles.length} file(s) selected</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {documentFiles.map(f => f.name).join(', ')}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="font-medium text-gray-900">Drag files here or click to select files</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Upload PDF, DOCX, TXT, HTML, CSV, or JSON files up to 30 MB.
+                            </p>
+                          </>
+                        )}
                       </div>
-                    </div>
+                    </label>
                   </div>
                   {levelType === "book" && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-1">
                       <Label className="text-sm font-medium text-teal-900">Cover Image Upload</Label>
-                      <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
+                      <label className="block bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors cursor-pointer h-[200px] flex flex-col items-center justify-center">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/gif,image/webp"
+                          onChange={handleCoverImageUpload}
+                          className="hidden"
+                        />
                         <div className="flex justify-center">
                           <div className="p-3 bg-teal-100 rounded-lg">
                             <FileText className="h-8 w-8 text-teal-600" />
                           </div>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">Drag images here or click to select images</p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
-                          </p>
+                          {coverImage ? (
+                            <>
+                              <p className="font-medium text-gray-900">Image selected</p>
+                              <p className="text-sm text-gray-600 mt-1">{coverImage.name}</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="font-medium text-gray-900">Drag images here or click to select images</p>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
+                              </p>
+                            </>
+                          )}
                         </div>
-                      </div>
+                      </label>
                     </div>
                   )}
                 </div>
