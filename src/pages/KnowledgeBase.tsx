@@ -112,28 +112,34 @@ const KnowledgeBase = () => {
                 {/* Level Type Selection Card */}
                 <Card className="border-2 border-purple-100 bg-purple-50">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-purple-600 text-white rounded-lg">
                           <BookOpen className="h-5 w-5" />
                         </div>
                         <h3 className="text-lg font-semibold text-purple-800">Select Knowledge Base Type</h3>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant={levelType === "book" ? "default" : "outline"}
+                      <div className="inline-flex bg-white p-1 rounded-lg border-2 border-purple-200">
+                        <button
                           onClick={() => setLevelType("book")}
-                          className={levelType === "book" ? "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600" : "border-purple-200"}
+                          className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                            levelType === "book"
+                              ? "bg-purple-600 text-white"
+                              : "text-purple-700 hover:text-purple-900"
+                          }`}
                         >
                           Book Level
-                        </Button>
-                        <Button
-                          variant={levelType === "study" ? "default" : "outline"}
+                        </button>
+                        <button
                           onClick={() => setLevelType("study")}
-                          className={levelType === "study" ? "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600" : "border-purple-200"}
+                          className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                            levelType === "study"
+                              ? "bg-purple-600 text-white"
+                              : "text-purple-700 hover:text-purple-900"
+                          }`}
                         >
                           Study Level
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   </CardContent>
