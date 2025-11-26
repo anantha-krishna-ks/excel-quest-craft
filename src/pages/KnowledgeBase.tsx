@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle, ScrollText, RefreshCw, Send } from "lucide-react";
+import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle, ScrollText, RefreshCw, Send, Bot, User } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -66,6 +66,18 @@ const KnowledgeBase = () => {
     }, 1000);
     
     setChatInput("");
+    // Reset textarea height
+    const textarea = document.querySelector('textarea');
+    if (textarea) {
+      textarea.style.height = 'auto';
+    }
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setChatInput(e.target.value);
+    // Auto-resize textarea
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
   };
 
   const filteredKnowledgeBases = knowledgeBases.filter((kb) =>
@@ -165,9 +177,9 @@ const KnowledgeBase = () => {
           <div className="max-w-7xl mx-auto space-y-6">
             {isChatMode ? (
               /* Chat Interface */
-              <div className="flex flex-col h-[calc(100vh-280px)]">
+              <div className="flex flex-col h-[calc(100vh-200px)]">
                 {/* Chat Messages Area */}
-                <div className="flex-1 bg-white rounded-lg border border-gray-200 overflow-y-auto p-6 space-y-4 mb-4">
+                <div className="flex-1 bg-white rounded-lg border border-gray-200 overflow-y-auto p-6 space-y-6 mb-4">
                   {chatMessages.length === 0 ? (
                     <div className="flex items-center justify-center h-full text-gray-400">
                       <div className="text-center">
@@ -178,22 +190,22 @@ const KnowledgeBase = () => {
                     </div>
                   ) : (
                     chatMessages.map((message, index) => (
-                      <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div key={index} className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {message.role === 'assistant' && (
-                          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <MessageSquare className="h-4 w-4 text-green-600" />
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                            <Bot className="h-5 w-5 text-white" />
                           </div>
                         )}
-                        <div className={`max-w-3xl px-4 py-3 rounded-2xl ${
+                        <div className={`max-w-[70%] px-5 py-3.5 rounded-2xl ${
                           message.role === 'user' 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-gray-100 text-gray-900'
+                            ? 'bg-blue-600 text-white rounded-tr-sm' 
+                            : 'bg-gray-100 text-gray-900 rounded-tl-sm'
                         }`}>
-                          <p className="text-sm leading-relaxed">{message.content}</p>
+                          <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
                         </div>
                         {message.role === 'user' && (
-                          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                            <span className="text-white text-xs font-medium">U</span>
+                          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                            <User className="h-5 w-5 text-white" />
                           </div>
                         )}
                       </div>
@@ -201,11 +213,11 @@ const KnowledgeBase = () => {
                   )}
                 </div>
 
-                {/* Input Area */}
-                <div className="bg-white rounded-lg border border-gray-200 p-4">
-                  <div className="flex items-center gap-3">
+                {/* Input Area - Fixed at bottom */}
+                <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+                  <div className="flex items-end gap-3">
                     <Select value={selectedModel} onValueChange={setSelectedModel}>
-                      <SelectTrigger className="w-40 bg-white border-gray-300">
+                      <SelectTrigger className="w-36 bg-white border-gray-300 flex-shrink-0">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
@@ -219,21 +231,22 @@ const KnowledgeBase = () => {
                       <Textarea 
                         placeholder="Ask a question about your documents..."
                         value={chatInput}
-                        onChange={(e) => setChatInput(e.target.value)}
+                        onChange={handleTextareaChange}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
                             handleSendMessage();
                           }
                         }}
-                        className="bg-white border-gray-300 resize-none min-h-[44px] max-h-[120px] pr-12"
+                        className="bg-white border-gray-300 resize-none min-h-[52px] max-h-[200px] pr-14 py-3 overflow-y-auto"
                         rows={1}
+                        style={{ height: 'auto' }}
                       />
                       <Button 
                         size="icon"
                         onClick={handleSendMessage}
                         disabled={!chatInput.trim()}
-                        className="absolute right-2 bottom-2 h-8 w-8 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+                        className="absolute right-2 bottom-2 h-9 w-9 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
                       >
                         <Send className="h-4 w-4 text-white" />
                       </Button>
