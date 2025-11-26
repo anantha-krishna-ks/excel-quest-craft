@@ -27,6 +27,7 @@ import Reports from "./pages/Reports";
 import ManageUsers from "./pages/ManageUsers";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import EditKnowledgeBase from "./pages/EditKnowledgeBase";
+import Collaboration from "./pages/Collaboration";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const App = () => (
           <Route path="/manage-users" element={<ManageUsers />} />
         <Route path="/knowledge-base" element={<KnowledgeBase />} />
         <Route path="/knowledge-base/edit/:id" element={<EditKnowledgeBase />} />
+          <Route path="/collaboration" element={<Collaboration />} />
           <Route path="/doc-chat-ncert" element={<DocChatNCERT />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
