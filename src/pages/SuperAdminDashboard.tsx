@@ -184,9 +184,9 @@ const SuperAdminDashboard = () => {
 
           {/* Error State */}
           {showError && (
-            <div className="bg-white rounded-lg shadow-sm p-12 flex items-center justify-center animate-fade-in">
-              <div className="text-center max-w-md">
-                <div className="relative mx-auto w-32 h-32 mb-6">
+            <div className="bg-white rounded-lg shadow-sm p-8 flex items-center justify-center animate-fade-in">
+              <div className="text-center max-w-lg">
+                <div className="relative mx-auto w-20 h-20 mb-4">
                   {/* Animated background circles */}
                   <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-red-100 rounded-full animate-pulse opacity-50"></div>
                   <div className="absolute inset-2 bg-white rounded-full"></div>
@@ -194,32 +194,32 @@ const SuperAdminDashboard = () => {
                   {/* Icon container */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative">
-                      <FileSearch className="w-16 h-16 text-orange-500 animate-scale-in" strokeWidth={1.5} />
-                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
-                        <AlertCircle className="w-6 h-6 text-red-500" fill="currentColor" />
+                      <FileSearch className="w-10 h-10 text-orange-500" strokeWidth={1.5} />
+                      <div className="absolute -bottom-0.5 -right-0.5 bg-white rounded-full p-0.5">
+                        <AlertCircle className="w-4 h-4 text-red-500" fill="currentColor" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   No Subscription Details Found
                 </h3>
-                <p className="text-gray-600 mb-8 leading-relaxed">
+                <p className="text-sm text-gray-600 mb-4">
                   We couldn't find any subscription details for the selected criteria. Please try selecting a different organization or adjusting your date range.
                 </p>
                 
-                <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4">
-                  <div className="flex items-start gap-3 text-left">
+                <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2 text-left">
                     <div className="flex-shrink-0 mt-0.5">
-                      <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">!</span>
+                      <div className="w-4 h-4 rounded-full bg-orange-500 flex items-center justify-center">
+                        <span className="text-white text-[10px] font-bold">!</span>
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-orange-900 mb-1">Quick Tip</p>
-                      <p className="text-sm text-orange-700">
-                        Make sure to select an organization from the dropdown menu and verify the date range covers the period you're looking for.
+                      <p className="text-xs font-medium text-orange-900 mb-0.5">Quick Tip</p>
+                      <p className="text-xs text-orange-700">
+                        Select an organization from the dropdown and verify the date range.
                       </p>
                     </div>
                   </div>
