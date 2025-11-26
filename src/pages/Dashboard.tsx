@@ -271,35 +271,35 @@ const Dashboard = () => {
       <div className="ml-0 lg:ml-52 min-h-screen flex flex-col">
         {/* Header */}
         <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div className="flex items-center gap-4">
+          <div className="flex h-16 items-center justify-between px-3 sm:px-6 gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               {/* Mobile Menu Button */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden flex-shrink-0"
                 onClick={() => setMobileMenuOpen(true)}
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Welcome Back, Robert Jones!</h1>
-                <p className="text-xs text-gray-600">Explore AI-powered tools to enhance your educational content creation</p>
+              <div className="min-w-0 hidden sm:block">
+                <h1 className="text-sm sm:text-lg font-bold text-gray-900 truncate">Welcome Back, Robert Jones!</h1>
+                <p className="text-xs text-gray-600 truncate hidden md:block">Explore AI-powered tools to enhance your educational content creation</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <div className="hidden sm:flex items-center gap-2">
                 <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
                   <span className="text-white text-xs">✦</span>
                 </div>
-                <span className="text-sm text-blue-600 font-medium">4,651 Tokens</span>
+                <span className="text-xs sm:text-sm text-blue-600 font-medium whitespace-nowrap">4,651</span>
               </div>
-              <div className="relative hidden md:block">
+              <div className="relative hidden lg:block">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input 
                   placeholder="Search AI tools..." 
-                  className="pl-10 w-60 lg:w-80 border-gray-200"
+                  className="pl-10 w-60 border-gray-200"
                 />
               </div>
               <ProfileDropdown />
