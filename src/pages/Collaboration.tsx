@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Edit, Trash2, Bell, Menu, Plus, Users as UsersIcon, X } from "lucide-react";
+import { Search, Edit, Trash2, CreditCard, Menu, Plus, Users as UsersIcon, X } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 
@@ -24,6 +24,8 @@ const Collaboration = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
+  const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -268,6 +270,54 @@ const Collaboration = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Subscription Details Dialog */}
+        <Dialog open={subscriptionDialogOpen} onOpenChange={setSubscriptionDialogOpen}>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-900">Subscription Details</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6 py-4">
+              {/* Subscription Table */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50">
+                      <TableHead className="w-12">
+                        <input type="checkbox" className="rounded border-gray-300" />
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900">App Name</TableHead>
+                      <TableHead className="font-semibold text-gray-900">App Status</TableHead>
+                      <TableHead className="font-semibold text-gray-900">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                        No subscription details available.
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3">
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white h-11 px-8 text-base font-semibold"
+                >
+                  Tag Apps
+                </Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white h-11 px-8 text-base font-semibold"
+                >
+                  Untag Apps
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Main Content */}
         <main className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
@@ -326,10 +376,13 @@ const Collaboration = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
-                              onClick={() => console.log('Notify user:', user.id)}
+                              className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              onClick={() => {
+                                setSelectedUserId(user.id);
+                                setSubscriptionDialogOpen(true);
+                              }}
                             >
-                              <Bell className="h-4 w-4" />
+                              <CreditCard className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
