@@ -70,17 +70,17 @@ const KnowledgeBase = () => {
         </header>
 
         {/* Page Title Section */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
+        <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Knowledge Base System</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Knowledge Base System</h2>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="text-gray-600 hover:text-gray-900">
+            <Button variant="outline" size="sm" className="text-gray-600 hover:text-gray-900 w-full sm:w-auto">
               <FileText className="w-4 h-4 mr-2" />
               Knowledge Base Manual
             </Button>
