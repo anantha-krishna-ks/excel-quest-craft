@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu } from "lucide-react";
+import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
@@ -112,35 +112,89 @@ const KnowledgeBase = () => {
                 {/* Level Type Selection Card */}
                 <Card className="border-2 border-purple-100 bg-purple-50">
                   <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-600 text-white rounded-lg">
-                          <BookOpen className="h-5 w-5" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-purple-800">Select Knowledge Base Type</h3>
-                      </div>
-                      <div className="inline-flex bg-white p-1 rounded-lg border-2 border-purple-200">
-                        <button
-                          onClick={() => setLevelType("book")}
-                          className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-purple-800">Select Knowledge Base Type</h3>
+                      <p className="text-sm text-purple-600 mt-1">Choose how you want to organize your knowledge base</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Book Level Option */}
+                      <button
+                        onClick={() => setLevelType("book")}
+                        className={`relative p-5 rounded-lg border-2 text-left transition-all ${
+                          levelType === "book"
+                            ? "border-purple-600 bg-white shadow-md"
+                            : "border-purple-200 bg-white hover:border-purple-300"
+                        }`}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className={`p-3 rounded-lg transition-colors ${
                             levelType === "book"
                               ? "bg-purple-600 text-white"
-                              : "text-purple-700 hover:text-purple-900"
-                          }`}
-                        >
-                          Book Level
-                        </button>
-                        <button
-                          onClick={() => setLevelType("study")}
-                          className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                              : "bg-purple-100 text-purple-600"
+                          }`}>
+                            <Library className="h-6 w-6" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className={`font-semibold mb-1 transition-colors ${
+                              levelType === "book" ? "text-purple-900" : "text-gray-900"
+                            }`}>
+                              Book Level
+                            </h4>
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                              Organize content by books, chapters, and topics. Best for structured educational material.
+                            </p>
+                          </div>
+                          {levelType === "book" && (
+                            <div className="absolute top-3 right-3">
+                              <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </button>
+
+                      {/* Study Level Option */}
+                      <button
+                        onClick={() => setLevelType("study")}
+                        className={`relative p-5 rounded-lg border-2 text-left transition-all ${
+                          levelType === "study"
+                            ? "border-purple-600 bg-white shadow-md"
+                            : "border-purple-200 bg-white hover:border-purple-300"
+                        }`}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className={`p-3 rounded-lg transition-colors ${
                             levelType === "study"
                               ? "bg-purple-600 text-white"
-                              : "text-purple-700 hover:text-purple-900"
-                          }`}
-                        >
-                          Study Level
-                        </button>
-                      </div>
+                              : "bg-purple-100 text-purple-600"
+                          }`}>
+                            <GraduationCap className="h-6 w-6" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className={`font-semibold mb-1 transition-colors ${
+                              levelType === "study" ? "text-purple-900" : "text-gray-900"
+                            }`}>
+                              Study Level
+                            </h4>
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                              Group by study levels, subjects, and difficulty. Ideal for exam preparation and courses.
+                            </p>
+                          </div>
+                          {levelType === "study" && (
+                            <div className="absolute top-3 right-3">
+                              <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
