@@ -53,7 +53,7 @@ export function AppSidebar({ onNavigate }: AppSidebarProps = {}) {
 
   return (
     <div className="h-full w-full bg-white/95 backdrop-blur-xl border-r border-border/20 shadow-xl">
-      <div className="p-6 border-b border-border/20">
+      <div className="p-4 border-b border-border/20">
         <div className="flex items-center">
           <img 
             src="/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" 
@@ -61,7 +61,6 @@ export function AppSidebar({ onNavigate }: AppSidebarProps = {}) {
             className="h-8 w-auto"
           />
         </div>
-        <p className="text-sm text-muted-foreground mt-1">Dashboard</p>
       </div>
       
       <div className="px-4 py-6">
