@@ -217,7 +217,7 @@ const KnowledgeBase = () => {
                 <div className="bg-white rounded-2xl border border-gray-200 p-3">
                   <div className="flex flex-col gap-3">
                     <Textarea 
-                      placeholder="Message AI..."
+                      placeholder="Ask a question about your documents..."
                       value={chatInput}
                       onChange={handleTextareaChange}
                       onKeyDown={(e) => {
@@ -233,10 +233,10 @@ const KnowledgeBase = () => {
                     
                     <div className="flex items-center justify-between gap-3">
                       <Select value={selectedModel} onValueChange={setSelectedModel}>
-                        <SelectTrigger className="w-40 bg-white border-none focus:ring-0 flex-shrink-0 h-9">
+                        <SelectTrigger className="w-40 bg-white border border-gray-300 rounded-lg flex-shrink-0 h-9">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white">
+                        <SelectContent className="bg-white z-50">
                           <SelectItem value="GPT-4o">GPT-4o</SelectItem>
                           <SelectItem value="GPT-4">GPT-4</SelectItem>
                           <SelectItem value="GPT-3.5">GPT-3.5</SelectItem>
