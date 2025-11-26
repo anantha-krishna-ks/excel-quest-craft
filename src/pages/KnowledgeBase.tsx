@@ -30,6 +30,7 @@ const KnowledgeBase = () => {
   const [isViewingGuidelines, setIsViewingGuidelines] = useState(false);
   const [selectedKBForGuidelines, setSelectedKBForGuidelines] = useState<{ id: number; name: string } | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [editingGuideline, setEditingGuideline] = useState<{ name: string; type: string; subtype?: string } | null>(null);
 
   const handleRefreshGuidelines = async () => {
     setIsRefreshing(true);
@@ -148,16 +149,18 @@ const KnowledgeBase = () => {
                 </Card>
 
                 {/* Add New Guideline Card */}
-                <Card className="border-2 border-teal-100 bg-teal-50">
+                <Card id="add-guideline-section" className="border-2 border-teal-100 bg-teal-50">
                   <CardContent className="p-6 space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Add New Guideline</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {editingGuideline ? 'Edit Guideline' : 'Add New Guideline'}
+                    </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-gray-900">
                           Guideline Type <span className="text-red-500">*</span>
                         </Label>
-                        <Select>
+                        <Select defaultValue={editingGuideline?.type}>
                           <SelectTrigger className="bg-white border-gray-300">
                             <SelectValue placeholder="Select guideline type" />
                           </SelectTrigger>
@@ -171,7 +174,7 @@ const KnowledgeBase = () => {
 
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-gray-900">Guideline Subtype</Label>
-                        <Select>
+                        <Select defaultValue={editingGuideline?.subtype}>
                           <SelectTrigger className="bg-white border-gray-300">
                             <SelectValue placeholder="Select subtype" />
                           </SelectTrigger>
@@ -189,6 +192,7 @@ const KnowledgeBase = () => {
                         <Input 
                           placeholder="Enter guideline name" 
                           className="bg-white border-gray-300"
+                          defaultValue={editingGuideline?.name}
                         />
                       </div>
                     </div>
@@ -218,9 +222,18 @@ const KnowledgeBase = () => {
                       </div>
                     </div>
 
-                    <div className="flex justify-start">
+                    <div className="flex justify-start gap-3">
+                      {editingGuideline && (
+                        <Button 
+                          variant="outline"
+                          onClick={() => setEditingGuideline(null)}
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                          Cancel
+                        </Button>
+                      )}
                       <Button className="bg-yellow-600 hover:bg-yellow-700 text-white">
-                        Upload Guideline
+                        {editingGuideline ? 'Update Guideline' : 'Upload Guideline'}
                       </Button>
                     </div>
                   </CardContent>
@@ -259,7 +272,15 @@ const KnowledgeBase = () => {
                               <TableCell className="text-gray-700 py-4">Content</TableCell>
                               <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
-                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-9 w-9 hover:bg-blue-100"
+                                    onClick={() => {
+                                      setEditingGuideline({ name: 'Content', type: 'content' });
+                                      document.getElementById('add-guideline-section')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                  >
                                     <Edit className="h-4 w-4 text-blue-600" />
                                   </Button>
                                   <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
@@ -273,7 +294,15 @@ const KnowledgeBase = () => {
                               <TableCell className="text-gray-700 py-4">Validation</TableCell>
                               <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
-                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-9 w-9 hover:bg-blue-100"
+                                    onClick={() => {
+                                      setEditingGuideline({ name: 'CREATE_Validation', type: 'validation' });
+                                      document.getElementById('add-guideline-section')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                  >
                                     <Edit className="h-4 w-4 text-blue-600" />
                                   </Button>
                                   <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
@@ -287,7 +316,15 @@ const KnowledgeBase = () => {
                               <TableCell className="text-gray-700 py-4">Validation</TableCell>
                               <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
-                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-9 w-9 hover:bg-blue-100"
+                                    onClick={() => {
+                                      setEditingGuideline({ name: 'General rule validation', type: 'validation' });
+                                      document.getElementById('add-guideline-section')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                  >
                                     <Edit className="h-4 w-4 text-blue-600" />
                                   </Button>
                                   <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
@@ -301,7 +338,15 @@ const KnowledgeBase = () => {
                               <TableCell className="text-gray-700 py-4">Question Generation</TableCell>
                               <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
-                                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-blue-100">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-9 w-9 hover:bg-blue-100"
+                                    onClick={() => {
+                                      setEditingGuideline({ name: 'Multiple Choice Question', type: 'generation' });
+                                      document.getElementById('add-guideline-section')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                  >
                                     <Edit className="h-4 w-4 text-blue-600" />
                                   </Button>
                                   <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-red-100">
