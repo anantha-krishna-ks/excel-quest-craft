@@ -218,7 +218,7 @@ const KnowledgeBase = () => {
                           <div>
                             <p className="font-medium text-gray-900">Drag images here or click to select images</p>
                             <p className="text-sm text-gray-600 mt-1">
-                              You can upload one image (PNG, JPEG, GIF, WEBP) up to 10 MB.
+                              Recommended: 800x400px (2:1 ratio) • PNG, JPEG, GIF, WEBP • Max 10 MB
                             </p>
                           </div>
                         </div>
