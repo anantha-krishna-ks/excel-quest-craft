@@ -73,7 +73,7 @@ export function AppSidebar({ onNavigate }: AppSidebarProps = {}) {
               onClick={onNavigate}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-primary/10 hover:scale-105 ${
                 isActive(item.url) 
-                  ? 'bg-primary/15 text-primary shadow-lg border border-primary/20' 
+                  ? 'bg-primary/15 text-primary border border-primary/20' 
                   : 'text-foreground hover:text-primary'
               }`}
             >
