@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Sparkles, Eye, EyeOff, AlertCircle, CheckCircle2, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -270,6 +270,7 @@ const Login = () => {
                     disabled={!canSubmit()}
                     className="w-full h-12 bg-[#2563eb] hover:bg-[#2563eb]/90 text-white font-semibold rounded-lg transform transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
                   >
+                    <LogIn className="w-5 h-5 mr-2" />
                     Sign In
                   </Button>
                 </form>
