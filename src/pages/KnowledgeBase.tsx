@@ -5,9 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library } from "lucide-react";
+import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
@@ -318,7 +319,16 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Retrieval Strategy
-                          <span className="text-orange-600 text-sm">ⓘ</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Retrieval Strategy decides how search results are ranked and selected</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </label>
                         <Select defaultValue="mmr">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -334,7 +344,16 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Number of Reranking Candidates (k)
-                          <span className="text-orange-600 text-sm">ⓘ</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Defines how many of the initially retrieved results are considered during reranking. Smaller k is faster but may miss relevant documents, larger k is more thorough but slower.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </label>
                         <Input 
                           type="number" 
@@ -346,7 +365,16 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Chunk Size
-                          <span className="text-orange-600 text-sm">ⓘ</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Defines how large each text segment is when splitting documents for retrieval. Smaller chunks give more precise matches but less context, larger chunks preserve more context but may include irrelevant material.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </label>
                         <Select defaultValue="1000">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -363,7 +391,16 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Overlap Percentage
-                          <span className="text-orange-600 text-sm">ⓘ</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Defines how much consecutive text chunks overlap when splitting documents. Higher overlap preserves more context across chunks but increases redundancy and processing cost.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </label>
                         <Select defaultValue="20">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -380,7 +417,16 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Chunking Strategy
-                          <span className="text-orange-600 text-sm">ⓘ</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Controls how documents are split into smaller parts for retrieval. Affects accuracy, context, and speed.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </label>
                         <Select defaultValue="recursive">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -396,7 +442,16 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Database Type
-                          <span className="text-orange-600 text-sm">ⓘ</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Defines how data is stored for retrieval, impacting speed, scalability, and accuracy.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </label>
                         <Select defaultValue="faiss">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
@@ -412,7 +467,16 @@ const KnowledgeBase = () => {
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Embedding Model
-                          <span className="text-orange-600 text-sm">ⓘ</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>Converts text into vectors for similarity search</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </label>
                         <Select defaultValue="openai">
                           <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
