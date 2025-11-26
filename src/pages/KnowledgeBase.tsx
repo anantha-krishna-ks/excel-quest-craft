@@ -152,12 +152,14 @@ const KnowledgeBase = () => {
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
                 <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-                {isCreating ? "Create New Knowledge Base" : isCreatingStudyLO ? "Create Study LO" : isViewingGuidelines ? "Guideline Data" : isChatMode ? `Knowledge Base: ${selectedKBForChat?.bookName}` : "Knowledge Base System"}
-              </h2>
-              {isChatMode && selectedKBForChat && (
-                <p className="text-sm text-gray-600 mt-1">Customer: {selectedCustomer}</p>
-              )}
+              <div className="flex flex-col">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                  {isCreating ? "Create New Knowledge Base" : isCreatingStudyLO ? "Create Study LO" : isViewingGuidelines ? "Guideline Data" : isChatMode ? `Knowledge Base: ${selectedKBForChat?.bookName}` : "Knowledge Base System"}
+                </h2>
+                {isChatMode && selectedKBForChat && (
+                  <p className="text-sm text-gray-600">Customer: {selectedCustomer}</p>
+                )}
+              </div>
             </div>
             {isCreatingStudyLO ? (
               <Button className="bg-yellow-600 hover:bg-yellow-700 text-white flex-shrink-0">
