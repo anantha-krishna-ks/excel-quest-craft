@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle, ScrollText, RefreshCw } from "lucide-react";
+import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu, GraduationCap, Library, HelpCircle, ScrollText, RefreshCw, Send } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -31,6 +31,11 @@ const KnowledgeBase = () => {
   const [selectedKBForGuidelines, setSelectedKBForGuidelines] = useState<{ id: number; name: string } | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [editingGuideline, setEditingGuideline] = useState<{ name: string; type: string; subtype?: string } | null>(null);
+  const [isChatMode, setIsChatMode] = useState(false);
+  const [selectedKBForChat, setSelectedKBForChat] = useState<{ id: number; name: string; bookName: string } | null>(null);
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [selectedModel, setSelectedModel] = useState("GPT-4o");
 
   const handleRefreshGuidelines = async () => {
     setIsRefreshing(true);
@@ -44,6 +49,23 @@ const KnowledgeBase = () => {
     } finally {
       setIsRefreshing(false);
     }
+  };
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    
+    // Add user message
+    setChatMessages(prev => [...prev, { role: 'user', content: chatInput }]);
+    
+    // Simulate AI response
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'This is a simulated response. In production, this would query the knowledge base and return relevant information.' 
+      }]);
+    }, 1000);
+    
+    setChatInput("");
   };
 
   const filteredKnowledgeBases = knowledgeBases.filter((kb) =>
@@ -98,7 +120,7 @@ const KnowledgeBase = () => {
         <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2 sm:gap-3">
-              {(isCreating || isCreatingStudyLO || isViewingGuidelines) && (
+              {(isCreating || isCreatingStudyLO || isViewingGuidelines || isChatMode) && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -107,6 +129,8 @@ const KnowledgeBase = () => {
                     setIsCreatingStudyLO(false);
                     setIsViewingGuidelines(false);
                     setSelectedKBForGuidelines(null);
+                    setIsChatMode(false);
+                    setSelectedKBForChat(null);
                   }}
                   className="flex-shrink-0"
                 >
@@ -117,8 +141,11 @@ const KnowledgeBase = () => {
                 <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-                {isCreating ? "Create New Knowledge Base" : isCreatingStudyLO ? "Create Study LO" : isViewingGuidelines ? "Guideline Data" : "Knowledge Base System"}
+                {isCreating ? "Create New Knowledge Base" : isCreatingStudyLO ? "Create Study LO" : isViewingGuidelines ? "Guideline Data" : isChatMode ? `Knowledge Base: ${selectedKBForChat?.bookName}` : "Knowledge Base System"}
               </h2>
+              {isChatMode && selectedKBForChat && (
+                <p className="text-sm text-gray-600 mt-1">Customer: {selectedCustomer}</p>
+              )}
             </div>
             {isCreatingStudyLO ? (
               <Button className="bg-yellow-600 hover:bg-yellow-700 text-white flex-shrink-0">
@@ -136,7 +163,85 @@ const KnowledgeBase = () => {
         {/* Main Content */}
         <main className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {isViewingGuidelines ? (
+            {isChatMode ? (
+              /* Chat Interface */
+              <div className="flex flex-col h-[calc(100vh-280px)]">
+                {/* Chat Messages Area */}
+                <div className="flex-1 bg-white rounded-lg border border-gray-200 overflow-y-auto p-6 space-y-4 mb-4">
+                  {chatMessages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-gray-400">
+                      <div className="text-center">
+                        <MessageSquare className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                        <p className="text-lg font-medium">Start a conversation</p>
+                        <p className="text-sm mt-1">Ask questions about your knowledge base documents</p>
+                      </div>
+                    </div>
+                  ) : (
+                    chatMessages.map((message, index) => (
+                      <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {message.role === 'assistant' && (
+                          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                            <MessageSquare className="h-4 w-4 text-green-600" />
+                          </div>
+                        )}
+                        <div className={`max-w-3xl px-4 py-3 rounded-2xl ${
+                          message.role === 'user' 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-gray-100 text-gray-900'
+                        }`}>
+                          <p className="text-sm leading-relaxed">{message.content}</p>
+                        </div>
+                        {message.role === 'user' && (
+                          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                            <span className="text-white text-xs font-medium">U</span>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Input Area */}
+                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="flex items-center gap-3">
+                    <Select value={selectedModel} onValueChange={setSelectedModel}>
+                      <SelectTrigger className="w-40 bg-white border-gray-300">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        <SelectItem value="GPT-4o">GPT-4o</SelectItem>
+                        <SelectItem value="GPT-4">GPT-4</SelectItem>
+                        <SelectItem value="GPT-3.5">GPT-3.5</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className="flex-1 relative">
+                      <Textarea 
+                        placeholder="Ask a question about your documents..."
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                        className="bg-white border-gray-300 resize-none min-h-[44px] max-h-[120px] pr-12"
+                        rows={1}
+                      />
+                      <Button 
+                        size="icon"
+                        onClick={handleSendMessage}
+                        disabled={!chatInput.trim()}
+                        className="absolute right-2 bottom-2 h-8 w-8 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+                      >
+                        <Send className="h-4 w-4 text-white" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : isViewingGuidelines ? (
               /* Guidelines View */
               <>
                 {/* Knowledge Base Info */}
@@ -960,6 +1065,11 @@ const KnowledgeBase = () => {
                                   variant="ghost" 
                                   size="icon" 
                                   className="h-9 w-9 hover:bg-teal-100 transition-colors"
+                                  onClick={() => {
+                                    setSelectedKBForChat({ id: kb.id, name: kb.name, bookName: kb.bookName });
+                                    setIsChatMode(true);
+                                    setChatMessages([]);
+                                  }}
                                 >
                                   <MessageSquare className="h-4 w-4 text-teal-600" />
                                 </Button>
