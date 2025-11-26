@@ -322,10 +322,10 @@ const KnowledgeBase = () => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help hover:text-orange-700 transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>Retrieval Strategy decides how search results are ranked and selected</p>
+                              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-700 px-4 py-3 rounded-lg shadow-lg">
+                                <p className="text-sm leading-relaxed">Retrieval Strategy decides how search results are ranked and selected</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -347,10 +347,10 @@ const KnowledgeBase = () => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help hover:text-orange-700 transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>Defines how many of the initially retrieved results are considered during reranking. Smaller k is faster but may miss relevant documents, larger k is more thorough but slower.</p>
+                              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-700 px-4 py-3 rounded-lg shadow-lg">
+                                <p className="text-sm leading-relaxed">Defines how many of the initially retrieved results are considered during reranking. Smaller k is faster but may miss relevant documents, larger k is more thorough but slower.</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -368,10 +368,10 @@ const KnowledgeBase = () => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help hover:text-orange-700 transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>Defines how large each text segment is when splitting documents for retrieval. Smaller chunks give more precise matches but less context, larger chunks preserve more context but may include irrelevant material.</p>
+                              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-700 px-4 py-3 rounded-lg shadow-lg">
+                                <p className="text-sm leading-relaxed">Defines how large each text segment is when splitting documents for retrieval. Smaller chunks give more precise matches but less context, larger chunks preserve more context but may include irrelevant material.</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -394,10 +394,10 @@ const KnowledgeBase = () => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help hover:text-orange-700 transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>Defines how much consecutive text chunks overlap when splitting documents. Higher overlap preserves more context across chunks but increases redundancy and processing cost.</p>
+                              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-700 px-4 py-3 rounded-lg shadow-lg">
+                                <p className="text-sm leading-relaxed">Defines how much consecutive text chunks overlap when splitting documents. Higher overlap preserves more context across chunks but increases redundancy and processing cost.</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -420,10 +420,10 @@ const KnowledgeBase = () => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help hover:text-orange-700 transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>Controls how documents are split into smaller parts for retrieval. Affects accuracy, context, and speed.</p>
+                              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-700 px-4 py-3 rounded-lg shadow-lg">
+                                <p className="text-sm leading-relaxed">Controls how documents are split into smaller parts for retrieval. Affects accuracy, context, and speed.</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -445,10 +445,10 @@ const KnowledgeBase = () => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help hover:text-orange-700 transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>Defines how data is stored for retrieval, impacting speed, scalability, and accuracy.</p>
+                              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-700 px-4 py-3 rounded-lg shadow-lg">
+                                <p className="text-sm leading-relaxed">Defines how data is stored for retrieval, impacting speed, scalability, and accuracy.</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -470,10 +470,10 @@ const KnowledgeBase = () => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help" />
+                                <HelpCircle className="h-4 w-4 text-orange-600 cursor-help hover:text-orange-700 transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>Converts text into vectors for similarity search</p>
+                              <TooltipContent className="max-w-xs bg-gray-800 text-white border-gray-700 px-4 py-3 rounded-lg shadow-lg">
+                                <p className="text-sm leading-relaxed">Converts text into vectors for similarity search</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
