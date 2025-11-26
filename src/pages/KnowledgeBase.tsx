@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen, Plus, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AppSidebar } from "@/components/AppSidebar";
 
 const knowledgeBases = [
   { id: 1, name: "agex", bookName: "agex", type: "Book Level" },
@@ -24,23 +26,44 @@ const KnowledgeBase = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Mobile Navigation Menu */}
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="fixed top-4 left-4 z-[60] lg:hidden bg-white border border-gray-200 shadow-sm hover:bg-gray-50"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0 w-64 z-[70]">
+          <AppSidebar onNavigate={() => {}} />
+        </SheetContent>
+      </Sheet>
+
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 lg:gap-3 pl-12 lg:pl-0">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">Knowledge Base System</h1>
-              <p className="text-xs text-gray-500">Manage and organize your knowledge repositories</p>
+              <h1 className="text-base lg:text-lg font-semibold text-gray-900">Knowledge Base System</h1>
+              <p className="text-xs text-gray-500 hidden sm:block">Manage and organize your knowledge repositories</p>
             </div>
           </div>
           
-          <Link to="/dashboard">
+          <Link to="/dashboard" className="hidden sm:block">
             <Button variant="ghost" size="sm" className="text-gray-600">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
+            </Button>
+          </Link>
+          <Link to="/dashboard" className="sm:hidden">
+            <Button variant="ghost" size="icon" className="text-gray-600">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
         </div>
