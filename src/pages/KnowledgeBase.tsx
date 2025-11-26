@@ -108,83 +108,140 @@ const KnowledgeBase = () => {
           <div className="max-w-7xl mx-auto space-y-6">
             {isCreating ? (
               /* Create Form */
-              <Card>
-                <CardContent className="p-6 space-y-6">
-                  {/* Level Type Toggle */}
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant={levelType === "book" ? "default" : "outline"}
-                      onClick={() => setLevelType("book")}
-                      className={levelType === "book" ? "bg-yellow-500 hover:bg-yellow-600 text-white" : ""}
-                    >
-                      Book Level
-                    </Button>
-                    <Button
-                      variant={levelType === "study" ? "default" : "outline"}
-                      onClick={() => setLevelType("study")}
-                      className={levelType === "study" ? "bg-yellow-500 hover:bg-yellow-600 text-white" : ""}
-                    >
-                      Study Level
-                    </Button>
-                  </div>
-
-                  {/* Basic Info */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">
-                        Book Name <span className="text-red-500">*</span>
-                      </label>
-                      <Input placeholder="Enter Book name" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">
-                        Knowledge Base Name <span className="text-red-500">*</span>
-                      </label>
-                      <Input placeholder="Enter knowledge base name" />
-                    </div>
-                  </div>
-
-                  {/* Upload Sections */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">
-                        Document Upload <span className="text-red-500">*</span>
-                      </label>
-                      <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-2">
-                        <FileText className="h-12 w-12 mx-auto text-yellow-500" />
-                        <p className="font-medium">Drag files here or click to select files</p>
-                        <p className="text-sm text-muted-foreground">
-                          Upload PDF, DOCX, TXT, HTML, CSV, or JSON files up to 30 MB.
-                        </p>
+              <>
+                {/* Level Type Selection Card */}
+                <Card className="border-2 border-purple-100 bg-purple-50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-600 text-white rounded-lg">
+                          <BookOpen className="h-5 w-5" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-purple-800">Select Knowledge Base Type</h3>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={levelType === "book" ? "default" : "outline"}
+                          onClick={() => setLevelType("book")}
+                          className={levelType === "book" ? "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600" : "border-purple-200"}
+                        >
+                          Book Level
+                        </Button>
+                        <Button
+                          variant={levelType === "study" ? "default" : "outline"}
+                          onClick={() => setLevelType("study")}
+                          className={levelType === "study" ? "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600" : "border-purple-200"}
+                        >
+                          Study Level
+                        </Button>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Cover Image Upload</label>
-                      <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-2">
-                        <FileText className="h-12 w-12 mx-auto text-yellow-500" />
-                        <p className="font-medium">Drag images here or click to select images</p>
-                        <p className="text-sm text-muted-foreground">
-                          You can upload one image (PNG, JPEG, GIF, WEBP) up to 10 MB.
-                        </p>
+                  </CardContent>
+                </Card>
+
+                {/* Basic Information Card */}
+                <Card className="border-2 border-blue-100 bg-blue-50">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-blue-600 text-white rounded-lg">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-blue-800">Basic Information</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-blue-900">
+                          Book Name <span className="text-red-500">*</span>
+                        </label>
+                        <Input 
+                          placeholder="Enter Book name" 
+                          className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-blue-900">
+                          Knowledge Base Name <span className="text-red-500">*</span>
+                        </label>
+                        <Input 
+                          placeholder="Enter knowledge base name" 
+                          className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                        />
                       </div>
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  {/* Processing Settings */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Processing Settings</h3>
+                {/* Upload Section Card */}
+                <Card className="border-2 border-teal-100 bg-teal-50">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-teal-600 text-white rounded-lg">
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-teal-800">File Uploads</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-teal-900">
+                          Document Upload <span className="text-red-500">*</span>
+                        </label>
+                        <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
+                          <div className="flex justify-center">
+                            <div className="p-3 bg-teal-100 rounded-lg">
+                              <FileText className="h-8 w-8 text-teal-600" />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">Drag files here or click to select files</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Upload PDF, DOCX, TXT, HTML, CSV, or JSON files up to 30 MB.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-teal-900">Cover Image Upload</label>
+                        <div className="bg-white border-2 border-dashed border-teal-200 rounded-lg p-8 text-center space-y-3 hover:border-teal-300 transition-colors">
+                          <div className="flex justify-center">
+                            <div className="p-3 bg-teal-100 rounded-lg">
+                              <FileText className="h-8 w-8 text-teal-600" />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">Drag images here or click to select images</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              You can upload one image (PNG, JPEG, GIF, WEBP) up to 10 MB.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Processing Settings Card */}
+                <Card className="border-2 border-orange-100 bg-orange-50">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-orange-600 text-white rounded-lg">
+                        <Search className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-orange-800">Processing Settings</h3>
+                    </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
+                        <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Retrieval Strategy
-                          <span className="text-blue-500">ⓘ</span>
+                          <span className="text-orange-600 text-xs">ⓘ</span>
                         </label>
                         <Select defaultValue="mmr">
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="mmr">Maximal Marginal Relevance (MMR)</SelectItem>
                             <SelectItem value="similarity">Similarity</SelectItem>
                           </SelectContent>
@@ -192,23 +249,27 @@ const KnowledgeBase = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
+                        <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Number of Reranking Candidates (k)
-                          <span className="text-blue-500">ⓘ</span>
+                          <span className="text-orange-600 text-xs">ⓘ</span>
                         </label>
-                        <Input type="number" defaultValue="10" />
+                        <Input 
+                          type="number" 
+                          defaultValue="10" 
+                          className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20"
+                        />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
+                        <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Chunk Size
-                          <span className="text-blue-500">ⓘ</span>
+                          <span className="text-orange-600 text-xs">ⓘ</span>
                         </label>
                         <Select defaultValue="1000">
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="500">500 tokens (Smaller chunks)</SelectItem>
                             <SelectItem value="1000">1000 tokens (Larger chunks, more context)</SelectItem>
                             <SelectItem value="1500">1500 tokens (Maximum context)</SelectItem>
@@ -217,15 +278,15 @@ const KnowledgeBase = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
+                        <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Overlap Percentage
-                          <span className="text-blue-500">ⓘ</span>
+                          <span className="text-orange-600 text-xs">ⓘ</span>
                         </label>
                         <Select defaultValue="20">
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="10">10% (Less overlap)</SelectItem>
                             <SelectItem value="20">20% (More context between chunks)</SelectItem>
                             <SelectItem value="30">30% (Maximum overlap)</SelectItem>
@@ -234,15 +295,15 @@ const KnowledgeBase = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
+                        <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Chunking Strategy
-                          <span className="text-blue-500">ⓘ</span>
+                          <span className="text-orange-600 text-xs">ⓘ</span>
                         </label>
                         <Select defaultValue="recursive">
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="recursive">Recursive Character</SelectItem>
                             <SelectItem value="sentence">Sentence-based</SelectItem>
                           </SelectContent>
@@ -250,15 +311,15 @@ const KnowledgeBase = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
+                        <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Database Type
-                          <span className="text-blue-500">ⓘ</span>
+                          <span className="text-orange-600 text-xs">ⓘ</span>
                         </label>
                         <Select defaultValue="faiss">
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="faiss">Faiss</SelectItem>
                             <SelectItem value="chroma">Chroma</SelectItem>
                           </SelectContent>
@@ -266,34 +327,42 @@ const KnowledgeBase = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
+                        <label className="text-sm font-medium text-orange-900 flex items-center gap-1">
                           Embedding Model
-                          <span className="text-blue-500">ⓘ</span>
+                          <span className="text-orange-600 text-xs">ⓘ</span>
                         </label>
                         <Select defaultValue="openai">
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white border-orange-200 focus:border-orange-400 focus:ring-orange-400/20">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white">
                             <SelectItem value="openai">OpenAI</SelectItem>
                             <SelectItem value="huggingface">HuggingFace</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  {/* Action Buttons */}
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button variant="outline" onClick={() => setIsCreating(false)}>
-                      Cancel
-                    </Button>
-                    <Button className="bg-primary hover:bg-primary/90">
-                      Create Knowledge Base
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* Action Buttons Card */}
+                <Card className="border-2 border-gray-200 bg-white">
+                  <CardContent className="p-6">
+                    <div className="flex justify-end gap-3">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsCreating(false)}
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                      >
+                        Cancel
+                      </Button>
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                        Create Knowledge Base
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
             ) : (
               <>
                 {/* Existing List View */}
