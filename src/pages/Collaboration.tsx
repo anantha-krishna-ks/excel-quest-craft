@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Edit, Trash2, CreditCard, Menu, Plus, Users as UsersIcon, X } from "lucide-react";
+import { Search, Edit, Trash2, Package, Menu, Plus, Users as UsersIcon, X } from "lucide-react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 
@@ -382,7 +382,7 @@ const Collaboration = () => {
                                 setSubscriptionDialogOpen(true);
                               }}
                             >
-                              <CreditCard className="h-4 w-4" />
+                              <Package className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
