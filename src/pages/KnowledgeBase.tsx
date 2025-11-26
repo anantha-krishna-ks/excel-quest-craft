@@ -9,7 +9,8 @@ import { Search, FileText, Edit, Eye, MessageSquare, Trash2, ArrowLeft, BookOpen
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Link } from "react-router-dom";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 
@@ -19,6 +20,7 @@ const knowledgeBases = [
 ];
 
 const KnowledgeBase = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("ACCA");
   const [typeFilter, setTypeFilter] = useState("All");
@@ -36,6 +38,8 @@ const KnowledgeBase = () => {
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const [chatInput, setChatInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4o");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [kbToDelete, setKbToDelete] = useState<{ id: number; name: string; bookName: string } | null>(null);
 
   const handleRefreshGuidelines = async () => {
     setIsRefreshing(true);
@@ -1063,6 +1067,7 @@ const KnowledgeBase = () => {
                                   variant="ghost" 
                                   size="icon" 
                                   className="h-9 w-9 hover:bg-blue-100 transition-colors"
+                                  onClick={() => navigate(`/knowledge-base/edit/${kb.id}`)}
                                 >
                                   <Edit className="h-4 w-4 text-blue-600" />
                                 </Button>
@@ -1093,6 +1098,10 @@ const KnowledgeBase = () => {
                                   variant="ghost" 
                                   size="icon" 
                                   className="h-9 w-9 hover:bg-red-100 transition-colors"
+                                  onClick={() => {
+                                    setKbToDelete({ id: kb.id, name: kb.name, bookName: kb.bookName });
+                                    setDeleteDialogOpen(true);
+                                  }}
                                 >
                                   <Trash2 className="h-4 w-4 text-red-600" />
                                 </Button>
@@ -1112,6 +1121,50 @@ const KnowledgeBase = () => {
           </div>
         </main>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-semibold text-gray-900">Delete Knowledge Base</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-600 space-y-3">
+              <p>Are you sure you want to delete this knowledge base? This action cannot be undone.</p>
+              {kbToDelete && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900">Knowledge Base:</span>
+                    <span className="text-gray-700">{kbToDelete.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900">Book Name:</span>
+                    <span className="text-gray-700">{kbToDelete.bookName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-900">ID:</span>
+                    <span className="text-gray-700">{kbToDelete.id}</span>
+                  </div>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-gray-300 text-gray-700 hover:bg-gray-50">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => {
+                // TODO: Implement delete functionality
+                console.log('Deleting knowledge base:', kbToDelete);
+                setDeleteDialogOpen(false);
+                setKbToDelete(null);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
