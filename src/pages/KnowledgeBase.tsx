@@ -214,10 +214,10 @@ const KnowledgeBase = () => {
                 </div>
 
                 {/* Input Area - Fixed at bottom */}
-                <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                  <div className="flex items-end gap-3">
+                <div className="bg-white rounded-2xl border border-gray-200 p-3">
+                  <div className="flex items-center gap-3">
                     <Select value={selectedModel} onValueChange={setSelectedModel}>
-                      <SelectTrigger className="w-36 bg-white border-gray-300 flex-shrink-0">
+                      <SelectTrigger className="w-40 bg-white border-none focus:ring-0 flex-shrink-0 h-10">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
@@ -229,7 +229,7 @@ const KnowledgeBase = () => {
                     
                     <div className="flex-1 relative">
                       <Textarea 
-                        placeholder="Ask a question about your documents..."
+                        placeholder="Message AI..."
                         value={chatInput}
                         onChange={handleTextareaChange}
                         onKeyDown={(e) => {
@@ -238,7 +238,7 @@ const KnowledgeBase = () => {
                             handleSendMessage();
                           }
                         }}
-                        className="bg-white border-gray-300 resize-none min-h-[52px] max-h-[200px] pr-14 py-3 overflow-y-auto"
+                        className="bg-white border-none focus:ring-0 resize-none min-h-[40px] max-h-[200px] pr-12 py-2 overflow-y-auto placeholder:text-gray-400"
                         rows={1}
                         style={{ height: 'auto' }}
                       />
@@ -246,7 +246,7 @@ const KnowledgeBase = () => {
                         size="icon"
                         onClick={handleSendMessage}
                         disabled={!chatInput.trim()}
-                        className="absolute right-2 bottom-2 h-9 w-9 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+                        className="absolute right-1 bottom-1 h-8 w-8 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
                       >
                         <Send className="h-4 w-4 text-white" />
                       </Button>
