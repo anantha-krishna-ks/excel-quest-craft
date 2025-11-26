@@ -145,7 +145,7 @@ const Collaboration = () => {
               </div>
               <div className="flex flex-col">
                 <h2 className="text-base sm:text-lg font-semibold text-gray-900">
-                  User Management
+                  Collaboration
                 </h2>
               </div>
             </div>
