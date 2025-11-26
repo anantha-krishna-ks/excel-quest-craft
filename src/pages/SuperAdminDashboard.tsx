@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, CheckCircle, XCircle } from "lucide-react";
+import { Menu, CheckCircle, XCircle, FileSearch, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -184,40 +184,45 @@ const SuperAdminDashboard = () => {
 
           {/* Error State */}
           {showError && (
-            <div className="bg-white rounded-lg shadow-sm p-12 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-sm p-12 flex items-center justify-center animate-fade-in">
               <div className="text-center max-w-md">
-                <div className="mx-auto w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6">
-                  <svg
-                    className="w-12 h-12 text-red-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                <div className="relative mx-auto w-32 h-32 mb-6">
+                  {/* Animated background circles */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-red-100 rounded-full animate-pulse opacity-50"></div>
+                  <div className="absolute inset-2 bg-white rounded-full"></div>
+                  
+                  {/* Icon container */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative">
+                      <FileSearch className="w-16 h-16 text-orange-500 animate-scale-in" strokeWidth={1.5} />
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
+                        <AlertCircle className="w-6 h-6 text-red-500" fill="currentColor" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
                   No Subscription Details Found
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  We couldn't find any subscription details for the selected criteria. Please try selecting a different organization or date range.
+                <p className="text-gray-600 mb-8 leading-relaxed">
+                  We couldn't find any subscription details for the selected criteria. Please try selecting a different organization or adjusting your date range.
                 </p>
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                  <span>Tip: Make sure to select an organization from the dropdown</span>
+                
+                <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4">
+                  <div className="flex items-start gap-3 text-left">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">!</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-orange-900 mb-1">Quick Tip</p>
+                      <p className="text-sm text-orange-700">
+                        Make sure to select an organization from the dropdown menu and verify the date range covers the period you're looking for.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
