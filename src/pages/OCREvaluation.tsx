@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2 } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -10,9 +10,51 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 interface CandidateData {
   id: string
   candidateName: string
+  registrationName: string
+  centreName: string
+  centreAddress: string
   phase1: "completed" | "in-progress" | "pending" | "error"
   phase2: "completed" | "in-progress" | "pending" | "error"
   phase3: "completed" | "in-progress" | "pending" | "error"
+}
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const config = {
+    completed: {
+      icon: CheckCircle,
+      label: "Completed",
+      className: "bg-emerald-50 text-emerald-700 border-emerald-200"
+    },
+    "in-progress": {
+      icon: Loader2,
+      label: "In Progress",
+      className: "bg-blue-50 text-blue-700 border-blue-200",
+      animate: true
+    },
+    pending: {
+      icon: Clock,
+      label: "Pending",
+      className: "bg-amber-50 text-amber-700 border-amber-200"
+    },
+    error: {
+      icon: AlertCircle,
+      label: "Error",
+      className: "bg-red-50 text-red-700 border-red-200"
+    }
+  }[status] || {
+    icon: Clock,
+    label: "Unknown",
+    className: "bg-gray-50 text-gray-500 border-gray-200"
+  }
+
+  const Icon = config.icon
+
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${config.className}`}>
+      <Icon className={`w-3.5 h-3.5 ${config.animate ? 'animate-spin' : ''}`} />
+      {config.label}
+    </div>
+  )
 }
 
 const OCREvaluation = () => {
@@ -21,6 +63,7 @@ const OCREvaluation = () => {
   const [folderName, setFolderName] = useState("")
   const [candidates, setCandidates] = useState<CandidateData[]>([])
   const [previewCandidate, setPreviewCandidate] = useState<CandidateData | null>(null)
+  const [detailCandidate, setDetailCandidate] = useState<CandidateData | null>(null)
 
   const handleFolderUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -45,10 +88,22 @@ const OCREvaluation = () => {
       })
 
       // If no valid names extracted, generate mock data
+      const centres = ["Delhi Centre", "Mumbai Centre", "Bangalore Centre", "Chennai Centre", "Kolkata Centre"]
+      const addresses = [
+        "123, Connaught Place, New Delhi - 110001",
+        "456, Bandra West, Mumbai - 400050",
+        "789, MG Road, Bangalore - 560001",
+        "321, Anna Nagar, Chennai - 600040",
+        "654, Park Street, Kolkata - 700016"
+      ]
+      
       const mockCandidates: CandidateData[] = candidateNames.size > 0 
         ? Array.from(candidateNames).slice(0, 125).map((name, index) => ({
             id: `candidate-${index + 1}`,
             candidateName: name,
+            registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+            centreName: centres[index % centres.length],
+            centreAddress: addresses[index % addresses.length],
             phase1: getRandomStatus(),
             phase2: getRandomStatus(),
             phase3: getRandomStatus(),
@@ -56,6 +111,9 @@ const OCREvaluation = () => {
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
             id: `candidate-${index + 1}`,
             candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
+            registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+            centreName: centres[index % centres.length],
+            centreAddress: addresses[index % addresses.length],
             phase1: getRandomStatus(),
             phase2: getRandomStatus(),
             phase3: getRandomStatus(),
@@ -87,35 +145,6 @@ const OCREvaluation = () => {
     toast.info("Ready to upload a new folder")
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="w-5 h-5 text-green-600" />
-      case "in-progress":
-        return <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-      case "pending":
-        return <Clock className="w-5 h-5 text-amber-500" />
-      case "error":
-        return <AlertCircle className="w-5 h-5 text-red-500" />
-      default:
-        return <Clock className="w-5 h-5 text-gray-400" />
-    }
-  }
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <span className="text-green-600 font-medium">Completed</span>
-      case "in-progress":
-        return <span className="text-blue-600 font-medium">In Progress</span>
-      case "pending":
-        return <span className="text-amber-500 font-medium">Pending</span>
-      case "error":
-        return <span className="text-red-500 font-medium">Error</span>
-      default:
-        return <span className="text-gray-400">Unknown</span>
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -238,6 +267,7 @@ const OCREvaluation = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
+                        <TableHead className="font-semibold text-slate-700 py-4 w-16">Sl. No</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-4">Candidate Name</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-4 text-center">Phase 1</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-4 text-center">Phase 2</TableHead>
@@ -246,31 +276,30 @@ const OCREvaluation = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {candidates.map((candidate) => (
+                      {candidates.map((candidate, index) => (
                         <TableRow 
                           key={candidate.id} 
                           className="border-b border-slate-100 last:border-b-0"
                         >
-                          <TableCell className="font-medium text-slate-900 py-4">
-                            {candidate.candidateName}
+                          <TableCell className="text-slate-600 py-4">
+                            {index + 1}
                           </TableCell>
                           <TableCell className="py-4">
-                            <div className="flex items-center justify-center gap-2">
-                              {getStatusIcon(candidate.phase1)}
-                              {getStatusLabel(candidate.phase1)}
-                            </div>
+                            <button
+                              onClick={() => setDetailCandidate(candidate)}
+                              className="font-medium text-teal-700 hover:text-teal-800 hover:underline cursor-pointer text-left"
+                            >
+                              {candidate.candidateName}
+                            </button>
                           </TableCell>
-                          <TableCell className="py-4">
-                            <div className="flex items-center justify-center gap-2">
-                              {getStatusIcon(candidate.phase2)}
-                              {getStatusLabel(candidate.phase2)}
-                            </div>
+                          <TableCell className="py-4 text-center">
+                            <StatusBadge status={candidate.phase1} />
                           </TableCell>
-                          <TableCell className="py-4">
-                            <div className="flex items-center justify-center gap-2">
-                              {getStatusIcon(candidate.phase3)}
-                              {getStatusLabel(candidate.phase3)}
-                            </div>
+                          <TableCell className="py-4 text-center">
+                            <StatusBadge status={candidate.phase2} />
+                          </TableCell>
+                          <TableCell className="py-4 text-center">
+                            <StatusBadge status={candidate.phase3} />
                           </TableCell>
                           <TableCell className="py-4 text-center">
                             <Button
@@ -309,24 +338,15 @@ const OCREvaluation = () => {
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg border border-slate-200 bg-slate-50">
                   <p className="text-sm text-gray-500 mb-2">Phase 1</p>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(previewCandidate.phase1)}
-                    {getStatusLabel(previewCandidate.phase1)}
-                  </div>
+                  <StatusBadge status={previewCandidate.phase1} />
                 </div>
                 <div className="p-4 rounded-lg border border-slate-200 bg-slate-50">
                   <p className="text-sm text-gray-500 mb-2">Phase 2</p>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(previewCandidate.phase2)}
-                    {getStatusLabel(previewCandidate.phase2)}
-                  </div>
+                  <StatusBadge status={previewCandidate.phase2} />
                 </div>
                 <div className="p-4 rounded-lg border border-slate-200 bg-slate-50">
                   <p className="text-sm text-gray-500 mb-2">Phase 3</p>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(previewCandidate.phase3)}
-                    {getStatusLabel(previewCandidate.phase3)}
-                  </div>
+                  <StatusBadge status={previewCandidate.phase3} />
                 </div>
               </div>
               
@@ -335,6 +355,56 @@ const OCREvaluation = () => {
                 <p className="text-sm text-gray-700">
                   Detailed OCR analysis and accuracy metrics for this candidate will be displayed here once processing is complete.
                 </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Candidate Detail Dialog */}
+      <Dialog open={!!detailCandidate} onOpenChange={() => setDetailCandidate(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-teal-700">
+              <User className="w-5 h-5" />
+              Candidate Details
+            </DialogTitle>
+          </DialogHeader>
+          
+          {detailCandidate && (
+            <div className="space-y-4 py-2">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                  <User className="w-5 h-5 text-teal-600 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">Name</p>
+                    <p className="font-medium text-gray-900">{detailCandidate.candidateName}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                  <FileText className="w-5 h-5 text-teal-600 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">Registration Name</p>
+                    <p className="font-medium text-gray-900">{detailCandidate.registrationName}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                  <Building className="w-5 h-5 text-teal-600 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">Centre Name</p>
+                    <p className="font-medium text-gray-900">{detailCandidate.centreName}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                  <MapPin className="w-5 h-5 text-teal-600 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">Centre Address</p>
+                    <p className="font-medium text-gray-900">{detailCandidate.centreAddress}</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
