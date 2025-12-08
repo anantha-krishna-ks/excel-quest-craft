@@ -22,6 +22,7 @@ import comingSoonImage from "@/assets/coming-soon.png"
 import speechEvaluationImage from "@/assets/speech-evaluation-hero.jpg"
 import essayEvaluationImage from "@/assets/essay-evaluation-hero.jpg"
 import essayEvaluationZeroShotImage from "@/assets/essay-evaluation-zero-shot.jpg"
+import ocrEvaluationImage from "@/assets/ocr-evaluation.png"
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -177,6 +178,18 @@ const Dashboard = () => {
       path: "/ocr",
       image: ocrImage,
       category: "AI Tools",
+      badge: "New",
+      badgeColor: "bg-blue-500",
+      icon: ScanLine,
+      subscriptionStatus: "active"
+    },
+    {
+      id: "ocr-evaluation",
+      title: "OCR Evaluation",
+      description: "AI-powered OCR evaluation tool that analyzes and scores text extraction accuracy from documents and images.",
+      path: "/ocr-evaluation",
+      image: ocrEvaluationImage,
+      category: "Assessment",
       badge: "New",
       badgeColor: "bg-blue-500",
       icon: ScanLine,
