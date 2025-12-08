@@ -31,6 +31,7 @@ import KnowledgeBase from "./pages/KnowledgeBase";
 import EditKnowledgeBase from "./pages/EditKnowledgeBase";
 import Collaboration from "./pages/Collaboration";
 import NotFound from "./pages/NotFound";
+import OCREvaluation from "./pages/OCREvaluation";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
         <Route path="/knowledge-base/edit/:id" element={<EditKnowledgeBase />} />
           <Route path="/collaboration" element={<Collaboration />} />
           <Route path="/doc-chat-ncert" element={<DocChatNCERT />} />
+          <Route path="/ocr-evaluation" element={<OCREvaluation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
