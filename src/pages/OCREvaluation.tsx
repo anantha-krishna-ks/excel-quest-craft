@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -21,6 +21,16 @@ interface SegmentImage {
   label: string
 }
 
+interface EvaluationData {
+  questionTitle: string
+  maxScore: number
+  extractedInfo: string
+  keypoints: string[]
+  evaluationScore: number
+  missing: string[]
+  rational: string
+}
+
 interface CandidateData {
   id: string
   candidateName: string
@@ -34,6 +44,7 @@ interface CandidateData {
   ocrData?: string
   answerSheets?: AnswerSheetPage[]
   segmentImages?: SegmentImage[]
+  evaluationData?: EvaluationData
 }
 
 const StatusBadge = ({ 
@@ -110,6 +121,28 @@ const OCREvaluation = () => {
   const [fromPageInput, setFromPageInput] = useState("")
   const [toPageInput, setToPageInput] = useState("")
   const [answerSheets, setAnswerSheets] = useState<AnswerSheetPage[]>([])
+  const [evaluationReviewCandidate, setEvaluationReviewCandidate] = useState<CandidateData | null>(null)
+
+  // Mock evaluation data
+  const generateMockEvaluationData = (): EvaluationData => ({
+    questionTitle: "Explain the process of photosynthesis in plants and describe the role of chlorophyll in this process.",
+    maxScore: 10,
+    extractedInfo: "The student has explained that photosynthesis is a process where plants convert carbon dioxide and water into glucose and oxygen using sunlight. The answer mentions that this process takes place in the leaves and involves the green pigment called chlorophyll which captures light energy.",
+    keypoints: [
+      "Definition of photosynthesis correctly stated",
+      "Reactants (CO₂ and H₂O) and products (glucose and O₂) identified",
+      "Role of sunlight as energy source mentioned",
+      "Chlorophyll identified as the light-absorbing pigment",
+      "Location of photosynthesis in chloroplasts mentioned"
+    ],
+    evaluationScore: 7,
+    missing: [
+      "Light-dependent and light-independent reactions not explained",
+      "Chemical equation not provided",
+      "Stomata's role in gas exchange not mentioned"
+    ],
+    rational: "The student demonstrates a good foundational understanding of photosynthesis. The answer correctly identifies the basic components and process of photosynthesis. However, the response lacks depth in explaining the detailed mechanisms such as the two stages of photosynthesis (light-dependent and light-independent reactions). The role of chlorophyll is mentioned but could be elaborated further to include how it absorbs specific wavelengths of light. Overall, a competent answer that meets most basic requirements but misses some advanced concepts expected at this level."
+  })
 
   // Mock answer sheet images
   const generateMockAnswerSheets = (): AnswerSheetPage[] => {
@@ -169,6 +202,7 @@ const OCREvaluation = () => {
             segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
             segmentImages: generateMockSegmentImages(),
+            evaluationData: generateMockEvaluationData(),
           }))
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
             id: `candidate-${index + 1}`,
@@ -182,6 +216,7 @@ const OCREvaluation = () => {
             segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
             segmentImages: generateMockSegmentImages(),
+            evaluationData: generateMockEvaluationData(),
           }))
 
       setCandidates(mockCandidates)
@@ -506,7 +541,11 @@ const OCREvaluation = () => {
                             />
                           </TableCell>
                           <TableCell className="py-4 text-center">
-                            <StatusBadge status={candidate.phase3} />
+                            <StatusBadge 
+                              status={candidate.phase3}
+                              clickable={candidate.phase3 === "completed"}
+                              onClick={() => setEvaluationReviewCandidate(candidate)}
+                            />
                           </TableCell>
                           <TableCell className="py-4 text-center">
                             <Button
@@ -883,6 +922,163 @@ const OCREvaluation = () => {
                 </div>
               </ScrollArea>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* Evaluation Review Dialog */}
+      <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => setEvaluationReviewCandidate(null)}>
+        <DialogContent className="max-w-5xl p-0 overflow-hidden max-h-[90vh] [&>button]:hidden">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <Award className="w-5 h-5 text-teal-600" />
+              Evaluation Review - {evaluationReviewCandidate?.candidateName}
+            </DialogTitle>
+            <button 
+              onClick={() => setEvaluationReviewCandidate(null)}
+              className="p-1.5 rounded-md hover:bg-slate-100 transition-colors"
+            >
+              <X className="w-5 h-5 text-slate-500" />
+            </button>
+          </div>
+          
+          {evaluationReviewCandidate && (
+            <ScrollArea className="max-h-[calc(90vh-70px)]">
+              <div className="p-6 space-y-6">
+                {(() => {
+                  const evalData = evaluationReviewCandidate.evaluationData || generateMockEvaluationData()
+                  return (
+                    <>
+                      {/* Question Title & Max Score Header */}
+                      <div className="flex items-start justify-between gap-6 p-5 rounded-xl bg-gradient-to-r from-teal-50 to-slate-50 border border-teal-100">
+                        <div className="flex items-start gap-4 flex-1">
+                          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
+                            <span className="text-sm font-bold">Q</span>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs font-medium text-teal-600 uppercase tracking-wide">Question</p>
+                            <p className="text-base text-slate-800 leading-relaxed font-medium">
+                              {evalData.questionTitle}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Max Score</p>
+                          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200">
+                            <Target className="w-4 h-4 text-teal-600" />
+                            <span className="text-2xl font-bold text-teal-700">{evalData.maxScore}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Two Column Layout */}
+                      <div className="grid grid-cols-2 gap-6">
+                        {/* Left Column */}
+                        <div className="space-y-5">
+                          {/* Extracted Info */}
+                          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                            <div className="px-4 py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-indigo-600" />
+                              <h3 className="text-sm font-semibold text-slate-800">Extracted Info</h3>
+                            </div>
+                            <div className="p-4">
+                              <p className="text-sm text-slate-600 leading-relaxed">
+                                {evalData.extractedInfo}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Keypoints */}
+                          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                            <div className="px-4 py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-2">
+                              <ListChecks className="w-4 h-4 text-emerald-600" />
+                              <h3 className="text-sm font-semibold text-slate-800">Keypoints</h3>
+                            </div>
+                            <div className="p-4">
+                              <ul className="space-y-2">
+                                {evalData.keypoints.map((point, index) => (
+                                  <li key={index} className="flex items-start gap-3 text-sm text-slate-600">
+                                    <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                    <span>{point}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+
+                          {/* Evaluation Score */}
+                          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                            <div className="px-4 py-3 bg-teal-50 border-b border-slate-200 flex items-center gap-2">
+                              <Award className="w-4 h-4 text-teal-600" />
+                              <h3 className="text-sm font-semibold text-slate-800">Evaluation Score</h3>
+                            </div>
+                            <div className="p-5 flex items-center justify-center">
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
+                                <span className="text-xl text-slate-400">/</span>
+                                <span className="text-2xl font-medium text-slate-500">{evalData.maxScore}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right Column */}
+                        <div className="space-y-5">
+                          {/* Missing */}
+                          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                            <div className="px-4 py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-2">
+                              <AlertTriangle className="w-4 h-4 text-amber-600" />
+                              <h3 className="text-sm font-semibold text-slate-800">Missing</h3>
+                            </div>
+                            <div className="p-4">
+                              <ul className="space-y-2">
+                                {evalData.missing.map((item, index) => (
+                                  <li key={index} className="flex items-start gap-3 text-sm text-slate-600">
+                                    <X className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+
+                          {/* Rational */}
+                          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                            <div className="px-4 py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-2">
+                              <MessageSquare className="w-4 h-4 text-purple-600" />
+                              <h3 className="text-sm font-semibold text-slate-800">Rational</h3>
+                            </div>
+                            <div className="p-4">
+                              <p className="text-sm text-slate-600 leading-relaxed">
+                                {evalData.rational}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Approve Button */}
+                      <div className="flex items-center justify-center pt-4 border-t border-slate-200">
+                        <Button
+                          onClick={() => {
+                            setCandidates(prev => prev.map(c => {
+                              if (c.id === evaluationReviewCandidate.id) {
+                                return { ...c, phase3: "approved" as any }
+                              }
+                              return c
+                            }))
+                            toast.success(`Evaluation approved for ${evaluationReviewCandidate.candidateName}`)
+                            setEvaluationReviewCandidate(null)
+                          }}
+                          className="px-10 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                        >
+                          Approve Evaluation
+                        </Button>
+                      </div>
+                    </>
+                  )
+                })()}
+              </div>
+            </ScrollArea>
           )}
         </DialogContent>
       </Dialog>
