@@ -11,9 +11,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface AnswerSheetPage {
-  questionNumber: number
-  fromPage: number
-  toPage: number
+  pageNumber: number
   imageUrl: string
 }
 
@@ -115,9 +113,9 @@ const OCREvaluation = () => {
   // Mock answer sheet images
   const generateMockAnswerSheets = (): AnswerSheetPage[] => {
     return [
-      { questionNumber: 1, fromPage: 1, toPage: 2, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png" },
-      { questionNumber: 2, fromPage: 3, toPage: 4, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png" },
-      { questionNumber: 3, fromPage: 5, toPage: 6, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" },
+      { pageNumber: 1, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png" },
+      { pageNumber: 2, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png" },
+      { pageNumber: 3, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" },
     ]
   }
 
@@ -246,14 +244,14 @@ const OCREvaluation = () => {
     const [removed] = newSheets.splice(fromIndex, 1)
     newSheets.splice(toPosition - 1, 0, removed)
     
-    // Update question numbers
+    // Update page numbers
     const reorderedSheets = newSheets.map((sheet, index) => ({
       ...sheet,
-      questionNumber: index + 1
+      pageNumber: index + 1
     }))
     
     setAnswerSheets(reorderedSheets)
-    toast.success(`Question moved to position ${toPosition}`)
+    toast.success(`Page moved to position ${toPosition}`)
   }
 
   const handlePhase1Approve = () => {
@@ -810,23 +808,20 @@ const OCREvaluation = () => {
                 <div className="grid grid-cols-2 gap-6">
                   {answerSheets.map((sheet, index) => (
                     <div 
-                      key={sheet.questionNumber}
-                      id={`answer-sheet-${sheet.questionNumber}`}
+                      key={sheet.pageNumber}
+                      id={`answer-sheet-${sheet.pageNumber}`}
                       className="rounded-xl border border-slate-200 bg-white overflow-hidden"
                     >
                       <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-                        <span className="text-sm font-semibold text-teal-700">
-                          Q{sheet.questionNumber}
-                        </span>
-                        <span className="text-sm text-slate-600">
-                          Page {sheet.fromPage} - {sheet.toPage}
+                        <span className="text-sm font-medium text-slate-700">
+                          Page {sheet.pageNumber}
                         </span>
                       </div>
                       <div className="p-3 bg-gray-100">
                         <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
                           <img 
                             src={sheet.imageUrl} 
-                            alt={`Answer sheet Q${sheet.questionNumber}`}
+                            alt={`Answer sheet page ${sheet.pageNumber}`}
                             className="w-full h-auto object-contain"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement
