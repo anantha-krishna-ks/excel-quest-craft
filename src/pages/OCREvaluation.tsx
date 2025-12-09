@@ -15,6 +15,12 @@ interface AnswerSheetPage {
   imageUrl: string
 }
 
+interface SegmentImage {
+  id: number
+  imageUrl: string
+  label: string
+}
+
 interface CandidateData {
   id: string
   candidateName: string
@@ -27,6 +33,7 @@ interface CandidateData {
   segmentData?: string
   ocrData?: string
   answerSheets?: AnswerSheetPage[]
+  segmentImages?: SegmentImage[]
 }
 
 const StatusBadge = ({ 
@@ -112,6 +119,15 @@ const OCREvaluation = () => {
     ]
   }
 
+  // Mock segment images (handwritten answer segments)
+  const generateMockSegmentImages = (): SegmentImage[] => {
+    return [
+      { id: 1, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png", label: "Section A - Q1-10" },
+      { id: 2, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png", label: "Section B - Q11-20" },
+      { id: 3, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png", label: "Section C - Q21-30" },
+    ]
+  }
+
   const handleFolderUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
@@ -151,6 +167,7 @@ const OCREvaluation = () => {
             phase3: getRandomStatus(),
             segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+            segmentImages: generateMockSegmentImages(),
           }))
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
             id: `candidate-${index + 1}`,
@@ -163,6 +180,7 @@ const OCREvaluation = () => {
             phase3: getRandomStatus(),
             segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+            segmentImages: generateMockSegmentImages(),
           }))
 
       setCandidates(mockCandidates)
@@ -256,6 +274,32 @@ const OCREvaluation = () => {
 
   const handleUpdate = () => {
     setIsEditing(true)
+  }
+
+  const handleSaveEdits = () => {
+    if (ocrReviewCandidate) {
+      setCandidates(prev => prev.map(c => {
+        if (c.id === ocrReviewCandidate.id) {
+          return {
+            ...c,
+            segmentData: editedSegmentData,
+            ocrData: editedOcrData
+          }
+        }
+        return c
+      }))
+      toast.success(`Changes saved for ${ocrReviewCandidate.candidateName}`)
+      setIsEditing(false)
+    }
+  }
+
+  const handleCancelEdits = () => {
+    if (ocrReviewCandidate) {
+      setEditedSegmentData(ocrReviewCandidate.segmentData || "")
+      setEditedOcrData(ocrReviewCandidate.ocrData || "")
+    }
+    setIsEditing(false)
+    toast.info("Changes discarded")
   }
 
   const handleApprove = () => {
@@ -552,8 +596,8 @@ const OCREvaluation = () => {
 
       {/* OCR Review Dialog */}
       <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); }}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden">
-          <div className="flex items-center justify-between p-6 border-b border-slate-200">
+        <DialogContent className="max-w-5xl p-0 overflow-hidden max-h-[90vh]">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
             <DialogTitle className="flex items-center gap-2 text-slate-800">
               <ScanLine className="w-5 h-5 text-teal-600" />
               OCR Review - {ocrReviewCandidate?.candidateName}
@@ -567,77 +611,126 @@ const OCREvaluation = () => {
           </div>
           
           {ocrReviewCandidate && (
-            <div className="p-6 space-y-6">
-              {/* Two Column Cards */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Segment Card */}
-                <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
-                  <div className="p-4 border-b border-slate-200 bg-white">
-                    <h3 className="text-lg font-semibold text-slate-800">Segment</h3>
+            <ScrollArea className="max-h-[calc(90vh-80px)]">
+              <div className="p-6 space-y-6">
+                {/* Two Column Cards */}
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Segment Card - with images */}
+                  <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
+                    <div className="p-4 border-b border-slate-200 bg-white">
+                      <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                        <Image className="w-4 h-4 text-indigo-600" />
+                        Segment
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1">Handwritten answer sheet segments</p>
+                    </div>
+                    <div className="p-4 space-y-4">
+                      {/* Segment Images */}
+                      <div className="space-y-3">
+                        {(ocrReviewCandidate.segmentImages || generateMockSegmentImages()).map((segment) => (
+                          <div key={segment.id} className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+                            <div className="px-3 py-2 bg-slate-50 border-b border-slate-200">
+                              <span className="text-xs font-medium text-slate-600">{segment.label}</span>
+                            </div>
+                            <div className="p-2">
+                              <img 
+                                src={segment.imageUrl} 
+                                alt={segment.label}
+                                className="w-full h-32 object-cover rounded"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.src = "/placeholder.svg"
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Segment Text Data */}
+                      <div className="mt-4 pt-4 border-t border-slate-200">
+                        <p className="text-xs font-medium text-slate-600 mb-2">Segment Data</p>
+                        {isEditing ? (
+                          <Textarea
+                            value={editedSegmentData}
+                            onChange={(e) => setEditedSegmentData(e.target.value)}
+                            className="min-h-[120px] text-sm font-mono bg-white border-slate-300 resize-none"
+                            placeholder="Enter segment data..."
+                          />
+                        ) : (
+                          <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-3 rounded-lg border border-slate-200">
+                            {ocrReviewCandidate.segmentData}
+                          </pre>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-4 min-h-[280px]">
-                    {isEditing ? (
-                      <Textarea
-                        value={editedSegmentData}
-                        onChange={(e) => setEditedSegmentData(e.target.value)}
-                        className="min-h-[250px] text-sm font-mono bg-white border-slate-300 resize-none"
-                        placeholder="Enter segment data..."
-                      />
-                    ) : (
-                      <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed">
-                        {ocrReviewCandidate.segmentData}
-                      </pre>
-                    )}
+
+                  {/* OCR Card */}
+                  <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
+                    <div className="p-4 border-b border-slate-200 bg-white">
+                      <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-indigo-600" />
+                        OCR
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1">Extracted text from segments</p>
+                    </div>
+                    <div className="p-4">
+                      {isEditing ? (
+                        <Textarea
+                          value={editedOcrData}
+                          onChange={(e) => setEditedOcrData(e.target.value)}
+                          className="min-h-[400px] text-sm font-mono bg-white border-slate-300 resize-none"
+                          placeholder="Enter OCR data..."
+                        />
+                      ) : (
+                        <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-4 rounded-lg border border-slate-200 min-h-[400px]">
+                          {ocrReviewCandidate.ocrData}
+                        </pre>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* OCR Card */}
-                <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
-                  <div className="p-4 border-b border-slate-200 bg-white">
-                    <h3 className="text-lg font-semibold text-slate-800">OCR</h3>
-                  </div>
-                  <div className="p-4 min-h-[280px]">
-                    {isEditing ? (
-                      <Textarea
-                        value={editedOcrData}
-                        onChange={(e) => setEditedOcrData(e.target.value)}
-                        className="min-h-[250px] text-sm font-mono bg-white border-slate-300 resize-none"
-                        placeholder="Enter OCR data..."
-                      />
-                    ) : (
-                      <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed">
-                        {ocrReviewCandidate.ocrData}
-                      </pre>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-center gap-6 pt-4">
-                <Button
-                  onClick={handleApprove}
-                  className="px-8 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium"
-                >
-                  Approve
-                </Button>
-                <Button
-                  onClick={handleUpdate}
-                  variant="outline"
-                  className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
-                  disabled={isEditing}
-                >
+                {/* Action Buttons */}
+                <div className="flex items-center justify-center gap-4 pt-4 border-t border-slate-200">
                   {isEditing ? (
                     <>
-                      <Edit2 className="w-4 h-4 mr-2" />
-                      Editing...
+                      <Button
+                        onClick={handleSaveEdits}
+                        className="px-8 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                      >
+                        Save Changes
+                      </Button>
+                      <Button
+                        onClick={handleCancelEdits}
+                        variant="outline"
+                        className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                      >
+                        Cancel
+                      </Button>
                     </>
                   ) : (
-                    "Update"
+                    <>
+                      <Button
+                        onClick={handleUpdate}
+                        variant="outline"
+                        className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                      >
+                        <Edit2 className="w-4 h-4 mr-2" />
+                        Update
+                      </Button>
+                      <Button
+                        onClick={handleApprove}
+                        className="px-8 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                      >
+                        Approve
+                      </Button>
+                    </>
                   )}
-                </Button>
+                </div>
               </div>
-            </div>
+            </ScrollArea>
           )}
         </DialogContent>
       </Dialog>
