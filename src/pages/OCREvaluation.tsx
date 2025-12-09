@@ -2,10 +2,11 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2 } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 
 interface CandidateData {
   id: string
@@ -16,9 +17,19 @@ interface CandidateData {
   phase1: "completed" | "in-progress" | "pending" | "error"
   phase2: "completed" | "in-progress" | "pending" | "error"
   phase3: "completed" | "in-progress" | "pending" | "error"
+  segmentData?: string
+  ocrData?: string
 }
 
-const StatusBadge = ({ status }: { status: string }) => {
+const StatusBadge = ({ 
+  status, 
+  clickable = false, 
+  onClick 
+}: { 
+  status: string
+  clickable?: boolean
+  onClick?: () => void
+}) => {
   const config = {
     completed: {
       icon: CheckCircle,
@@ -40,6 +51,11 @@ const StatusBadge = ({ status }: { status: string }) => {
       icon: AlertCircle,
       label: "Error",
       className: "bg-red-50 text-red-700 border-red-200"
+    },
+    approved: {
+      icon: CheckCircle,
+      label: "Approved",
+      className: "bg-teal-50 text-teal-700 border-teal-200"
     }
   }[status] || {
     icon: Clock,
@@ -50,10 +66,17 @@ const StatusBadge = ({ status }: { status: string }) => {
   const Icon = config.icon
 
   return (
-    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${config.className}`}>
+    <button
+      type="button"
+      onClick={clickable ? onClick : undefined}
+      disabled={!clickable}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${config.className} ${
+        clickable ? 'cursor-pointer hover:ring-2 hover:ring-teal-300 transition-all' : 'cursor-default'
+      }`}
+    >
       <Icon className={`w-3.5 h-3.5 ${config.animate ? 'animate-spin' : ''}`} />
       {config.label}
-    </div>
+    </button>
   )
 }
 
@@ -64,6 +87,10 @@ const OCREvaluation = () => {
   const [candidates, setCandidates] = useState<CandidateData[]>([])
   const [previewCandidate, setPreviewCandidate] = useState<CandidateData | null>(null)
   const [detailCandidate, setDetailCandidate] = useState<CandidateData | null>(null)
+  const [ocrReviewCandidate, setOcrReviewCandidate] = useState<CandidateData | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedSegmentData, setEditedSegmentData] = useState("")
+  const [editedOcrData, setEditedOcrData] = useState("")
 
   const handleFolderUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -71,23 +98,18 @@ const OCREvaluation = () => {
 
     setIsUploading(true)
 
-    // Simulate folder processing
     setTimeout(() => {
-      // Extract folder name from the first file's path
       const firstFilePath = files[0].webkitRelativePath
       const extractedFolderName = firstFilePath.split('/')[0]
       setFolderName(extractedFolderName)
 
-      // Generate mock candidate data from files
       const candidateNames = new Set<string>()
       Array.from(files).forEach(file => {
-        // Extract candidate name from filename (assuming format: CandidateName_paper.pdf)
         const fileName = file.name.replace(/\.[^/.]+$/, "")
         const namePart = fileName.split('_')[0] || fileName
         if (namePart) candidateNames.add(namePart)
       })
 
-      // If no valid names extracted, generate mock data
       const centres = ["Delhi Centre", "Mumbai Centre", "Bangalore Centre", "Chennai Centre", "Kolkata Centre"]
       const addresses = [
         "123, Connaught Place, New Delhi - 110001",
@@ -107,6 +129,8 @@ const OCREvaluation = () => {
             phase1: getRandomStatus(),
             phase2: getRandomStatus(),
             phase3: getRandomStatus(),
+            segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+            ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
           }))
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
             id: `candidate-${index + 1}`,
@@ -117,6 +141,8 @@ const OCREvaluation = () => {
             phase1: getRandomStatus(),
             phase2: getRandomStatus(),
             phase3: getRandomStatus(),
+            segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+            ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
           }))
 
       setCandidates(mockCandidates)
@@ -145,6 +171,35 @@ const OCREvaluation = () => {
     toast.info("Ready to upload a new folder")
   }
 
+  const handleOpenOcrReview = (candidate: CandidateData) => {
+    setOcrReviewCandidate(candidate)
+    setEditedSegmentData(candidate.segmentData || "")
+    setEditedOcrData(candidate.ocrData || "")
+    setIsEditing(false)
+  }
+
+  const handleUpdate = () => {
+    setIsEditing(true)
+  }
+
+  const handleApprove = () => {
+    if (ocrReviewCandidate) {
+      setCandidates(prev => prev.map(c => {
+        if (c.id === ocrReviewCandidate.id) {
+          return {
+            ...c,
+            phase2: "approved" as any,
+            segmentData: editedSegmentData,
+            ocrData: editedOcrData
+          }
+        }
+        return c
+      }))
+      toast.success(`Phase 2 approved for ${ocrReviewCandidate.candidateName}`)
+      setOcrReviewCandidate(null)
+      setIsEditing(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -182,7 +237,7 @@ const OCREvaluation = () => {
       <main className="p-6">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Upload Section */}
-          <Card className="border-2 border-teal-100 bg-gradient-to-br from-teal-50 to-teal-100">
+          <Card className="border-2 border-teal-100 bg-teal-50">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-teal-600 text-white rounded-lg">
@@ -254,7 +309,7 @@ const OCREvaluation = () => {
 
           {/* Results Table */}
           {hasUploaded && candidates.length > 0 && (
-            <Card className="border-2 border-slate-100 bg-gradient-to-br from-white to-slate-50">
+            <Card className="border-2 border-slate-100 bg-white">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-slate-500 text-white rounded-lg">
@@ -263,7 +318,7 @@ const OCREvaluation = () => {
                   <h2 className="text-2xl font-semibold text-slate-700">Evaluation Results</h2>
                 </div>
 
-                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 shadow-sm">
+                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
@@ -296,7 +351,11 @@ const OCREvaluation = () => {
                             <StatusBadge status={candidate.phase1} />
                           </TableCell>
                           <TableCell className="py-4 text-center">
-                            <StatusBadge status={candidate.phase2} />
+                            <StatusBadge 
+                              status={candidate.phase2} 
+                              clickable={candidate.phase2 === "completed"}
+                              onClick={() => handleOpenOcrReview(candidate)}
+                            />
                           </TableCell>
                           <TableCell className="py-4 text-center">
                             <StatusBadge status={candidate.phase3} />
@@ -405,6 +464,98 @@ const OCREvaluation = () => {
                     <p className="font-medium text-gray-900">{detailCandidate.centreAddress}</p>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* OCR Review Dialog */}
+      <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); }}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+          <div className="flex items-center justify-between p-6 border-b border-slate-200">
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <ScanLine className="w-5 h-5 text-teal-600" />
+              OCR Review - {ocrReviewCandidate?.candidateName}
+            </DialogTitle>
+            <button 
+              onClick={() => { setOcrReviewCandidate(null); setIsEditing(false); }}
+              className="p-1 rounded-md hover:bg-slate-100 transition-colors"
+            >
+              <X className="w-5 h-5 text-slate-500" />
+            </button>
+          </div>
+          
+          {ocrReviewCandidate && (
+            <div className="p-6 space-y-6">
+              {/* Two Column Cards */}
+              <div className="grid grid-cols-2 gap-6">
+                {/* Segment Card */}
+                <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
+                  <div className="p-4 border-b border-slate-200 bg-white">
+                    <h3 className="text-lg font-semibold text-slate-800">Segment</h3>
+                  </div>
+                  <div className="p-4 min-h-[280px]">
+                    {isEditing ? (
+                      <Textarea
+                        value={editedSegmentData}
+                        onChange={(e) => setEditedSegmentData(e.target.value)}
+                        className="min-h-[250px] text-sm font-mono bg-white border-slate-300 resize-none"
+                        placeholder="Enter segment data..."
+                      />
+                    ) : (
+                      <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed">
+                        {ocrReviewCandidate.segmentData}
+                      </pre>
+                    )}
+                  </div>
+                </div>
+
+                {/* OCR Card */}
+                <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
+                  <div className="p-4 border-b border-slate-200 bg-white">
+                    <h3 className="text-lg font-semibold text-slate-800">OCR</h3>
+                  </div>
+                  <div className="p-4 min-h-[280px]">
+                    {isEditing ? (
+                      <Textarea
+                        value={editedOcrData}
+                        onChange={(e) => setEditedOcrData(e.target.value)}
+                        className="min-h-[250px] text-sm font-mono bg-white border-slate-300 resize-none"
+                        placeholder="Enter OCR data..."
+                      />
+                    ) : (
+                      <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed">
+                        {ocrReviewCandidate.ocrData}
+                      </pre>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-center gap-6 pt-4">
+                <Button
+                  onClick={handleApprove}
+                  className="px-8 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                >
+                  Approve
+                </Button>
+                <Button
+                  onClick={handleUpdate}
+                  variant="outline"
+                  className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                  disabled={isEditing}
+                >
+                  {isEditing ? (
+                    <>
+                      <Edit2 className="w-4 h-4 mr-2" />
+                      Editing...
+                    </>
+                  ) : (
+                    "Update"
+                  )}
+                </Button>
               </div>
             </div>
           )}
