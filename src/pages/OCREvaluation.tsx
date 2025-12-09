@@ -122,6 +122,16 @@ const OCREvaluation = () => {
   const [toPageInput, setToPageInput] = useState("")
   const [answerSheets, setAnswerSheets] = useState<AnswerSheetPage[]>([])
   const [evaluationReviewCandidate, setEvaluationReviewCandidate] = useState<CandidateData | null>(null)
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
+
+  // Mock questions list for Phase 1 review
+  const mockQuestionsList = [
+    { id: 1, text: "Explain the process of photosynthesis in plants and describe the role of chlorophyll in this process.", maxScore: 10, pages: 3 },
+    { id: 2, text: "Define the term 'ecosystem' and describe the different components of an ecosystem with suitable examples.", maxScore: 8, pages: 2 },
+    { id: 3, text: "What is cellular respiration? Explain the difference between aerobic and anaerobic respiration.", maxScore: 10, pages: 3 },
+    { id: 4, text: "Describe the structure of DNA and explain how genetic information is transferred from one generation to another.", maxScore: 12, pages: 4 },
+    { id: 5, text: "Explain the water cycle and its importance in maintaining ecological balance.", maxScore: 6, pages: 2 },
+  ]
 
   // Mock evaluation data
   const generateMockEvaluationData = (): EvaluationData => ({
@@ -799,7 +809,7 @@ const OCREvaluation = () => {
       </Dialog>
 
       {/* Phase 1 Answer Sheets Review Dialog */}
-      <Dialog open={!!phase1ReviewCandidate} onOpenChange={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}>
+      <Dialog open={!!phase1ReviewCandidate} onOpenChange={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}>
         <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 overflow-hidden [&>button]:hidden">
           <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
             <DialogTitle className="flex items-center gap-2 text-slate-800">
@@ -815,7 +825,7 @@ const OCREvaluation = () => {
                 Approve
               </Button>
               <Button
-                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
+                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}
                 size="sm"
                 variant="outline"
                 className="px-6 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
@@ -823,7 +833,7 @@ const OCREvaluation = () => {
                 Cancel
               </Button>
               <button 
-                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
+                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}
                 className="p-1.5 rounded-md hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5 text-slate-500" />
@@ -832,99 +842,161 @@ const OCREvaluation = () => {
           </div>
           
           {phase1ReviewCandidate && (
-            <div className="flex flex-col h-[calc(95vh-70px)]">
-              {/* Candidate Name Header */}
-              <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200 space-y-3">
-                {/* Top Row: Candidate Info + Reposition Controls */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
-                    <span className="text-sm text-slate-500 bg-white/70 px-2 py-0.5 rounded">
-                      {phase1ReviewCandidate.registrationName}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-1.5">
-                      <span className="text-xs font-medium text-slate-500">From</span>
-                      <Input
-                        type="number"
-                        placeholder="#"
-                        value={fromPageInput}
-                        onChange={(e) => setFromPageInput(e.target.value)}
-                        className="w-14 h-7 text-sm border-slate-300 text-center"
-                        min={1}
-                        max={answerSheets.length}
-                      />
-                      <span className="text-xs font-medium text-slate-500">To</span>
-                      <Input
-                        type="number"
-                        placeholder="#"
-                        value={toPageInput}
-                        onChange={(e) => setToPageInput(e.target.value)}
-                        className="w-14 h-7 text-sm border-slate-300 text-center"
-                        min={1}
-                        max={answerSheets.length}
-                      />
-                      <Button
-                        onClick={handleRepositionPages}
-                        size="sm"
-                        className="h-7 px-3 bg-teal-600 hover:bg-teal-700 text-white text-xs"
+            <div className="flex h-[calc(95vh-70px)]">
+              {/* Left Sidebar: Question List */}
+              <div className="w-72 border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
+                <div className="px-4 py-3 border-b border-slate-200 bg-white">
+                  <h4 className="text-sm font-semibold text-slate-700">Questions</h4>
+                  <p className="text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                </div>
+                <ScrollArea className="flex-1">
+                  <div className="p-2 space-y-1">
+                    {mockQuestionsList.map((question, index) => (
+                      <button
+                        key={question.id}
+                        onClick={() => setActiveQuestionIndex(index)}
+                        className={`w-full text-left px-3 py-3 rounded-lg transition-all ${
+                          activeQuestionIndex === index
+                            ? 'bg-teal-600 text-white shadow-sm'
+                            : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                        }`}
                       >
-                        Reposition
-                      </Button>
-                    </div>
-                    <span className="text-sm font-medium text-slate-600 bg-white/70 px-2 py-0.5 rounded">
-                      {answerSheets.length} pages
-                    </span>
+                        <div className="flex items-start gap-2">
+                          <span className={`flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold shrink-0 ${
+                            activeQuestionIndex === index
+                              ? 'bg-white/20 text-white'
+                              : 'bg-teal-100 text-teal-700'
+                          }`}>
+                            {question.id}
+                          </span>
+                          <p className={`text-xs leading-relaxed line-clamp-2 ${
+                            activeQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
+                          }`}>
+                            {question.text}
+                          </p>
+                        </div>
+                        <div className={`flex items-center gap-2 mt-2 text-xs ${
+                          activeQuestionIndex === index ? 'text-white/70' : 'text-slate-400'
+                        }`}>
+                          <span>{question.pages} pages</span>
+                          <span>•</span>
+                          <span>Max: {question.maxScore}</span>
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                </div>
-                
-                {/* Bottom Row: Question Display */}
-                <div className="flex items-start gap-3 bg-white rounded-lg border border-slate-200 px-4 py-3">
-                  <div className="flex items-center justify-center h-7 w-7 rounded-full bg-teal-600 text-white shrink-0">
-                    <span className="text-xs font-bold">Q</span>
-                  </div>
-                  <p className="text-sm text-slate-700 leading-relaxed pt-0.5">
-                    Explain the process of photosynthesis in plants and describe the role of chlorophyll in this process.
-                  </p>
-                </div>
+                </ScrollArea>
               </div>
 
-              {/* Answer Sheets Grid */}
-              <ScrollArea className="flex-1 px-6 py-4">
-                <div className="grid grid-cols-2 gap-6">
-                  {answerSheets.map((sheet, index) => (
-                    <div 
-                      key={sheet.pageNumber}
-                      id={`answer-sheet-${sheet.pageNumber}`}
-                      className="rounded-xl border border-slate-200 bg-white overflow-hidden"
-                    >
-                      <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-                        <span className="text-sm font-medium text-slate-700">
-                          Page {sheet.pageNumber}
+              {/* Right Content: Active Question Details */}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Header with Candidate Info & Controls */}
+                <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
+                      <span className="text-sm text-slate-500 bg-white/70 px-2 py-0.5 rounded">
+                        {phase1ReviewCandidate.registrationName}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-1.5">
+                        <span className="text-xs font-medium text-slate-500">From</span>
+                        <Input
+                          type="number"
+                          placeholder="#"
+                          value={fromPageInput}
+                          onChange={(e) => setFromPageInput(e.target.value)}
+                          className="w-14 h-7 text-sm border-slate-300 text-center"
+                          min={1}
+                          max={answerSheets.length}
+                        />
+                        <span className="text-xs font-medium text-slate-500">To</span>
+                        <Input
+                          type="number"
+                          placeholder="#"
+                          value={toPageInput}
+                          onChange={(e) => setToPageInput(e.target.value)}
+                          className="w-14 h-7 text-sm border-slate-300 text-center"
+                          min={1}
+                          max={answerSheets.length}
+                        />
+                        <Button
+                          onClick={handleRepositionPages}
+                          size="sm"
+                          className="h-7 px-3 bg-teal-600 hover:bg-teal-700 text-white text-xs"
+                        >
+                          Reposition
+                        </Button>
+                      </div>
+                      <span className="text-sm font-medium text-slate-600 bg-white/70 px-2 py-0.5 rounded">
+                        {answerSheets.length} pages
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Active Question Card */}
+                <div className="px-6 py-4 bg-white border-b border-slate-200">
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-teal-50 to-slate-50 border border-teal-100">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
+                      <span className="text-sm font-bold">Q{mockQuestionsList[activeQuestionIndex]?.id}</span>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-sm text-slate-800 leading-relaxed font-medium">
+                        {mockQuestionsList[activeQuestionIndex]?.text}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-slate-500">
+                        <span className="flex items-center gap-1">
+                          <Target className="w-3.5 h-3.5 text-teal-600" />
+                          Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[activeQuestionIndex]?.maxScore}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <FileText className="w-3.5 h-3.5 text-slate-400" />
+                          Pages: <span className="font-semibold text-slate-700">{mockQuestionsList[activeQuestionIndex]?.pages}</span>
                         </span>
                       </div>
-                      <div className="p-3 bg-gray-100">
-                        <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
-                          <img 
-                            src={sheet.imageUrl} 
-                            alt={`Answer sheet page ${sheet.pageNumber}`}
-                            className="w-full h-auto object-contain"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement
-                              target.src = "/placeholder.svg"
-                            }}
-                          />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Answer Sheets Grid */}
+                <ScrollArea className="flex-1 px-6 py-4 bg-slate-50">
+                  <div className="grid grid-cols-2 gap-6">
+                    {answerSheets.map((sheet, index) => (
+                      <div 
+                        key={sheet.pageNumber}
+                        id={`answer-sheet-${sheet.pageNumber}`}
+                        className="rounded-xl border border-slate-200 bg-white overflow-hidden"
+                      >
+                        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                          <span className="text-sm font-medium text-slate-700">
+                            Page {sheet.pageNumber}
+                          </span>
+                        </div>
+                        <div className="p-3 bg-gray-100">
+                          <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                            <img 
+                              src={sheet.imageUrl} 
+                              alt={`Answer sheet page ${sheet.pageNumber}`}
+                              className="w-full h-auto object-contain"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.src = "/placeholder.svg"
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
       {/* Evaluation Review Dialog */}
       <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => setEvaluationReviewCandidate(null)}>
         <DialogContent className="max-w-5xl p-0 overflow-hidden max-h-[90vh] [&>button]:hidden">
