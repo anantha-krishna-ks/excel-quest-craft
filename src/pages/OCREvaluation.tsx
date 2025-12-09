@@ -444,9 +444,9 @@ const OCREvaluation = () => {
                       <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
                         <TableHead className="font-semibold text-slate-700 py-4 w-16">Sl. No</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-4">Candidate Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Phase 1</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Phase 2</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Phase 3</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Segmentation Indexing</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-4 text-center">OCR</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Evaluation</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-4 text-center">Preview</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -520,15 +520,15 @@ const OCREvaluation = () => {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg border border-slate-200 bg-slate-50">
-                  <p className="text-sm text-gray-500 mb-2">Phase 1</p>
+                  <p className="text-sm text-gray-500 mb-2">Segmentation Indexing</p>
                   <StatusBadge status={previewCandidate.phase1} />
                 </div>
                 <div className="p-4 rounded-lg border border-slate-200 bg-slate-50">
-                  <p className="text-sm text-gray-500 mb-2">Phase 2</p>
+                  <p className="text-sm text-gray-500 mb-2">OCR</p>
                   <StatusBadge status={previewCandidate.phase2} />
                 </div>
                 <div className="p-4 rounded-lg border border-slate-200 bg-slate-50">
-                  <p className="text-sm text-gray-500 mb-2">Phase 3</p>
+                  <p className="text-sm text-gray-500 mb-2">Evaluation</p>
                   <StatusBadge status={previewCandidate.phase3} />
                 </div>
               </div>
@@ -600,7 +600,7 @@ const OCREvaluation = () => {
           <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
             <DialogTitle className="flex items-center gap-2 text-slate-800">
               <ScanLine className="w-5 h-5 text-teal-600" />
-              OCR Review - {ocrReviewCandidate?.candidateName}
+              OCR - {ocrReviewCandidate?.candidateName}
             </DialogTitle>
             <button 
               onClick={() => { setOcrReviewCandidate(null); setIsEditing(false); }}
@@ -741,7 +741,7 @@ const OCREvaluation = () => {
           <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
             <DialogTitle className="flex items-center gap-2 text-slate-800">
               <Image className="w-5 h-5 text-teal-600" />
-              Digital Answer Sheets - {phase1ReviewCandidate?.candidateName}
+              Segmentation Indexing Review - {phase1ReviewCandidate?.candidateName}
             </DialogTitle>
             <div className="flex items-center gap-4">
               <Button
