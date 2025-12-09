@@ -231,14 +231,14 @@ const QuestionGenerator = () => {
                   </div>
                   <h3 className="text-sm font-semibold text-gray-800">AI Generation Mode</h3>
                 </div>
-                <div className="bg-gray-100 p-1.5 rounded-full flex">
+                <div className="bg-gray-200 p-1 rounded-full flex">
                   <button
                     type="button"
                     onClick={() => setGenerationMode(false)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-sm font-medium transition-all duration-300 ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 ${
                       !generationMode 
-                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' 
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-emerald-500 text-white' 
+                        : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     <Database className="w-4 h-4" />
@@ -247,10 +247,10 @@ const QuestionGenerator = () => {
                   <button
                     type="button"
                     onClick={() => setGenerationMode(true)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-sm font-medium transition-all duration-300 ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-sm font-medium transition-all duration-200 ${
                       generationMode 
-                        ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30' 
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-violet-500 text-white' 
+                        : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     <Brain className="w-4 h-4" />
