@@ -596,7 +596,7 @@ const OCREvaluation = () => {
 
       {/* OCR Review Dialog */}
       <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); }}>
-        <DialogContent className="max-w-5xl p-0 overflow-hidden max-h-[90vh]">
+        <DialogContent className="max-w-5xl p-0 overflow-hidden max-h-[90vh] [&>button]:hidden">
           <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
             <DialogTitle className="flex items-center gap-2 text-slate-800">
               <ScanLine className="w-5 h-5 text-teal-600" />
