@@ -875,13 +875,6 @@ const OCREvaluation = () => {
                             {question.text}
                           </p>
                         </div>
-                        <div className={`flex items-center gap-2 mt-2 text-xs ${
-                          activeQuestionIndex === index ? 'text-white/70' : 'text-slate-400'
-                        }`}>
-                          <span>{question.pages} pages</span>
-                          <span>•</span>
-                          <span>Max: {question.maxScore}</span>
-                        </div>
                       </button>
                     ))}
                   </div>
