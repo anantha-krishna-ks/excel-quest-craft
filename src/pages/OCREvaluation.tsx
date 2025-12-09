@@ -816,41 +816,6 @@ const OCREvaluation = () => {
                         <span className="text-sm font-medium text-slate-700">
                           Page {sheet.pageNumber}
                         </span>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            placeholder="Move to"
-                            className="w-20 h-7 text-xs border-slate-300"
-                            min={1}
-                            max={answerSheets.length}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                const target = e.target as HTMLInputElement
-                                const newPos = parseInt(target.value)
-                                if (newPos) {
-                                  handleReorderPage(index, newPos)
-                                  target.value = ''
-                                }
-                              }
-                            }}
-                          />
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleReorderPage(index, index)}
-                              disabled={index === 0}
-                              className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                              <ChevronLeft className="w-4 h-4 text-slate-600" />
-                            </button>
-                            <button
-                              onClick={() => handleReorderPage(index, index + 2)}
-                              disabled={index === answerSheets.length - 1}
-                              className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                              <ChevronRight className="w-4 h-4 text-slate-600" />
-                            </button>
-                          </div>
-                        </div>
                       </div>
                       <div className="p-3 bg-gray-100">
                         <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
