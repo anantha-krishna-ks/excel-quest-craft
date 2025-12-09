@@ -644,24 +644,41 @@ const OCREvaluation = () => {
 
       {/* Phase 1 Answer Sheets Review Dialog */}
       <Dialog open={!!phase1ReviewCandidate} onOpenChange={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}>
-        <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
-          <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-white">
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 overflow-hidden [&>button]:hidden">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
             <DialogTitle className="flex items-center gap-2 text-slate-800">
               <Image className="w-5 h-5 text-teal-600" />
               Digital Answer Sheets - {phase1ReviewCandidate?.candidateName}
             </DialogTitle>
-            <button 
-              onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
-              className="p-1 rounded-md hover:bg-slate-100 transition-colors"
-            >
-              <X className="w-5 h-5 text-slate-500" />
-            </button>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={handlePhase1Approve}
+                size="sm"
+                className="px-6 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+              >
+                Approve
+              </Button>
+              <Button
+                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
+                size="sm"
+                variant="outline"
+                className="px-6 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+              >
+                Cancel
+              </Button>
+              <button 
+                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
+                className="p-1.5 rounded-md hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
           </div>
           
           {phase1ReviewCandidate && (
-            <div className="flex flex-col h-[calc(90vh-180px)]">
+            <div className="flex flex-col h-[calc(95vh-70px)]">
               {/* Candidate Name Header */}
-              <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
+              <div className="px-6 py-3 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
@@ -759,23 +776,6 @@ const OCREvaluation = () => {
                   ))}
                 </div>
               </ScrollArea>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-center gap-4 p-6 border-t border-slate-200 bg-white">
-                <Button
-                  onClick={handlePhase1Approve}
-                  className="px-8 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium"
-                >
-                  Approve
-                </Button>
-                <Button
-                  onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
-                  variant="outline"
-                  className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
-                >
-                  Cancel
-                </Button>
-              </div>
             </div>
           )}
         </DialogContent>
