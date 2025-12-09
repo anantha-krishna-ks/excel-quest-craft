@@ -107,7 +107,8 @@ const OCREvaluation = () => {
   const [editedSegmentData, setEditedSegmentData] = useState("")
   const [editedOcrData, setEditedOcrData] = useState("")
   const [phase1ReviewCandidate, setPhase1ReviewCandidate] = useState<CandidateData | null>(null)
-  const [pageNumberInput, setPageNumberInput] = useState("")
+  const [fromPageInput, setFromPageInput] = useState("")
+  const [toPageInput, setToPageInput] = useState("")
   const [answerSheets, setAnswerSheets] = useState<AnswerSheetPage[]>([])
 
   // Mock answer sheet images
@@ -220,18 +221,41 @@ const OCREvaluation = () => {
     setPhase1ReviewCandidate(candidate)
     const sheets = candidate.answerSheets || generateMockAnswerSheets()
     setAnswerSheets(sheets)
-    setPageNumberInput("")
+    setFromPageInput("")
+    setToPageInput("")
   }
 
-  const handleGoToPage = () => {
-    const pageNum = parseInt(pageNumberInput)
-    if (pageNum && pageNum >= 1 && pageNum <= answerSheets.length) {
-      const element = document.getElementById(`answer-sheet-${pageNum}`)
-      element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      toast.success(`Navigated to page ${pageNum}`)
-    } else {
-      toast.error(`Please enter a valid page number (1-${answerSheets.length})`)
+  const handleRepositionPages = () => {
+    const fromPage = parseInt(fromPageInput)
+    const toPage = parseInt(toPageInput)
+    
+    if (!fromPage || fromPage < 1 || fromPage > answerSheets.length) {
+      toast.error(`Please enter a valid "From" page number (1-${answerSheets.length})`)
+      return
     }
+    if (!toPage || toPage < 1 || toPage > answerSheets.length) {
+      toast.error(`Please enter a valid "To" page number (1-${answerSheets.length})`)
+      return
+    }
+    if (fromPage === toPage) {
+      toast.error("From and To page numbers must be different")
+      return
+    }
+    
+    const newSheets = [...answerSheets]
+    const [removed] = newSheets.splice(fromPage - 1, 1)
+    newSheets.splice(toPage - 1, 0, removed)
+    
+    // Update page numbers
+    const updatedSheets = newSheets.map((sheet, idx) => ({
+      ...sheet,
+      pageNumber: idx + 1
+    }))
+    
+    setAnswerSheets(updatedSheets)
+    setFromPageInput("")
+    setToPageInput("")
+    toast.success(`Page ${fromPage} repositioned to position ${toPage}`)
   }
 
   const handleReorderPage = (fromIndex: number, toPosition: number) => {
@@ -779,21 +803,32 @@ const OCREvaluation = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
+                      <span className="text-sm text-slate-600">From</span>
                       <Input
                         type="number"
-                        placeholder="Page #"
-                        value={pageNumberInput}
-                        onChange={(e) => setPageNumberInput(e.target.value)}
-                        className="w-24 h-9 text-sm border-slate-300"
+                        placeholder="#"
+                        value={fromPageInput}
+                        onChange={(e) => setFromPageInput(e.target.value)}
+                        className="w-16 h-9 text-sm border-slate-300"
+                        min={1}
+                        max={answerSheets.length}
+                      />
+                      <span className="text-sm text-slate-600">To</span>
+                      <Input
+                        type="number"
+                        placeholder="#"
+                        value={toPageInput}
+                        onChange={(e) => setToPageInput(e.target.value)}
+                        className="w-16 h-9 text-sm border-slate-300"
                         min={1}
                         max={answerSheets.length}
                       />
                       <Button
-                        onClick={handleGoToPage}
+                        onClick={handleRepositionPages}
                         size="sm"
                         className="bg-teal-600 hover:bg-teal-700 text-white"
                       >
-                        Go to Page
+                        Reposition
                       </Button>
                     </div>
                     <span className="text-sm text-slate-500">
