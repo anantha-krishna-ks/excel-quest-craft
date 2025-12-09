@@ -799,7 +799,14 @@ const OCREvaluation = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
-                    <p className="text-sm text-slate-500">Registration: {phase1ReviewCandidate.registrationName}</p>
+                    <div className="flex items-center gap-3 text-sm text-slate-500">
+                      <span>Registration: {phase1ReviewCandidate.registrationName}</span>
+                      <span className="text-slate-300">|</span>
+                      <span className="flex items-center gap-1">
+                        <FileText className="h-3.5 w-3.5" />
+                        Mathematics - Paper I
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
