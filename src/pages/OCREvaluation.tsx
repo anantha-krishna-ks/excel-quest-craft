@@ -162,10 +162,10 @@ const OCREvaluation = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 rounded-full">
-              <Sparkles className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-600">
-                4,651 Tokens
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 rounded-lg border border-teal-200">
+              <Sparkles className="h-4 w-4 text-teal-600" />
+              <span className="text-sm font-medium text-teal-600">
+                {candidates.length} Candidates
               </span>
             </div>
             <Link to="/dashboard">
