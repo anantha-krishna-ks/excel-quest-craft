@@ -225,20 +225,37 @@ const QuestionGenerator = () => {
 
               {/* AI Generation Mode */}
               <Card className="p-6 bg-white border border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-700">AI Generation Mode</h3>
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Settings2 className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-white" />
                   </div>
+                  <h3 className="text-sm font-semibold text-gray-800">AI Generation Mode</h3>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Knowledge Base</span>
-                  <Switch 
-                    checked={generationMode} 
-                    onCheckedChange={setGenerationMode}
-                    className="data-[state=checked]:bg-blue-600"
-                  />
-                  <span className="text-sm font-medium text-blue-600">LLM</span>
+                <div className="bg-gray-100 p-1 rounded-xl flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setGenerationMode(false)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      !generationMode 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <Database className="w-4 h-4" />
+                    <span>Knowledge Base</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGenerationMode(true)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      generationMode 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <Brain className="w-4 h-4" />
+                    <span>LLM</span>
+                  </button>
                 </div>
               </Card>
             </div>
