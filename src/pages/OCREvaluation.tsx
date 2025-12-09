@@ -795,56 +795,59 @@ const OCREvaluation = () => {
           {phase1ReviewCandidate && (
             <div className="flex flex-col h-[calc(95vh-70px)]">
               {/* Candidate Name Header */}
-              <div className="px-6 py-3 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
+              <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200 space-y-3">
+                {/* Top Row: Candidate Info + Reposition Controls */}
                 <div className="flex items-center justify-between">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
-                      <span className="text-sm text-slate-500">Registration: {phase1ReviewCandidate.registrationName}</span>
-                    </div>
-                    <div className="flex items-start gap-3 bg-white rounded-lg border border-slate-200 px-4 py-3">
-                      <div className="flex items-center justify-center h-6 w-6 rounded-full bg-teal-100 text-teal-700 shrink-0">
-                        <span className="text-xs font-bold">Q</span>
-                      </div>
-                      <p className="text-sm text-slate-700 leading-relaxed">
-                        Explain the process of photosynthesis in plants and describe the role of chlorophyll in this process.
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
+                    <span className="text-sm text-slate-500 bg-white/70 px-2 py-0.5 rounded">
+                      {phase1ReviewCandidate.registrationName}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-slate-600">From</span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-1.5">
+                      <span className="text-xs font-medium text-slate-500">From</span>
                       <Input
                         type="number"
                         placeholder="#"
                         value={fromPageInput}
                         onChange={(e) => setFromPageInput(e.target.value)}
-                        className="w-16 h-9 text-sm border-slate-300"
+                        className="w-14 h-7 text-sm border-slate-300 text-center"
                         min={1}
                         max={answerSheets.length}
                       />
-                      <span className="text-sm text-slate-600">To</span>
+                      <span className="text-xs font-medium text-slate-500">To</span>
                       <Input
                         type="number"
                         placeholder="#"
                         value={toPageInput}
                         onChange={(e) => setToPageInput(e.target.value)}
-                        className="w-16 h-9 text-sm border-slate-300"
+                        className="w-14 h-7 text-sm border-slate-300 text-center"
                         min={1}
                         max={answerSheets.length}
                       />
                       <Button
                         onClick={handleRepositionPages}
                         size="sm"
-                        className="bg-teal-600 hover:bg-teal-700 text-white"
+                        className="h-7 px-3 bg-teal-600 hover:bg-teal-700 text-white text-xs"
                       >
                         Reposition
                       </Button>
                     </div>
-                    <span className="text-sm text-slate-500">
+                    <span className="text-sm font-medium text-slate-600 bg-white/70 px-2 py-0.5 rounded">
                       {answerSheets.length} pages
                     </span>
                   </div>
+                </div>
+                
+                {/* Bottom Row: Question Display */}
+                <div className="flex items-start gap-3 bg-white rounded-lg border border-slate-200 px-4 py-3">
+                  <div className="flex items-center justify-center h-7 w-7 rounded-full bg-teal-600 text-white shrink-0">
+                    <span className="text-xs font-bold">Q</span>
+                  </div>
+                  <p className="text-sm text-slate-700 leading-relaxed pt-0.5">
+                    Explain the process of photosynthesis in plants and describe the role of chlorophyll in this process.
+                  </p>
                 </div>
               </div>
 
