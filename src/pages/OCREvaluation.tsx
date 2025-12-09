@@ -673,43 +673,42 @@ const OCREvaluation = () => {
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
+            {/* Candidate Name Header - attached to dialog header */}
+            <div className="px-6 py-3 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate?.candidateName}</h3>
+                  <p className="text-sm text-slate-500">Registration: {phase1ReviewCandidate?.registrationName}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      placeholder="Page #"
+                      value={pageNumberInput}
+                      onChange={(e) => setPageNumberInput(e.target.value)}
+                      className="w-24 h-9 text-sm border-slate-300"
+                      min={1}
+                      max={answerSheets.length}
+                    />
+                    <Button
+                      onClick={handleGoToPage}
+                      size="sm"
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                    >
+                      Go to Page
+                    </Button>
+                  </div>
+                  <span className="text-sm text-slate-500">
+                    {answerSheets.length} pages
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           
           {phase1ReviewCandidate && (
-            <div className="flex flex-col h-[calc(95vh-70px)]">
-              {/* Candidate Name Header */}
-              <div className="px-6 py-3 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
-                    <p className="text-sm text-slate-500">Registration: {phase1ReviewCandidate.registrationName}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <Input
-                        type="number"
-                        placeholder="Page #"
-                        value={pageNumberInput}
-                        onChange={(e) => setPageNumberInput(e.target.value)}
-                        className="w-24 h-9 text-sm border-slate-300"
-                        min={1}
-                        max={answerSheets.length}
-                      />
-                      <Button
-                        onClick={handleGoToPage}
-                        size="sm"
-                        className="bg-teal-600 hover:bg-teal-700 text-white"
-                      >
-                        Go to Page
-                      </Button>
-                    </div>
-                    <span className="text-sm text-slate-500">
-                      {answerSheets.length} pages
-                    </span>
-                  </div>
-                </div>
-              </div>
-
+            <div className="flex flex-col h-[calc(95vh-140px)]">
               {/* Answer Sheets Grid */}
               <ScrollArea className="flex-1 px-6 py-4">
                 <div className="grid grid-cols-2 gap-6">
