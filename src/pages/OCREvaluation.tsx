@@ -2,11 +2,18 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2 } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
+interface AnswerSheetPage {
+  pageNumber: number
+  imageUrl: string
+}
 
 interface CandidateData {
   id: string
@@ -19,6 +26,7 @@ interface CandidateData {
   phase3: "completed" | "in-progress" | "pending" | "error"
   segmentData?: string
   ocrData?: string
+  answerSheets?: AnswerSheetPage[]
 }
 
 const StatusBadge = ({ 
@@ -91,6 +99,18 @@ const OCREvaluation = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [editedSegmentData, setEditedSegmentData] = useState("")
   const [editedOcrData, setEditedOcrData] = useState("")
+  const [phase1ReviewCandidate, setPhase1ReviewCandidate] = useState<CandidateData | null>(null)
+  const [pageNumberInput, setPageNumberInput] = useState("")
+  const [answerSheets, setAnswerSheets] = useState<AnswerSheetPage[]>([])
+
+  // Mock answer sheet images
+  const generateMockAnswerSheets = (): AnswerSheetPage[] => {
+    return [
+      { pageNumber: 1, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png" },
+      { pageNumber: 2, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png" },
+      { pageNumber: 3, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" },
+    ]
+  }
 
   const handleFolderUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -176,6 +196,62 @@ const OCREvaluation = () => {
     setEditedSegmentData(candidate.segmentData || "")
     setEditedOcrData(candidate.ocrData || "")
     setIsEditing(false)
+  }
+
+  const handleOpenPhase1Review = (candidate: CandidateData) => {
+    setPhase1ReviewCandidate(candidate)
+    const sheets = candidate.answerSheets || generateMockAnswerSheets()
+    setAnswerSheets(sheets)
+    setPageNumberInput("")
+  }
+
+  const handleGoToPage = () => {
+    const pageNum = parseInt(pageNumberInput)
+    if (pageNum && pageNum >= 1 && pageNum <= answerSheets.length) {
+      const element = document.getElementById(`answer-sheet-${pageNum}`)
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      toast.success(`Navigated to page ${pageNum}`)
+    } else {
+      toast.error(`Please enter a valid page number (1-${answerSheets.length})`)
+    }
+  }
+
+  const handleReorderPage = (fromIndex: number, toPosition: number) => {
+    if (toPosition < 1 || toPosition > answerSheets.length) {
+      toast.error(`Invalid position. Please enter a number between 1 and ${answerSheets.length}`)
+      return
+    }
+    
+    const newSheets = [...answerSheets]
+    const [removed] = newSheets.splice(fromIndex, 1)
+    newSheets.splice(toPosition - 1, 0, removed)
+    
+    // Update page numbers
+    const reorderedSheets = newSheets.map((sheet, index) => ({
+      ...sheet,
+      pageNumber: index + 1
+    }))
+    
+    setAnswerSheets(reorderedSheets)
+    toast.success(`Page moved to position ${toPosition}`)
+  }
+
+  const handlePhase1Approve = () => {
+    if (phase1ReviewCandidate) {
+      setCandidates(prev => prev.map(c => {
+        if (c.id === phase1ReviewCandidate.id) {
+          return {
+            ...c,
+            phase1: "approved" as any,
+            answerSheets: answerSheets
+          }
+        }
+        return c
+      }))
+      toast.success(`Phase 1 approved for ${phase1ReviewCandidate.candidateName}`)
+      setPhase1ReviewCandidate(null)
+      setAnswerSheets([])
+    }
   }
 
   const handleUpdate = () => {
@@ -348,7 +424,11 @@ const OCREvaluation = () => {
                             </button>
                           </TableCell>
                           <TableCell className="py-4 text-center">
-                            <StatusBadge status={candidate.phase1} />
+                            <StatusBadge 
+                              status={candidate.phase1}
+                              clickable={candidate.phase1 === "completed"}
+                              onClick={() => handleOpenPhase1Review(candidate)}
+                            />
                           </TableCell>
                           <TableCell className="py-4 text-center">
                             <StatusBadge 
@@ -555,6 +635,145 @@ const OCREvaluation = () => {
                   ) : (
                     "Update"
                   )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Phase 1 Answer Sheets Review Dialog */}
+      <Dialog open={!!phase1ReviewCandidate} onOpenChange={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}>
+        <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
+          <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-white">
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <Image className="w-5 h-5 text-teal-600" />
+              Digital Answer Sheets - {phase1ReviewCandidate?.candidateName}
+            </DialogTitle>
+            <button 
+              onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
+              className="p-1 rounded-md hover:bg-slate-100 transition-colors"
+            >
+              <X className="w-5 h-5 text-slate-500" />
+            </button>
+          </div>
+          
+          {phase1ReviewCandidate && (
+            <div className="flex flex-col h-[calc(90vh-180px)]">
+              {/* Candidate Name Header */}
+              <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
+                    <p className="text-sm text-slate-500">Registration: {phase1ReviewCandidate.registrationName}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        placeholder="Page #"
+                        value={pageNumberInput}
+                        onChange={(e) => setPageNumberInput(e.target.value)}
+                        className="w-24 h-9 text-sm border-slate-300"
+                        min={1}
+                        max={answerSheets.length}
+                      />
+                      <Button
+                        onClick={handleGoToPage}
+                        size="sm"
+                        className="bg-teal-600 hover:bg-teal-700 text-white"
+                      >
+                        Go to Page
+                      </Button>
+                    </div>
+                    <span className="text-sm text-slate-500">
+                      {answerSheets.length} pages
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Answer Sheets Grid */}
+              <ScrollArea className="flex-1 px-6 py-4">
+                <div className="grid grid-cols-2 gap-6">
+                  {answerSheets.map((sheet, index) => (
+                    <div 
+                      key={sheet.pageNumber}
+                      id={`answer-sheet-${sheet.pageNumber}`}
+                      className="rounded-xl border border-slate-200 bg-white overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                        <span className="text-sm font-medium text-slate-700">
+                          Page {sheet.pageNumber}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            placeholder="Move to"
+                            className="w-20 h-7 text-xs border-slate-300"
+                            min={1}
+                            max={answerSheets.length}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                const target = e.target as HTMLInputElement
+                                const newPos = parseInt(target.value)
+                                if (newPos) {
+                                  handleReorderPage(index, newPos)
+                                  target.value = ''
+                                }
+                              }
+                            }}
+                          />
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleReorderPage(index, index)}
+                              disabled={index === 0}
+                              className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <ChevronLeft className="w-4 h-4 text-slate-600" />
+                            </button>
+                            <button
+                              onClick={() => handleReorderPage(index, index + 2)}
+                              disabled={index === answerSheets.length - 1}
+                              className="p-1 rounded hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <ChevronRight className="w-4 h-4 text-slate-600" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-3 bg-gray-100">
+                        <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                          <img 
+                            src={sheet.imageUrl} 
+                            alt={`Answer sheet page ${sheet.pageNumber}`}
+                            className="w-full h-auto object-contain"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.src = "/placeholder.svg"
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-center gap-4 p-6 border-t border-slate-200 bg-white">
+                <Button
+                  onClick={handlePhase1Approve}
+                  className="px-8 py-2 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                >
+                  Approve
+                </Button>
+                <Button
+                  onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); }}
+                  variant="outline"
+                  className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                >
+                  Cancel
                 </Button>
               </div>
             </div>
