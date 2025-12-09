@@ -797,14 +797,18 @@ const OCREvaluation = () => {
               {/* Candidate Name Header */}
               <div className="px-6 py-3 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
                 <div className="flex items-center justify-between">
-                  <div className="flex-1">
+                  <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-3">
                       <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
                       <span className="text-sm text-slate-500">Registration: {phase1ReviewCandidate.registrationName}</span>
                     </div>
-                    <div className="mt-1 flex items-start gap-2 text-sm text-slate-600 bg-white/60 rounded px-2 py-1">
-                      <FileText className="h-4 w-4 mt-0.5 text-teal-600 shrink-0" />
-                      <span><strong>Q:</strong> Explain the process of photosynthesis in plants and describe the role of chlorophyll in this process.</span>
+                    <div className="flex items-start gap-3 bg-white rounded-lg border border-slate-200 px-4 py-3">
+                      <div className="flex items-center justify-center h-6 w-6 rounded-full bg-teal-100 text-teal-700 shrink-0">
+                        <span className="text-xs font-bold">Q</span>
+                      </div>
+                      <p className="text-sm text-slate-700 leading-relaxed">
+                        Explain the process of photosynthesis in plants and describe the role of chlorophyll in this process.
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
