@@ -57,10 +57,20 @@ const StatusBadge = ({
   onClick?: () => void
 }) => {
   const config = {
-    completed: {
-      icon: CheckCircle,
-      label: "Completed",
-      className: "bg-emerald-50 text-emerald-700 border-emerald-200"
+    "yet-to-segmentation": {
+      icon: Clock,
+      label: "Yet to Segmentation",
+      className: "bg-slate-50 text-slate-600 border-slate-200"
+    },
+    "yet-to-ocr": {
+      icon: Clock,
+      label: "Yet to OCR",
+      className: "bg-slate-50 text-slate-600 border-slate-200"
+    },
+    "yet-to-evaluation": {
+      icon: Clock,
+      label: "Yet to Evaluation",
+      className: "bg-slate-50 text-slate-600 border-slate-200"
     },
     "in-progress": {
       icon: Loader2,
@@ -68,15 +78,15 @@ const StatusBadge = ({
       className: "bg-blue-50 text-blue-700 border-blue-200",
       animate: true
     },
+    completed: {
+      icon: CheckCircle,
+      label: "Completed",
+      className: "bg-emerald-50 text-emerald-700 border-emerald-200"
+    },
     pending: {
       icon: Clock,
       label: "Pending",
       className: "bg-amber-50 text-amber-700 border-amber-200"
-    },
-    error: {
-      icon: AlertCircle,
-      label: "Error",
-      className: "bg-red-50 text-red-700 border-red-200"
     },
     approved: {
       icon: CheckCircle,
@@ -540,7 +550,7 @@ const OCREvaluation = () => {
                       <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
                         <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm">Sl. No</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm">Candidate Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm whitespace-nowrap">Segmentation</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm whitespace-nowrap">Segmentation Indexing</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm">OCR</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm">Evaluation</TableHead>
                       </TableRow>
