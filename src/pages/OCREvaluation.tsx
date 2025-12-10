@@ -671,27 +671,27 @@ const OCREvaluation = () => {
 
       {/* OCR Review Dialog */}
       <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); }}>
-        <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 overflow-hidden [&>button]:hidden">
-          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
-            <DialogTitle className="flex items-center gap-2 text-slate-800">
-              <ScanLine className="w-5 h-5 text-teal-600" />
-              OCR Review - {ocrReviewCandidate?.candidateName}
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 border-b border-slate-200 bg-white">
+            <DialogTitle className="flex items-center gap-2 text-slate-800 text-sm sm:text-base">
+              <ScanLine className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
+              <span className="truncate">OCR Review - {ocrReviewCandidate?.candidateName}</span>
             </DialogTitle>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
               {isEditing ? (
                 <>
                   <Button
                     onClick={handleSaveEdits}
                     size="sm"
-                    className="px-6 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                    className="px-3 sm:px-6 text-xs sm:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
                   >
-                    Save Changes
+                    Save
                   </Button>
                   <Button
                     onClick={handleCancelEdits}
                     size="sm"
                     variant="outline"
-                    className="px-6 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                    className="px-3 sm:px-6 text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
                   >
                     Cancel
                   </Button>
@@ -702,15 +702,15 @@ const OCREvaluation = () => {
                     onClick={handleUpdate}
                     size="sm"
                     variant="outline"
-                    className="px-6 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                    className="px-3 sm:px-6 text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
                   >
-                    <Edit2 className="w-4 h-4 mr-2" />
+                    <Edit2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Update
                   </Button>
                   <Button
                     onClick={handleApprove}
                     size="sm"
-                    className="px-6 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                    className="px-3 sm:px-6 text-xs sm:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
                   >
                     Approve
                   </Button>
@@ -726,9 +726,9 @@ const OCREvaluation = () => {
           </div>
           
           {ocrReviewCandidate && (
-            <div className="flex h-[calc(95vh-70px)]">
+            <div className="flex flex-col md:flex-row h-[calc(95vh-70px)]">
               {/* Left Sidebar: Question List */}
-              <div className="w-72 border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
+              <div className="w-full md:w-72 h-32 md:h-auto border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
                 <div className="px-4 py-3 border-b border-slate-200 bg-white">
                   <h4 className="text-sm font-semibold text-slate-700">Questions</h4>
                   <p className="text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
@@ -790,7 +790,7 @@ const OCREvaluation = () => {
 
                   {/* Two Column Cards */}
                   <div className="px-6 py-4">
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Segment Card - with images */}
                     <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
                       <div className="p-4 border-b border-slate-200 bg-white">
@@ -877,17 +877,17 @@ const OCREvaluation = () => {
 
       {/* Phase 1 Answer Sheets Review Dialog */}
       <Dialog open={!!phase1ReviewCandidate} onOpenChange={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}>
-        <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 overflow-hidden [&>button]:hidden">
-          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
-            <DialogTitle className="flex items-center gap-2 text-slate-800">
-              <Image className="w-5 h-5 text-teal-600" />
-              Segmentation Indexing Review - {phase1ReviewCandidate?.candidateName}
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 border-b border-slate-200 bg-white">
+            <DialogTitle className="flex items-center gap-2 text-slate-800 text-sm sm:text-base">
+              <Image className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
+              <span className="truncate">Segmentation Indexing - {phase1ReviewCandidate?.candidateName}</span>
             </DialogTitle>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
               <Button
                 onClick={handlePhase1Approve}
                 size="sm"
-                className="px-6 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                className="px-3 sm:px-6 text-xs sm:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
               >
                 Approve
               </Button>
@@ -895,7 +895,7 @@ const OCREvaluation = () => {
                 onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}
                 size="sm"
                 variant="outline"
-                className="px-6 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                className="px-3 sm:px-6 text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
               >
                 Cancel
               </Button>
@@ -909,9 +909,9 @@ const OCREvaluation = () => {
           </div>
           
           {phase1ReviewCandidate && (
-            <div className="flex h-[calc(95vh-70px)]">
+            <div className="flex flex-col md:flex-row h-[calc(95vh-70px)]">
               {/* Left Sidebar: Question List */}
-              <div className="w-72 border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
+              <div className="w-full md:w-72 h-32 md:h-auto border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
                 <div className="px-4 py-3 border-b border-slate-200 bg-white">
                   <h4 className="text-sm font-semibold text-slate-700">Questions</h4>
                   <p className="text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
@@ -952,23 +952,23 @@ const OCREvaluation = () => {
               <div className="flex-1 flex flex-col overflow-hidden">
                 <ScrollArea className="flex-1 bg-slate-50">
                   {/* Header with Candidate Info & Controls */}
-                  <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
-                        <span className="text-sm text-slate-500 bg-white/70 px-2 py-0.5 rounded">
+                  <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-teal-50 to-slate-50">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 sm:gap-4">
+                        <h3 className="text-sm sm:text-lg font-semibold text-slate-800 truncate">{phase1ReviewCandidate.candidateName}</h3>
+                        <span className="text-xs sm:text-sm text-slate-500 bg-white/70 px-2 py-0.5 rounded shrink-0">
                           {phase1ReviewCandidate.registrationName}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-1.5">
+                      <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+                        <div className="flex items-center gap-1 sm:gap-2 bg-white rounded-lg border border-slate-200 px-2 sm:px-3 py-1 sm:py-1.5">
                           <span className="text-xs font-medium text-slate-500">From</span>
                           <Input
                             type="number"
                             placeholder="#"
                             value={fromPageInput}
                             onChange={(e) => setFromPageInput(e.target.value)}
-                            className="w-14 h-7 text-sm border-slate-300 text-center"
+                            className="w-10 sm:w-14 h-6 sm:h-7 text-xs sm:text-sm border-slate-300 text-center"
                             min={1}
                             max={answerSheets.length}
                           />
@@ -978,19 +978,19 @@ const OCREvaluation = () => {
                             placeholder="#"
                             value={toPageInput}
                             onChange={(e) => setToPageInput(e.target.value)}
-                            className="w-14 h-7 text-sm border-slate-300 text-center"
+                            className="w-10 sm:w-14 h-6 sm:h-7 text-xs sm:text-sm border-slate-300 text-center"
                             min={1}
                             max={answerSheets.length}
                           />
                           <Button
                             onClick={handleRepositionPages}
                             size="sm"
-                            className="h-7 px-3 bg-teal-600 hover:bg-teal-700 text-white text-xs"
+                            className="h-6 sm:h-7 px-2 sm:px-3 bg-teal-600 hover:bg-teal-700 text-white text-xs"
                           >
                             Reposition
                           </Button>
                         </div>
-                        <span className="text-sm font-medium text-slate-600 bg-white/70 px-2 py-0.5 rounded">
+                        <span className="text-xs sm:text-sm font-medium text-slate-600 bg-white/70 px-2 py-0.5 rounded">
                           {answerSheets.length} pages
                         </span>
                       </div>
@@ -1022,8 +1022,8 @@ const OCREvaluation = () => {
                   </div>
 
                   {/* Answer Sheets Grid */}
-                  <div className="px-6 py-4">
-                    <div className="grid grid-cols-2 gap-6">
+                  <div className="px-4 sm:px-6 py-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       {answerSheets.map((sheet, index) => (
                         <div 
                           key={sheet.pageNumber}
@@ -1061,13 +1061,13 @@ const OCREvaluation = () => {
 
       {/* Evaluation Review Dialog */}
       <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); }}>
-        <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 overflow-hidden [&>button]:hidden">
-          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
-            <DialogTitle className="flex items-center gap-2 text-slate-800">
-              <Award className="w-5 h-5 text-teal-600" />
-              Evaluation Review - {evaluationReviewCandidate?.candidateName}
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 border-b border-slate-200 bg-white">
+            <DialogTitle className="flex items-center gap-2 text-slate-800 text-sm sm:text-base">
+              <Award className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
+              <span className="truncate">Evaluation Review - {evaluationReviewCandidate?.candidateName}</span>
             </DialogTitle>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
               <Button
                 onClick={() => {
                   setCandidates(prev => prev.map(c => {
@@ -1081,9 +1081,9 @@ const OCREvaluation = () => {
                   setEvalActiveQuestionIndex(0)
                 }}
                 size="sm"
-                className="px-6 bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                className="px-3 sm:px-6 text-xs sm:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
               >
-                Approve Evaluation
+                Approve
               </Button>
               <button 
                 onClick={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); }}
@@ -1095,9 +1095,9 @@ const OCREvaluation = () => {
           </div>
           
           {evaluationReviewCandidate && (
-            <div className="flex h-[calc(95vh-70px)]">
+            <div className="flex flex-col md:flex-row h-[calc(95vh-70px)]">
               {/* Left Sidebar: Question List */}
-              <div className="w-72 border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
+              <div className="w-full md:w-72 h-32 md:h-auto border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
                 <div className="px-4 py-3 border-b border-slate-200 bg-white">
                   <h4 className="text-sm font-semibold text-slate-700">Questions</h4>
                   <p className="text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
@@ -1165,8 +1165,8 @@ const OCREvaluation = () => {
                       </div>
 
                       {/* Evaluation Details */}
-                      <div className="px-6 py-4">
-                        <div className="grid grid-cols-2 gap-6">
+                      <div className="px-4 sm:px-6 py-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                           {/* Left Column */}
                           <div className="space-y-5">
                             {/* Extracted Info */}
