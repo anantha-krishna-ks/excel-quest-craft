@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -139,6 +139,7 @@ const OCREvaluation = () => {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
   const [ocrActiveQuestionIndex, setOcrActiveQuestionIndex] = useState(0)
   const [evalActiveQuestionIndex, setEvalActiveQuestionIndex] = useState(0)
+  const [showReuploadConfirm, setShowReuploadConfirm] = useState(false)
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B'
@@ -278,12 +279,13 @@ const OCREvaluation = () => {
     return "pending"
   }
 
-  const handleReupload = () => {
+  const handleReuploadConfirm = () => {
     setHasUploaded(false)
     setCandidates([])
     setFolderName("")
     setFileCount(0)
     setTotalFileSize(0)
+    setShowReuploadConfirm(false)
     toast.info("Ready to upload a new folder")
   }
 
@@ -522,7 +524,7 @@ const OCREvaluation = () => {
                     </div>
                   </div>
                   <Button
-                    onClick={handleReupload}
+                    onClick={() => setShowReuploadConfirm(true)}
                     variant="outline"
                     size="sm"
                     className="border-teal-300 text-teal-700 hover:bg-teal-50 shrink-0"
@@ -1398,6 +1400,36 @@ const OCREvaluation = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Re-upload Confirmation Dialog */}
+      <Dialog open={showReuploadConfirm} onOpenChange={setShowReuploadConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <RotateCcw className="w-5 h-5 text-amber-500" />
+              Confirm Re-upload
+            </DialogTitle>
+            <DialogDescription className="text-slate-600 pt-2">
+              Are you sure you want to re-upload a new folder? This will clear all current candidate data and evaluation progress.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowReuploadConfirm(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleReuploadConfirm}
+              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              Yes, Re-upload
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
