@@ -518,7 +518,7 @@ const OCREvaluation = () => {
                         <TableHead className="font-semibold text-slate-700 py-4 text-center">Segmentation Indexing</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-4 text-center">OCR</TableHead>
                         <TableHead className="font-semibold text-slate-700 py-4 text-center">Evaluation</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Preview</TableHead>
+                        
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -558,17 +558,6 @@ const OCREvaluation = () => {
                               clickable={candidate.phase3 === "completed"}
                               onClick={() => setEvaluationReviewCandidate(candidate)}
                             />
-                          </TableCell>
-                          <TableCell className="py-4 text-center">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setPreviewCandidate(candidate)}
-                              className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Preview
-                            </Button>
                           </TableCell>
                         </TableRow>
                       ))}
