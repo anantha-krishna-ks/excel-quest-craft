@@ -31,15 +31,17 @@ interface EvaluationData {
   rational: string
 }
 
+type PhaseStatus = "yet-to-segmentation" | "yet-to-ocr" | "yet-to-evaluation" | "in-progress" | "completed" | "pending" | "approved"
+
 interface CandidateData {
   id: string
   candidateName: string
   registrationName: string
   centreName: string
   centreAddress: string
-  phase1: "completed" | "in-progress" | "pending" | "error"
-  phase2: "completed" | "in-progress" | "pending" | "error"
-  phase3: "completed" | "in-progress" | "pending" | "error"
+  phase1: PhaseStatus
+  phase2: PhaseStatus
+  phase3: PhaseStatus
   segmentData?: string
   ocrData?: string
   answerSheets?: AnswerSheetPage[]
@@ -233,9 +235,9 @@ const OCREvaluation = () => {
             registrationName: `REG${String(index + 1).padStart(6, '0')}`,
             centreName: centres[index % centres.length],
             centreAddress: addresses[index % addresses.length],
-            phase1: getRandomStatus(),
-            phase2: getRandomStatus(),
-            phase3: getRandomStatus(),
+            phase1: getRandomStatus(1),
+            phase2: getRandomStatus(2),
+            phase3: getRandomStatus(3),
             segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
             segmentImages: generateMockSegmentImages(),
@@ -247,9 +249,9 @@ const OCREvaluation = () => {
             registrationName: `REG${String(index + 1).padStart(6, '0')}`,
             centreName: centres[index % centres.length],
             centreAddress: addresses[index % addresses.length],
-            phase1: getRandomStatus(),
-            phase2: getRandomStatus(),
-            phase3: getRandomStatus(),
+            phase1: getRandomStatus(1),
+            phase2: getRandomStatus(2),
+            phase3: getRandomStatus(3),
             segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
             segmentImages: generateMockSegmentImages(),
@@ -263,9 +265,10 @@ const OCREvaluation = () => {
     }, 2000)
   }
 
-  const getRandomStatus = (): "completed" | "in-progress" | "pending" | "error" => {
-    const statuses: ("completed" | "in-progress" | "pending" | "error")[] = ["completed", "in-progress", "pending", "error"]
-    const weights = [0.6, 0.15, 0.15, 0.1]
+  const getRandomStatus = (phase: 1 | 2 | 3): PhaseStatus => {
+    const yetToStatus: PhaseStatus = phase === 1 ? "yet-to-segmentation" : phase === 2 ? "yet-to-ocr" : "yet-to-evaluation"
+    const statuses: PhaseStatus[] = [yetToStatus, "in-progress", "completed", "pending", "approved"]
+    const weights = [0.15, 0.2, 0.35, 0.15, 0.15]
     const random = Math.random()
     let cumulative = 0
     for (let i = 0; i < weights.length; i++) {
