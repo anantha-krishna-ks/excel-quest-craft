@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2 } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -142,6 +142,9 @@ const OCREvaluation = () => {
   const [showReuploadConfirm, setShowReuploadConfirm] = useState(false)
   const [activeAnswerSheetIndex, setActiveAnswerSheetIndex] = useState(0)
   const [zoomLevel, setZoomLevel] = useState(100)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [phaseFilter, setPhaseFilter] = useState<"all" | "phase1" | "phase2" | "phase3">("all")
+  const [statusFilter, setStatusFilter] = useState<"all" | PhaseStatus>("all")
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B'
@@ -546,67 +549,153 @@ const OCREvaluation = () => {
           {hasUploaded && candidates.length > 0 && (
             <Card className="border-2 border-slate-100 bg-white">
               <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-3 mb-4">
-                  <div className="p-1.5 sm:p-2 bg-slate-500 text-white rounded-lg shrink-0">
-                    <ScanLine className="h-4 w-4 sm:h-5 sm:w-5" />
+                <div className="flex flex-col gap-4 mb-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="p-1.5 sm:p-2 bg-slate-500 text-white rounded-lg shrink-0">
+                      <ScanLine className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </div>
+                    <h2 className="text-lg sm:text-2xl font-semibold text-slate-700">Evaluation Results</h2>
                   </div>
-                  <h2 className="text-lg sm:text-2xl font-semibold text-slate-700">Evaluation Results</h2>
+                  
+                  {/* Search and Filters */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Input
+                        placeholder="Search by candidate name..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9 border-slate-200 focus:border-teal-300 focus:ring-teal-200"
+                      />
+                    </div>
+                    
+                    {/* Phase Filter */}
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-slate-400 hidden sm:block" />
+                      <select
+                        value={phaseFilter}
+                        onChange={(e) => setPhaseFilter(e.target.value as "all" | "phase1" | "phase2" | "phase3")}
+                        className="h-10 px-3 py-2 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-300 focus:ring-1 focus:ring-teal-200 focus:outline-none"
+                      >
+                        <option value="all">All Phases</option>
+                        <option value="phase1">Segmentation Indexing</option>
+                        <option value="phase2">OCR</option>
+                        <option value="phase3">Evaluation</option>
+                      </select>
+                    </div>
+                    
+                    {/* Status Filter */}
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value as "all" | PhaseStatus)}
+                      className="h-10 px-3 py-2 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-300 focus:ring-1 focus:ring-teal-200 focus:outline-none"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="completed">Completed</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="yet-to-segmentation">Yet to Segmentation</option>
+                      <option value="yet-to-ocr">Yet to OCR</option>
+                      <option value="yet-to-evaluation">Yet to Evaluation</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 -mx-4 sm:mx-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm text-left">Sl. No</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Candidate Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {candidates.map((candidate, index) => (
-                        <TableRow 
-                          key={candidate.id} 
-                          className="border-b border-slate-100 last:border-b-0"
-                        >
-                          <TableCell className="text-slate-600 py-3 sm:py-4 text-xs sm:text-sm text-left">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell className="py-3 sm:py-4 text-left">
-                            <button
-                              onClick={() => setDetailCandidate(candidate)}
-                              className="font-medium text-teal-700 hover:text-teal-800 hover:underline cursor-pointer text-left text-xs sm:text-sm"
-                            >
-                              {candidate.candidateName}
-                            </button>
-                          </TableCell>
-                          <TableCell className="py-3 sm:py-4 text-left">
-                            <StatusBadge 
-                              status={candidate.phase1}
-                              clickable={candidate.phase1 === "completed"}
-                              onClick={() => handleOpenPhase1Review(candidate)}
-                            />
-                          </TableCell>
-                          <TableCell className="py-3 sm:py-4 text-left">
-                            <StatusBadge 
-                              status={candidate.phase2} 
-                              clickable={candidate.phase2 === "completed"}
-                              onClick={() => handleOpenOcrReview(candidate)}
-                            />
-                          </TableCell>
-                          <TableCell className="py-3 sm:py-4 text-left">
-                            <StatusBadge 
-                              status={candidate.phase3}
-                              clickable={candidate.phase3 === "completed"}
-                              onClick={() => setEvaluationReviewCandidate(candidate)}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                {/* Filtered Results */}
+                {(() => {
+                  const filteredCandidates = candidates.filter(candidate => {
+                    // Search filter
+                    const matchesSearch = candidate.candidateName.toLowerCase().includes(searchQuery.toLowerCase())
+                    
+                    // Status filter
+                    let matchesStatus = statusFilter === "all"
+                    if (!matchesStatus) {
+                      if (phaseFilter === "all") {
+                        matchesStatus = candidate.phase1 === statusFilter || candidate.phase2 === statusFilter || candidate.phase3 === statusFilter
+                      } else if (phaseFilter === "phase1") {
+                        matchesStatus = candidate.phase1 === statusFilter
+                      } else if (phaseFilter === "phase2") {
+                        matchesStatus = candidate.phase2 === statusFilter
+                      } else if (phaseFilter === "phase3") {
+                        matchesStatus = candidate.phase3 === statusFilter
+                      }
+                    }
+                    
+                    return matchesSearch && matchesStatus
+                  })
+
+                  return (
+                    <>
+                      <div className="text-sm text-slate-500 mb-3">
+                        Showing {filteredCandidates.length} of {candidates.length} candidates
+                      </div>
+                      <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 -mx-4 sm:mx-0">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm text-left">Sl. No</TableHead>
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Candidate Name</TableHead>
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filteredCandidates.length === 0 ? (
+                              <TableRow>
+                                <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                                  No candidates found matching your filters
+                                </TableCell>
+                              </TableRow>
+                            ) : (
+                              filteredCandidates.map((candidate, index) => (
+                                <TableRow 
+                                  key={candidate.id} 
+                                  className="border-b border-slate-100 last:border-b-0"
+                                >
+                                  <TableCell className="text-slate-600 py-3 sm:py-4 text-xs sm:text-sm text-left">
+                                    {index + 1}
+                                  </TableCell>
+                                  <TableCell className="py-3 sm:py-4 text-left">
+                                    <button
+                                      onClick={() => setDetailCandidate(candidate)}
+                                      className="font-medium text-teal-700 hover:text-teal-800 hover:underline cursor-pointer text-left text-xs sm:text-sm"
+                                    >
+                                      {candidate.candidateName}
+                                    </button>
+                                  </TableCell>
+                                  <TableCell className="py-3 sm:py-4 text-left">
+                                    <StatusBadge 
+                                      status={candidate.phase1}
+                                      clickable={candidate.phase1 === "completed"}
+                                      onClick={() => handleOpenPhase1Review(candidate)}
+                                    />
+                                  </TableCell>
+                                  <TableCell className="py-3 sm:py-4 text-left">
+                                    <StatusBadge 
+                                      status={candidate.phase2} 
+                                      clickable={candidate.phase2 === "completed"}
+                                      onClick={() => handleOpenOcrReview(candidate)}
+                                    />
+                                  </TableCell>
+                                  <TableCell className="py-3 sm:py-4 text-left">
+                                    <StatusBadge 
+                                      status={candidate.phase3}
+                                      clickable={candidate.phase3 === "completed"}
+                                      onClick={() => setEvaluationReviewCandidate(candidate)}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </>
+                  )
+                })()}
               </CardContent>
             </Card>
           )}
