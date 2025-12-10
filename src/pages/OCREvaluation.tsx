@@ -1521,7 +1521,7 @@ const OCREvaluation = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-slate-800">
-              <RotateCcw className="w-5 h-5 text-amber-500" />
+              <RotateCcw className="w-5 h-5 text-teal-600" />
               Confirm Re-upload
             </DialogTitle>
             <DialogDescription className="text-slate-600 pt-2">
@@ -1532,13 +1532,13 @@ const OCREvaluation = () => {
             <Button
               variant="outline"
               onClick={() => setShowReuploadConfirm(false)}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800"
             >
               Cancel
             </Button>
             <Button
               onClick={handleReuploadConfirm}
-              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white"
+              className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
             >
               Yes, Re-upload
             </Button>
