@@ -697,19 +697,20 @@ const OCREvaluation = () => {
 
       {/* OCR Review Dialog */}
       <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); }}>
-        <DialogContent className="max-w-[95vw] w-full h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 border-b border-slate-200 bg-white">
-            <DialogTitle className="flex items-center gap-2 text-slate-800 text-sm sm:text-base">
-              <ScanLine className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
+          {/* Dialog Header */}
+          <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
+            <DialogTitle className="flex items-center gap-1.5 sm:gap-2 text-slate-800 text-xs sm:text-sm md:text-base min-w-0">
+              <ScanLine className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 shrink-0" />
               <span className="truncate">OCR Review - {ocrReviewCandidate?.candidateName}</span>
             </DialogTitle>
-            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
               {isEditing ? (
                 <>
                   <Button
                     onClick={handleSaveEdits}
                     size="sm"
-                    className="px-3 sm:px-6 text-xs sm:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
                   >
                     Save
                   </Button>
@@ -717,7 +718,7 @@ const OCREvaluation = () => {
                     onClick={handleCancelEdits}
                     size="sm"
                     variant="outline"
-                    className="px-3 sm:px-6 text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
                   >
                     Cancel
                   </Button>
@@ -728,15 +729,15 @@ const OCREvaluation = () => {
                     onClick={handleUpdate}
                     size="sm"
                     variant="outline"
-                    className="px-3 sm:px-6 text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
                   >
-                    <Edit2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    Update
+                    <Edit2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                    <span className="hidden sm:inline">Update</span>
                   </Button>
                   <Button
                     onClick={handleApprove}
                     size="sm"
-                    className="px-3 sm:px-6 text-xs sm:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
                   >
                     Approve
                   </Button>
@@ -744,157 +745,198 @@ const OCREvaluation = () => {
               )}
               <button 
                 onClick={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); }}
-                className="p-1.5 rounded-md hover:bg-slate-100 transition-colors"
+                className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
               >
-                <X className="w-5 h-5 text-slate-500" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
               </button>
             </div>
           </div>
           
           {ocrReviewCandidate && (
-            <div className="flex flex-col md:flex-row h-[calc(95vh-70px)]">
-              {/* Left Sidebar: Question List */}
-              <div className="w-full md:w-72 h-32 md:h-auto border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
-                <div className="px-4 py-3 border-b border-slate-200 bg-white">
-                  <h4 className="text-sm font-semibold text-slate-700">Questions</h4>
-                  <p className="text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
-                </div>
-                <ScrollArea className="flex-1">
-                  <div className="p-2 space-y-1">
+            <div className="flex flex-col h-[calc(95vh-52px)] sm:h-[calc(95vh-56px)] md:h-[calc(95vh-64px)] overflow-hidden">
+              {/* Mobile/Tablet: Horizontal Question Selector */}
+              <div className="md:hidden bg-slate-50 border-b border-slate-200 shrink-0">
+                <div className="flex items-center gap-2 px-2 py-2">
+                  <span className="text-xs font-medium text-slate-500 shrink-0">Q:</span>
+                  <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                     {mockQuestionsList.map((question, index) => (
                       <button
                         key={question.id}
                         onClick={() => setOcrActiveQuestionIndex(index)}
-                        className={`w-full text-left px-3 py-3 rounded-lg transition-all ${
+                        className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
                           ocrActiveQuestionIndex === index
                             ? 'bg-teal-600 text-white shadow-sm'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                            : 'bg-white text-slate-600 border border-slate-200'
                         }`}
                       >
-                        <div className="flex items-start gap-2">
-                          <span className={`flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold shrink-0 ${
-                            ocrActiveQuestionIndex === index
-                              ? 'bg-white/20 text-white'
-                              : 'bg-teal-100 text-teal-700'
-                          }`}>
-                            {question.id}
-                          </span>
-                          <p className={`text-xs leading-relaxed line-clamp-2 ${
-                            ocrActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
-                          }`}>
-                            {question.text}
-                          </p>
-                        </div>
+                        {question.id}
                       </button>
                     ))}
                   </div>
-                </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <div className="flex items-center gap-1 shrink-0 ml-auto">
+                    <button
+                      onClick={() => setOcrActiveQuestionIndex(Math.max(0, ocrActiveQuestionIndex - 1))}
+                      disabled={ocrActiveQuestionIndex === 0}
+                      className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4 text-slate-600" />
+                    </button>
+                    <button
+                      onClick={() => setOcrActiveQuestionIndex(Math.min(mockQuestionsList.length - 1, ocrActiveQuestionIndex + 1))}
+                      disabled={ocrActiveQuestionIndex === mockQuestionsList.length - 1}
+                      className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4 text-slate-600" />
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Right Content: Active Question Details */}
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <ScrollArea className="flex-1 bg-slate-50">
-                  {/* Active Question Card */}
-                  <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50">
-                    <div className="flex items-start gap-4 p-4 rounded-xl bg-white border border-teal-100">
-                      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
-                        <span className="text-sm font-bold">Q{mockQuestionsList[ocrActiveQuestionIndex]?.id}</span>
-                      </div>
-                      <div className="flex-1 space-y-2">
-                        <p className="text-sm text-slate-800 leading-relaxed font-medium">
-                          {mockQuestionsList[ocrActiveQuestionIndex]?.text}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-slate-500">
-                          <span className="flex items-center gap-1">
-                            <Target className="w-3.5 h-3.5 text-teal-600" />
-                            Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[ocrActiveQuestionIndex]?.maxScore}</span>
-                          </span>
+              <div className="flex flex-1 min-h-0">
+                {/* Desktop: Left Sidebar Question List */}
+                <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
+                  <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
+                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                  </div>
+                  <ScrollArea className="flex-1">
+                    <div className="p-1.5 lg:p-2 space-y-1">
+                      {mockQuestionsList.map((question, index) => (
+                        <button
+                          key={question.id}
+                          onClick={() => setOcrActiveQuestionIndex(index)}
+                          className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
+                            ocrActiveQuestionIndex === index
+                              ? 'bg-teal-600 text-white shadow-sm'
+                              : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className={`flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                              ocrActiveQuestionIndex === index
+                                ? 'bg-white/20 text-white'
+                                : 'bg-teal-100 text-teal-700'
+                            }`}>
+                              {question.id}
+                            </span>
+                            <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
+                              ocrActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
+                            }`}>
+                              {question.text}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+
+                {/* Right Content: Active Question Details */}
+                <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                  <ScrollArea className="flex-1 bg-slate-50">
+                    {/* Active Question Card */}
+                    <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 bg-gradient-to-r from-teal-50 to-slate-50">
+                      <div className="flex items-start gap-2 sm:gap-3 md:gap-4 p-2.5 sm:p-3 md:p-4 rounded-xl bg-white border border-teal-100">
+                        <div className="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 rounded-full bg-teal-600 text-white shrink-0">
+                          <span className="text-[10px] sm:text-xs md:text-sm font-bold">Q{mockQuestionsList[ocrActiveQuestionIndex]?.id}</span>
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+                          <p className="text-[11px] sm:text-xs md:text-sm text-slate-800 leading-relaxed font-medium">
+                            {mockQuestionsList[ocrActiveQuestionIndex]?.text}
+                          </p>
+                          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 text-[10px] sm:text-xs text-slate-500">
+                            <span className="flex items-center gap-1">
+                              <Target className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-teal-600" />
+                              Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[ocrActiveQuestionIndex]?.maxScore}</span>
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Two Column Cards */}
-                  <div className="px-6 py-4">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                    {/* Segment Card - with images */}
-                    <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
-                      <div className="p-4 border-b border-slate-200 bg-white">
-                        <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                          <Image className="w-4 h-4 text-indigo-600" />
-                          Segment
-                        </h3>
-                        <p className="text-xs text-slate-500 mt-1">Handwritten answer sheet segments</p>
-                      </div>
-                      <div className="p-4 space-y-4">
-                        {/* Segment Images */}
-                        <div className="space-y-3">
-                          {(ocrReviewCandidate.segmentImages || generateMockSegmentImages()).map((segment) => (
-                            <div key={segment.id} className="rounded-lg border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-3 py-2 bg-slate-50 border-b border-slate-200">
-                                <span className="text-xs font-medium text-slate-600">{segment.label}</span>
-                              </div>
-                              <div className="p-2">
-                                <img 
-                                  src={segment.imageUrl} 
-                                  alt={segment.label}
-                                  className="w-full h-32 object-cover rounded"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement
-                                    target.src = "/placeholder.svg"
-                                  }}
-                                />
-                              </div>
+                    {/* Two Column Cards */}
+                    <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+                        {/* Segment Card - with images */}
+                        <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
+                          <div className="p-2.5 sm:p-3 md:p-4 border-b border-slate-200 bg-white">
+                            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 flex items-center gap-2">
+                              <Image className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
+                              Segment
+                            </h3>
+                            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Handwritten answer sheet segments</p>
+                          </div>
+                          <div className="p-2.5 sm:p-3 md:p-4 space-y-3 sm:space-y-4">
+                            {/* Segment Images */}
+                            <div className="space-y-2 sm:space-y-3">
+                              {(ocrReviewCandidate.segmentImages || generateMockSegmentImages()).map((segment) => (
+                                <div key={segment.id} className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+                                  <div className="px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-50 border-b border-slate-200">
+                                    <span className="text-[10px] sm:text-xs font-medium text-slate-600">{segment.label}</span>
+                                  </div>
+                                  <div className="p-1.5 sm:p-2">
+                                    <img 
+                                      src={segment.imageUrl} 
+                                      alt={segment.label}
+                                      className="w-full h-24 sm:h-28 md:h-32 object-cover rounded"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.src = "/placeholder.svg"
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                            
+                            {/* Segment Text Data */}
+                            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-slate-200">
+                              <p className="text-[10px] sm:text-xs font-medium text-slate-600 mb-1.5 sm:mb-2">Segment Data</p>
+                              {isEditing ? (
+                                <Textarea
+                                  value={editedSegmentData}
+                                  onChange={(e) => setEditedSegmentData(e.target.value)}
+                                  className="min-h-[80px] sm:min-h-[100px] md:min-h-[120px] text-xs sm:text-sm font-mono bg-white border-slate-300 resize-none"
+                                  placeholder="Enter segment data..."
+                                />
+                              ) : (
+                                <pre className="text-[10px] sm:text-xs md:text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-2 sm:p-3 rounded-lg border border-slate-200">
+                                  {ocrReviewCandidate.segmentData}
+                                </pre>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        
-                        {/* Segment Text Data */}
-                        <div className="mt-4 pt-4 border-t border-slate-200">
-                          <p className="text-xs font-medium text-slate-600 mb-2">Segment Data</p>
-                          {isEditing ? (
-                            <Textarea
-                              value={editedSegmentData}
-                              onChange={(e) => setEditedSegmentData(e.target.value)}
-                              className="min-h-[120px] text-sm font-mono bg-white border-slate-300 resize-none"
-                              placeholder="Enter segment data..."
-                            />
-                          ) : (
-                            <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-3 rounded-lg border border-slate-200">
-                              {ocrReviewCandidate.segmentData}
-                            </pre>
-                          )}
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* OCR Card */}
-                    <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
-                      <div className="p-4 border-b border-slate-200 bg-white">
-                        <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-indigo-600" />
-                          OCR
-                        </h3>
-                        <p className="text-xs text-slate-500 mt-1">Extracted text from segments</p>
-                      </div>
-                      <div className="p-4">
-                        {isEditing ? (
-                          <Textarea
-                            value={editedOcrData}
-                            onChange={(e) => setEditedOcrData(e.target.value)}
-                            className="min-h-[400px] text-sm font-mono bg-white border-slate-300 resize-none"
-                            placeholder="Enter OCR data..."
-                          />
-                        ) : (
-                          <pre className="text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-4 rounded-lg border border-slate-200 min-h-[400px]">
-                            {ocrReviewCandidate.ocrData}
-                          </pre>
-                        )}
+                        {/* OCR Card */}
+                        <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
+                          <div className="p-2.5 sm:p-3 md:p-4 border-b border-slate-200 bg-white">
+                            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 flex items-center gap-2">
+                              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
+                              OCR
+                            </h3>
+                            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Extracted text from segments</p>
+                          </div>
+                          <div className="p-2.5 sm:p-3 md:p-4">
+                            {isEditing ? (
+                              <Textarea
+                                value={editedOcrData}
+                                onChange={(e) => setEditedOcrData(e.target.value)}
+                                className="min-h-[250px] sm:min-h-[300px] md:min-h-[400px] text-xs sm:text-sm font-mono bg-white border-slate-300 resize-none"
+                                placeholder="Enter OCR data..."
+                              />
+                            ) : (
+                              <pre className="text-[10px] sm:text-xs md:text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-2 sm:p-3 md:p-4 rounded-lg border border-slate-200 min-h-[250px] sm:min-h-[300px] md:min-h-[400px]">
+                                {ocrReviewCandidate.ocrData}
+                              </pre>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  </div>
-                </ScrollArea>
+                  </ScrollArea>
+                </div>
               </div>
             </div>
           )}
@@ -1123,13 +1165,14 @@ const OCREvaluation = () => {
 
       {/* Evaluation Review Dialog */}
       <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); }}>
-        <DialogContent className="max-w-[95vw] w-full h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 sm:p-4 border-b border-slate-200 bg-white">
-            <DialogTitle className="flex items-center gap-2 text-slate-800 text-sm sm:text-base">
-              <Award className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
+          {/* Dialog Header */}
+          <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
+            <DialogTitle className="flex items-center gap-1.5 sm:gap-2 text-slate-800 text-xs sm:text-sm md:text-base min-w-0">
+              <Award className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 shrink-0" />
               <span className="truncate">Evaluation Review - {evaluationReviewCandidate?.candidateName}</span>
             </DialogTitle>
-            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
               <Button
                 onClick={() => {
                   setCandidates(prev => prev.map(c => {
@@ -1143,179 +1186,220 @@ const OCREvaluation = () => {
                   setEvalActiveQuestionIndex(0)
                 }}
                 size="sm"
-                className="px-3 sm:px-6 text-xs sm:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
               >
                 Approve
               </Button>
               <button 
                 onClick={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); }}
-                className="p-1.5 rounded-md hover:bg-slate-100 transition-colors"
+                className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
               >
-                <X className="w-5 h-5 text-slate-500" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
               </button>
             </div>
           </div>
           
           {evaluationReviewCandidate && (
-            <div className="flex flex-col md:flex-row h-[calc(95vh-70px)]">
-              {/* Left Sidebar: Question List */}
-              <div className="w-full md:w-72 h-32 md:h-auto border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50 flex flex-col shrink-0">
-                <div className="px-4 py-3 border-b border-slate-200 bg-white">
-                  <h4 className="text-sm font-semibold text-slate-700">Questions</h4>
-                  <p className="text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
-                </div>
-                <ScrollArea className="flex-1">
-                  <div className="p-2 space-y-1">
+            <div className="flex flex-col h-[calc(95vh-52px)] sm:h-[calc(95vh-56px)] md:h-[calc(95vh-64px)] overflow-hidden">
+              {/* Mobile/Tablet: Horizontal Question Selector */}
+              <div className="md:hidden bg-slate-50 border-b border-slate-200 shrink-0">
+                <div className="flex items-center gap-2 px-2 py-2">
+                  <span className="text-xs font-medium text-slate-500 shrink-0">Q:</span>
+                  <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                     {mockQuestionsList.map((question, index) => (
                       <button
                         key={question.id}
                         onClick={() => setEvalActiveQuestionIndex(index)}
-                        className={`w-full text-left px-3 py-3 rounded-lg transition-all ${
+                        className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
                           evalActiveQuestionIndex === index
                             ? 'bg-teal-600 text-white shadow-sm'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                            : 'bg-white text-slate-600 border border-slate-200'
                         }`}
                       >
-                        <div className="flex items-start gap-2">
-                          <span className={`flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold shrink-0 ${
-                            evalActiveQuestionIndex === index
-                              ? 'bg-white/20 text-white'
-                              : 'bg-teal-100 text-teal-700'
-                          }`}>
-                            {question.id}
-                          </span>
-                          <p className={`text-xs leading-relaxed line-clamp-2 ${
-                            evalActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
-                          }`}>
-                            {question.text}
-                          </p>
-                        </div>
+                        {question.id}
                       </button>
                     ))}
                   </div>
-                </ScrollArea>
+                  {/* Navigation Arrows */}
+                  <div className="flex items-center gap-1 shrink-0 ml-auto">
+                    <button
+                      onClick={() => setEvalActiveQuestionIndex(Math.max(0, evalActiveQuestionIndex - 1))}
+                      disabled={evalActiveQuestionIndex === 0}
+                      className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4 text-slate-600" />
+                    </button>
+                    <button
+                      onClick={() => setEvalActiveQuestionIndex(Math.min(mockQuestionsList.length - 1, evalActiveQuestionIndex + 1))}
+                      disabled={evalActiveQuestionIndex === mockQuestionsList.length - 1}
+                      className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4 text-slate-600" />
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Right Content: Active Question Details */}
-              <div className="flex-1 flex flex-col overflow-hidden">
-                {(() => {
-                  const evalData = evaluationReviewCandidate.evaluationData || generateMockEvaluationData()
-                  const activeQuestion = mockQuestionsList[evalActiveQuestionIndex]
-                  return (
-                    <ScrollArea className="flex-1 bg-slate-50">
-                      {/* Active Question Card */}
-                      <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50">
-                        <div className="flex items-start justify-between gap-6 p-4 rounded-xl bg-white border border-teal-100">
-                          <div className="flex items-start gap-4 flex-1">
-                            <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
-                              <span className="text-sm font-bold">Q{activeQuestion?.id}</span>
-                            </div>
-                            <div className="space-y-1 flex-1">
-                              <p className="text-sm text-slate-800 leading-relaxed font-medium">
-                                {activeQuestion?.text}
-                              </p>
-                            </div>
+              <div className="flex flex-1 min-h-0">
+                {/* Desktop: Left Sidebar Question List */}
+                <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
+                  <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
+                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                  </div>
+                  <ScrollArea className="flex-1">
+                    <div className="p-1.5 lg:p-2 space-y-1">
+                      {mockQuestionsList.map((question, index) => (
+                        <button
+                          key={question.id}
+                          onClick={() => setEvalActiveQuestionIndex(index)}
+                          className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
+                            evalActiveQuestionIndex === index
+                              ? 'bg-teal-600 text-white shadow-sm'
+                              : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className={`flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                              evalActiveQuestionIndex === index
+                                ? 'bg-white/20 text-white'
+                                : 'bg-teal-100 text-teal-700'
+                            }`}>
+                              {question.id}
+                            </span>
+                            <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
+                              evalActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
+                            }`}>
+                              {question.text}
+                            </p>
                           </div>
-                          <div className="shrink-0 text-right">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Max Score</p>
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-50 border border-teal-200">
-                              <Target className="w-4 h-4 text-teal-600" />
-                              <span className="text-2xl font-bold text-teal-700">{activeQuestion?.maxScore}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                        </button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
 
-                      {/* Evaluation Details */}
-                      <div className="px-4 sm:px-6 py-4">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                          {/* Left Column */}
-                          <div className="space-y-5">
-                            {/* Extracted Info */}
-                            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-4 py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-indigo-600" />
-                                <h3 className="text-sm font-semibold text-slate-800">Extracted Info</h3>
+                {/* Right Content: Active Question Details */}
+                <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                  {(() => {
+                    const evalData = evaluationReviewCandidate.evaluationData || generateMockEvaluationData()
+                    const activeQuestion = mockQuestionsList[evalActiveQuestionIndex]
+                    return (
+                      <ScrollArea className="flex-1 bg-slate-50">
+                        {/* Active Question Card */}
+                        <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 bg-gradient-to-r from-teal-50 to-slate-50">
+                          <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4 md:gap-6 p-2.5 sm:p-3 md:p-4 rounded-xl bg-white border border-teal-100">
+                            <div className="flex items-start gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
+                              <div className="flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 rounded-full bg-teal-600 text-white shrink-0">
+                                <span className="text-[10px] sm:text-xs md:text-sm font-bold">Q{activeQuestion?.id}</span>
                               </div>
-                              <div className="p-4">
-                                <p className="text-sm text-slate-600 leading-relaxed">
-                                  {evalData.extractedInfo}
+                              <div className="space-y-1 flex-1 min-w-0">
+                                <p className="text-[11px] sm:text-xs md:text-sm text-slate-800 leading-relaxed font-medium">
+                                  {activeQuestion?.text}
                                 </p>
                               </div>
                             </div>
-
-                            {/* Keypoints */}
-                            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-4 py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-2">
-                                <ListChecks className="w-4 h-4 text-emerald-600" />
-                                <h3 className="text-sm font-semibold text-slate-800">Keypoints</h3>
+                            <div className="shrink-0 sm:text-right">
+                              <p className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Max Score</p>
+                              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg bg-teal-50 border border-teal-200">
+                                <Target className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-teal-600" />
+                                <span className="text-lg sm:text-xl md:text-2xl font-bold text-teal-700">{activeQuestion?.maxScore}</span>
                               </div>
-                              <div className="p-4">
-                                <ul className="space-y-2">
-                                  {evalData.keypoints.map((point, index) => (
-                                    <li key={index} className="flex items-start gap-3 text-sm text-slate-600">
-                                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                      <span>{point}</span>
-                                    </li>
-                                  ))}
-                                </ul>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Evaluation Details */}
+                        <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+                            {/* Left Column */}
+                            <div className="space-y-3 sm:space-y-4 md:space-y-5">
+                              {/* Extracted Info */}
+                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
+                                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
+                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Extracted Info</h3>
+                                </div>
+                                <div className="p-2.5 sm:p-3 md:p-4">
+                                  <p className="text-[11px] sm:text-xs md:text-sm text-slate-600 leading-relaxed">
+                                    {evalData.extractedInfo}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Keypoints */}
+                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
+                                  <ListChecks className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Keypoints</h3>
+                                </div>
+                                <div className="p-2.5 sm:p-3 md:p-4">
+                                  <ul className="space-y-1.5 sm:space-y-2">
+                                    {evalData.keypoints.map((point, index) => (
+                                      <li key={index} className="flex items-start gap-2 sm:gap-3 text-[11px] sm:text-xs md:text-sm text-slate-600">
+                                        <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                        <span>{point}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+
+                              {/* Evaluation Score */}
+                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-teal-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
+                                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600" />
+                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Evaluation Score</h3>
+                                </div>
+                                <div className="p-3 sm:p-4 md:p-5 flex items-center justify-center">
+                                  <div className="flex items-baseline gap-1.5 sm:gap-2">
+                                    <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
+                                    <span className="text-lg sm:text-xl text-slate-400">/</span>
+                                    <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
-                            {/* Evaluation Score */}
-                            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-4 py-3 bg-teal-50 border-b border-slate-200 flex items-center gap-2">
-                                <Award className="w-4 h-4 text-teal-600" />
-                                <h3 className="text-sm font-semibold text-slate-800">Evaluation Score</h3>
+                            {/* Right Column */}
+                            <div className="space-y-3 sm:space-y-4 md:space-y-5">
+                              {/* Missing */}
+                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
+                                  <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Missing</h3>
+                                </div>
+                                <div className="p-2.5 sm:p-3 md:p-4">
+                                  <ul className="space-y-1.5 sm:space-y-2">
+                                    {evalData.missing.map((item, index) => (
+                                      <li key={index} className="flex items-start gap-2 sm:gap-3 text-[11px] sm:text-xs md:text-sm text-slate-600">
+                                        <X className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0 mt-0.5" />
+                                        <span>{item}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
                               </div>
-                              <div className="p-5 flex items-center justify-center">
-                                <div className="flex items-baseline gap-2">
-                                  <span className="text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
-                                  <span className="text-xl text-slate-400">/</span>
-                                  <span className="text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
+
+                              {/* Rational */}
+                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
+                                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
+                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Rational</h3>
+                                </div>
+                                <div className="p-2.5 sm:p-3 md:p-4">
+                                  <p className="text-[11px] sm:text-xs md:text-sm text-slate-600 leading-relaxed">
+                                    {evalData.rational}
+                                  </p>
                                 </div>
                               </div>
                             </div>
                           </div>
-
-                          {/* Right Column */}
-                          <div className="space-y-5">
-                            {/* Missing */}
-                            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-4 py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-2">
-                                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                                <h3 className="text-sm font-semibold text-slate-800">Missing</h3>
-                              </div>
-                              <div className="p-4">
-                                <ul className="space-y-2">
-                                  {evalData.missing.map((item, index) => (
-                                    <li key={index} className="flex items-start gap-3 text-sm text-slate-600">
-                                      <X className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                                      <span>{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-
-                            {/* Rational */}
-                            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-4 py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-2">
-                                <MessageSquare className="w-4 h-4 text-purple-600" />
-                                <h3 className="text-sm font-semibold text-slate-800">Rational</h3>
-                              </div>
-                              <div className="p-4">
-                                <p className="text-sm text-slate-600 leading-relaxed">
-                                  {evalData.rational}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
                         </div>
-                      </div>
-                    </ScrollArea>
-                  )
-                })()}
+                      </ScrollArea>
+                    )
+                  })()}
+                </div>
               </div>
             </div>
           )}
