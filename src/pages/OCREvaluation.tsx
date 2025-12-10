@@ -1326,15 +1326,15 @@ const OCREvaluation = () => {
                             </div>
                           </div>
 
-                          {/* Main Content Grid */}
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+                          {/* Main Content - Single Column */}
+                          <div className="space-y-4 sm:space-y-5">
                             {/* Extracted Info */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
                               <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-indigo-600" />
                                 <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Extracted Info</h3>
                               </div>
-                              <div className="p-3 sm:p-4 flex-1">
+                              <div className="p-3 sm:p-4">
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                                   {evalData.extractedInfo}
                                 </p>
@@ -1342,12 +1342,12 @@ const OCREvaluation = () => {
                             </div>
 
                             {/* Keypoints */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
                               <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-2">
                                 <ListChecks className="w-4 h-4 text-emerald-600" />
                                 <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Keypoints</h3>
                               </div>
-                              <div className="p-3 sm:p-4 flex-1">
+                              <div className="p-3 sm:p-4">
                                 <ul className="space-y-2">
                                   {evalData.keypoints.map((point, index) => (
                                     <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
@@ -1360,12 +1360,12 @@ const OCREvaluation = () => {
                             </div>
 
                             {/* Missing Items */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
                               <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-2">
                                 <AlertTriangle className="w-4 h-4 text-amber-600" />
                                 <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Missing Items</h3>
                               </div>
-                              <div className="p-3 sm:p-4 flex-1">
+                              <div className="p-3 sm:p-4">
                                 <ul className="space-y-2">
                                   {evalData.missing.map((item, index) => (
                                     <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
@@ -1378,12 +1378,12 @@ const OCREvaluation = () => {
                             </div>
 
                             {/* Rationale */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
                               <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-2">
                                 <MessageSquare className="w-4 h-4 text-purple-600" />
                                 <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Rationale</h3>
                               </div>
-                              <div className="p-3 sm:p-4 flex-1">
+                              <div className="p-3 sm:p-4">
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                                   {evalData.rational}
                                 </p>
