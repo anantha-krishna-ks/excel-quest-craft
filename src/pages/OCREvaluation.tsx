@@ -767,28 +767,29 @@ const OCREvaluation = () => {
 
               {/* Right Content: Active Question Details */}
               <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Active Question Card */}
-                <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-white border border-teal-100">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
-                      <span className="text-sm font-bold">Q{mockQuestionsList[ocrActiveQuestionIndex]?.id}</span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <p className="text-sm text-slate-800 leading-relaxed font-medium">
-                        {mockQuestionsList[ocrActiveQuestionIndex]?.text}
-                      </p>
-                      <div className="flex items-center gap-4 text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <Target className="w-3.5 h-3.5 text-teal-600" />
-                          Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[ocrActiveQuestionIndex]?.maxScore}</span>
-                        </span>
+                <ScrollArea className="flex-1 bg-slate-50">
+                  {/* Active Question Card */}
+                  <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50">
+                    <div className="flex items-start gap-4 p-4 rounded-xl bg-white border border-teal-100">
+                      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
+                        <span className="text-sm font-bold">Q{mockQuestionsList[ocrActiveQuestionIndex]?.id}</span>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <p className="text-sm text-slate-800 leading-relaxed font-medium">
+                          {mockQuestionsList[ocrActiveQuestionIndex]?.text}
+                        </p>
+                        <div className="flex items-center gap-4 text-xs text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <Target className="w-3.5 h-3.5 text-teal-600" />
+                            Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[ocrActiveQuestionIndex]?.maxScore}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Two Column Cards */}
-                <ScrollArea className="flex-1 px-6 py-4 bg-slate-50">
+                  {/* Two Column Cards */}
+                  <div className="px-6 py-4">
                   <div className="grid grid-cols-2 gap-6">
                     {/* Segment Card - with images */}
                     <div className="rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
@@ -865,6 +866,7 @@ const OCREvaluation = () => {
                         )}
                       </div>
                     </div>
+                  </div>
                   </div>
                 </ScrollArea>
               </div>
@@ -948,105 +950,107 @@ const OCREvaluation = () => {
 
               {/* Right Content: Active Question Details */}
               <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Header with Candidate Info & Controls */}
-                <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
-                      <span className="text-sm text-slate-500 bg-white/70 px-2 py-0.5 rounded">
-                        {phase1ReviewCandidate.registrationName}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-1.5">
-                        <span className="text-xs font-medium text-slate-500">From</span>
-                        <Input
-                          type="number"
-                          placeholder="#"
-                          value={fromPageInput}
-                          onChange={(e) => setFromPageInput(e.target.value)}
-                          className="w-14 h-7 text-sm border-slate-300 text-center"
-                          min={1}
-                          max={answerSheets.length}
-                        />
-                        <span className="text-xs font-medium text-slate-500">To</span>
-                        <Input
-                          type="number"
-                          placeholder="#"
-                          value={toPageInput}
-                          onChange={(e) => setToPageInput(e.target.value)}
-                          className="w-14 h-7 text-sm border-slate-300 text-center"
-                          min={1}
-                          max={answerSheets.length}
-                        />
-                        <Button
-                          onClick={handleRepositionPages}
-                          size="sm"
-                          className="h-7 px-3 bg-teal-600 hover:bg-teal-700 text-white text-xs"
-                        >
-                          Reposition
-                        </Button>
-                      </div>
-                      <span className="text-sm font-medium text-slate-600 bg-white/70 px-2 py-0.5 rounded">
-                        {answerSheets.length} pages
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Active Question Card */}
-                <div className="px-6 py-4 bg-white border-b border-slate-200">
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-teal-50 to-slate-50 border border-teal-100">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
-                      <span className="text-sm font-bold">Q{mockQuestionsList[activeQuestionIndex]?.id}</span>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <p className="text-sm text-slate-800 leading-relaxed font-medium">
-                        {mockQuestionsList[activeQuestionIndex]?.text}
-                      </p>
-                      <div className="flex items-center gap-4 text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <Target className="w-3.5 h-3.5 text-teal-600" />
-                          Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[activeQuestionIndex]?.maxScore}</span>
+                <ScrollArea className="flex-1 bg-slate-50">
+                  {/* Header with Candidate Info & Controls */}
+                  <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <h3 className="text-lg font-semibold text-slate-800">{phase1ReviewCandidate.candidateName}</h3>
+                        <span className="text-sm text-slate-500 bg-white/70 px-2 py-0.5 rounded">
+                          {phase1ReviewCandidate.registrationName}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <FileText className="w-3.5 h-3.5 text-slate-400" />
-                          Pages: <span className="font-semibold text-slate-700">{mockQuestionsList[activeQuestionIndex]?.pages}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-1.5">
+                          <span className="text-xs font-medium text-slate-500">From</span>
+                          <Input
+                            type="number"
+                            placeholder="#"
+                            value={fromPageInput}
+                            onChange={(e) => setFromPageInput(e.target.value)}
+                            className="w-14 h-7 text-sm border-slate-300 text-center"
+                            min={1}
+                            max={answerSheets.length}
+                          />
+                          <span className="text-xs font-medium text-slate-500">To</span>
+                          <Input
+                            type="number"
+                            placeholder="#"
+                            value={toPageInput}
+                            onChange={(e) => setToPageInput(e.target.value)}
+                            className="w-14 h-7 text-sm border-slate-300 text-center"
+                            min={1}
+                            max={answerSheets.length}
+                          />
+                          <Button
+                            onClick={handleRepositionPages}
+                            size="sm"
+                            className="h-7 px-3 bg-teal-600 hover:bg-teal-700 text-white text-xs"
+                          >
+                            Reposition
+                          </Button>
+                        </div>
+                        <span className="text-sm font-medium text-slate-600 bg-white/70 px-2 py-0.5 rounded">
+                          {answerSheets.length} pages
                         </span>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Answer Sheets Grid */}
-                <ScrollArea className="flex-1 px-6 py-4 bg-slate-50">
-                  <div className="grid grid-cols-2 gap-6">
-                    {answerSheets.map((sheet, index) => (
-                      <div 
-                        key={sheet.pageNumber}
-                        id={`answer-sheet-${sheet.pageNumber}`}
-                        className="rounded-xl border border-slate-200 bg-white overflow-hidden"
-                      >
-                        <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-                          <span className="text-sm font-medium text-slate-700">
-                            Page {sheet.pageNumber}
+                  {/* Active Question Card */}
+                  <div className="px-6 py-4 bg-white">
+                    <div className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-teal-50 to-slate-50 border border-teal-100">
+                      <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
+                        <span className="text-sm font-bold">Q{mockQuestionsList[activeQuestionIndex]?.id}</span>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <p className="text-sm text-slate-800 leading-relaxed font-medium">
+                          {mockQuestionsList[activeQuestionIndex]?.text}
+                        </p>
+                        <div className="flex items-center gap-4 text-xs text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <Target className="w-3.5 h-3.5 text-teal-600" />
+                            Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[activeQuestionIndex]?.maxScore}</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FileText className="w-3.5 h-3.5 text-slate-400" />
+                            Pages: <span className="font-semibold text-slate-700">{mockQuestionsList[activeQuestionIndex]?.pages}</span>
                           </span>
                         </div>
-                        <div className="p-3 bg-gray-100">
-                          <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
-                            <img 
-                              src={sheet.imageUrl} 
-                              alt={`Answer sheet page ${sheet.pageNumber}`}
-                              className="w-full h-auto object-contain"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement
-                                target.src = "/placeholder.svg"
-                              }}
-                            />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Answer Sheets Grid */}
+                  <div className="px-6 py-4">
+                    <div className="grid grid-cols-2 gap-6">
+                      {answerSheets.map((sheet, index) => (
+                        <div 
+                          key={sheet.pageNumber}
+                          id={`answer-sheet-${sheet.pageNumber}`}
+                          className="rounded-xl border border-slate-200 bg-white overflow-hidden"
+                        >
+                          <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+                            <span className="text-sm font-medium text-slate-700">
+                              Page {sheet.pageNumber}
+                            </span>
+                          </div>
+                          <div className="p-3 bg-gray-100">
+                            <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                              <img 
+                                src={sheet.imageUrl} 
+                                alt={`Answer sheet page ${sheet.pageNumber}`}
+                                className="w-full h-auto object-contain"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.src = "/placeholder.svg"
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </ScrollArea>
               </div>
@@ -1136,9 +1140,9 @@ const OCREvaluation = () => {
                   const evalData = evaluationReviewCandidate.evaluationData || generateMockEvaluationData()
                   const activeQuestion = mockQuestionsList[evalActiveQuestionIndex]
                   return (
-                    <>
+                    <ScrollArea className="flex-1 bg-slate-50">
                       {/* Active Question Card */}
-                      <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50 border-b border-slate-200">
+                      <div className="px-6 py-4 bg-gradient-to-r from-teal-50 to-slate-50">
                         <div className="flex items-start justify-between gap-6 p-4 rounded-xl bg-white border border-teal-100">
                           <div className="flex items-start gap-4 flex-1">
                             <div className="flex items-center justify-center h-10 w-10 rounded-full bg-teal-600 text-white shrink-0">
@@ -1161,7 +1165,7 @@ const OCREvaluation = () => {
                       </div>
 
                       {/* Evaluation Details */}
-                      <ScrollArea className="flex-1 px-6 py-4 bg-slate-50">
+                      <div className="px-6 py-4">
                         <div className="grid grid-cols-2 gap-6">
                           {/* Left Column */}
                           <div className="space-y-5">
@@ -1246,8 +1250,8 @@ const OCREvaluation = () => {
                             </div>
                           </div>
                         </div>
-                      </ScrollArea>
-                    </>
+                      </div>
+                    </ScrollArea>
                   )
                 })()}
               </div>
