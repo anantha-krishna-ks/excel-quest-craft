@@ -1311,87 +1311,82 @@ const OCREvaluation = () => {
 
                         {/* Evaluation Details */}
                         <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                            {/* Left Column */}
-                            <div className="space-y-3 sm:space-y-4 md:space-y-5">
-                              {/* Extracted Info */}
-                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
-                                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
-                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Extracted Info</h3>
-                                </div>
-                                <div className="p-2.5 sm:p-3 md:p-4">
-                                  <p className="text-[11px] sm:text-xs md:text-sm text-slate-600 leading-relaxed">
-                                    {evalData.extractedInfo}
-                                  </p>
-                                </div>
+                          {/* Score Banner */}
+                          <div className="mb-4 sm:mb-5 md:mb-6 rounded-lg sm:rounded-xl border border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 overflow-hidden">
+                            <div className="px-4 sm:px-5 md:px-6 py-4 sm:py-5 md:py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <Award className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
+                                <h3 className="text-sm sm:text-base font-semibold text-slate-800">Evaluation Score</h3>
                               </div>
-
-                              {/* Keypoints */}
-                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
-                                  <ListChecks className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
-                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Keypoints</h3>
-                                </div>
-                                <div className="p-2.5 sm:p-3 md:p-4">
-                                  <ul className="space-y-1.5 sm:space-y-2">
-                                    {evalData.keypoints.map((point, index) => (
-                                      <li key={index} className="flex items-start gap-2 sm:gap-3 text-[11px] sm:text-xs md:text-sm text-slate-600">
-                                        <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                        <span>{point}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
+                              <div className="flex items-baseline gap-1.5 sm:gap-2">
+                                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
+                                <span className="text-lg sm:text-xl text-slate-400">/</span>
+                                <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
                               </div>
+                            </div>
+                          </div>
 
-                              {/* Evaluation Score */}
-                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-teal-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
-                                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-600" />
-                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Evaluation Score</h3>
-                                </div>
-                                <div className="p-3 sm:p-4 md:p-5 flex items-center justify-center">
-                                  <div className="flex items-baseline gap-1.5 sm:gap-2">
-                                    <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
-                                    <span className="text-lg sm:text-xl text-slate-400">/</span>
-                                    <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
-                                  </div>
-                                </div>
+                          {/* Main Content Grid */}
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+                            {/* Extracted Info */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-indigo-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Extracted Info</h3>
+                              </div>
+                              <div className="p-3 sm:p-4 flex-1">
+                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                  {evalData.extractedInfo}
+                                </p>
                               </div>
                             </div>
 
-                            {/* Right Column */}
-                            <div className="space-y-3 sm:space-y-4 md:space-y-5">
-                              {/* Missing */}
-                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
-                                  <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
-                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Missing</h3>
-                                </div>
-                                <div className="p-2.5 sm:p-3 md:p-4">
-                                  <ul className="space-y-1.5 sm:space-y-2">
-                                    {evalData.missing.map((item, index) => (
-                                      <li key={index} className="flex items-start gap-2 sm:gap-3 text-[11px] sm:text-xs md:text-sm text-slate-600">
-                                        <X className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0 mt-0.5" />
-                                        <span>{item}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
+                            {/* Keypoints */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-2">
+                                <ListChecks className="w-4 h-4 text-emerald-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Keypoints</h3>
                               </div>
+                              <div className="p-3 sm:p-4 flex-1">
+                                <ul className="space-y-2">
+                                  {evalData.keypoints.map((point, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+                                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                      <span>{point}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
 
-                              {/* Rational */}
-                              <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                                <div className="px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-1.5 sm:gap-2">
-                                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
-                                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Rational</h3>
-                                </div>
-                                <div className="p-2.5 sm:p-3 md:p-4">
-                                  <p className="text-[11px] sm:text-xs md:text-sm text-slate-600 leading-relaxed">
-                                    {evalData.rational}
-                                  </p>
-                                </div>
+                            {/* Missing Items */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Missing Items</h3>
+                              </div>
+                              <div className="p-3 sm:p-4 flex-1">
+                                <ul className="space-y-2">
+                                  {evalData.missing.map((item, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+                                      <X className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                                      <span>{item}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+
+                            {/* Rationale */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-2">
+                                <MessageSquare className="w-4 h-4 text-purple-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Rationale</h3>
+                              </div>
+                              <div className="p-3 sm:p-4 flex-1">
+                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                  {evalData.rational}
+                                </p>
                               </div>
                             </div>
                           </div>
