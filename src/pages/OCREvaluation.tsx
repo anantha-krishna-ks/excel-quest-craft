@@ -891,14 +891,6 @@ const OCREvaluation = () => {
               >
                 Approve
               </Button>
-              <Button
-                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}
-                size="sm"
-                variant="outline"
-                className="px-3 sm:px-6 text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
-              >
-                Cancel
-              </Button>
               <button 
                 onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}
                 className="p-1.5 rounded-md hover:bg-slate-100 transition-colors"
