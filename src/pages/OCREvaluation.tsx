@@ -531,7 +531,7 @@ const OCREvaluation = () => {
                     onClick={() => setShowReuploadConfirm(true)}
                     variant="outline"
                     size="sm"
-                    className="border-teal-300 text-teal-700 hover:bg-teal-50 shrink-0"
+                    className="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800 shrink-0"
                   >
                     <RotateCcw className="w-4 h-4 sm:mr-2" />
                     <span className="hidden sm:inline">Re-upload Folder</span>
