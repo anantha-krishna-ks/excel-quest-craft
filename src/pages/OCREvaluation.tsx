@@ -110,6 +110,8 @@ const OCREvaluation = () => {
   const [isUploading, setIsUploading] = useState(false)
   const [hasUploaded, setHasUploaded] = useState(false)
   const [folderName, setFolderName] = useState("")
+  const [fileCount, setFileCount] = useState(0)
+  const [totalFileSize, setTotalFileSize] = useState(0)
   const [candidates, setCandidates] = useState<CandidateData[]>([])
   const [previewCandidate, setPreviewCandidate] = useState<CandidateData | null>(null)
   const [detailCandidate, setDetailCandidate] = useState<CandidateData | null>(null)
@@ -125,6 +127,14 @@ const OCREvaluation = () => {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
   const [ocrActiveQuestionIndex, setOcrActiveQuestionIndex] = useState(0)
   const [evalActiveQuestionIndex, setEvalActiveQuestionIndex] = useState(0)
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
 
   // Mock questions list for Phase 1 review
   const mockQuestionsList = [
@@ -180,10 +190,15 @@ const OCREvaluation = () => {
 
     setIsUploading(true)
 
+    // Calculate total file size
+    const totalSize = Array.from(files).reduce((acc, file) => acc + file.size, 0)
+
     setTimeout(() => {
       const firstFilePath = files[0].webkitRelativePath
       const extractedFolderName = firstFilePath.split('/')[0]
       setFolderName(extractedFolderName)
+      setFileCount(files.length)
+      setTotalFileSize(totalSize)
 
       const candidateNames = new Set<string>()
       Array.from(files).forEach(file => {
@@ -254,6 +269,8 @@ const OCREvaluation = () => {
     setHasUploaded(false)
     setCandidates([])
     setFolderName("")
+    setFileCount(0)
+    setTotalFileSize(0)
     toast.info("Ready to upload a new folder")
   }
 
@@ -395,29 +412,29 @@ const OCREvaluation = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50">
-        <div className="flex items-center justify-between">
+      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sticky top-0 z-50">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-teal-700 rounded-lg flex items-center justify-center">
-              <ScanLine className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-teal-600 to-teal-700 rounded-lg flex items-center justify-center shrink-0">
+              <ScanLine className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">OCR Evaluation</h1>
-              <p className="text-xs text-gray-500">AI-powered OCR accuracy assessment</p>
+              <h1 className="text-base sm:text-lg font-semibold text-gray-900">OCR Evaluation</h1>
+              <p className="text-xs text-gray-500 hidden sm:block">AI-powered OCR accuracy assessment</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 rounded-full border border-purple-200">
-              <Sparkles className="h-4 w-4 text-purple-500" />
-              <span className="text-sm font-medium text-purple-600">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-purple-50 rounded-full border border-purple-200">
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
+              <span className="text-xs sm:text-sm font-medium text-purple-600">
                 4,651 Tokens
               </span>
             </div>
             <Link to="/dashboard">
-              <Button variant="ghost" size="sm" className="text-gray-600">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+              <Button variant="ghost" size="sm" className="text-gray-600 px-2 sm:px-3">
+                <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
               </Button>
             </Link>
           </div>
@@ -425,25 +442,25 @@ const OCREvaluation = () => {
       </header>
 
       {/* Main Content */}
-      <main className="p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <main className="p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
           {/* Upload Section */}
           <Card className="border-2 border-teal-100 bg-teal-50">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-teal-600 text-white rounded-lg">
-                  <FolderOpen className="h-5 w-5" />
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4">
+                <div className="p-1.5 sm:p-2 bg-teal-600 text-white rounded-lg shrink-0">
+                  <FolderOpen className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <h2 className="text-2xl font-semibold text-teal-800">Upload Assessment Folder</h2>
+                <h2 className="text-lg sm:text-2xl font-semibold text-teal-800">Upload Assessment Folder</h2>
               </div>
 
               {!hasUploaded ? (
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Upload a folder containing candidate papers (supports up to 125 papers).
                   </p>
                   
-                  <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
+                  <div className="flex flex-col items-center justify-center p-6 sm:p-8 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
                     <input
                       type="file"
                       id="folder-upload"
@@ -460,38 +477,46 @@ const OCREvaluation = () => {
                     >
                       {isUploading ? (
                         <>
-                          <Loader2 className="w-12 h-12 text-teal-600 mb-3 animate-spin" />
-                          <span className="text-base font-medium text-teal-700">Processing files...</span>
-                          <span className="text-sm text-gray-500 mt-1">Please wait while we analyze your documents</span>
+                          <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-teal-600 mb-3 animate-spin" />
+                          <span className="text-sm sm:text-base font-medium text-teal-700 text-center">Processing files...</span>
+                          <span className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Please wait while we analyze your documents</span>
                         </>
                       ) : (
                         <>
-                          <Upload className="w-12 h-12 text-teal-600 mb-3" />
-                          <span className="text-base font-medium text-teal-700">Click to select a folder</span>
-                          <span className="text-sm text-gray-500 mt-1">Or drag and drop your assessment folder here</span>
+                          <Upload className="w-10 h-10 sm:w-12 sm:h-12 text-teal-600 mb-3" />
+                          <span className="text-sm sm:text-base font-medium text-teal-700 text-center">Click to select a folder</span>
+                          <span className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Or drag and drop your assessment folder here</span>
                         </>
                       )}
                     </label>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between bg-white/70 rounded-lg p-4 border border-teal-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/70 rounded-lg p-3 sm:p-4 border border-teal-200">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-teal-100 rounded-lg">
-                      <FolderOpen className="w-5 h-5 text-teal-600" />
+                    <div className="p-1.5 sm:p-2 bg-teal-100 rounded-lg shrink-0">
+                      <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{folderName}</p>
-                      <p className="text-sm text-gray-500">{candidates.length} candidate papers uploaded</p>
+                    <div className="min-w-0">
+                      <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{folderName}</p>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+                        <span>{candidates.length} papers</span>
+                        <span className="text-gray-300">•</span>
+                        <span>{fileCount} files</span>
+                        <span className="text-gray-300">•</span>
+                        <span className="font-medium text-teal-600">{formatFileSize(totalFileSize)}</span>
+                      </div>
                     </div>
                   </div>
                   <Button
                     onClick={handleReupload}
                     variant="outline"
-                    className="border-teal-300 text-teal-700 hover:bg-teal-50"
+                    size="sm"
+                    className="border-teal-300 text-teal-700 hover:bg-teal-50 shrink-0"
                   >
-                    <RotateCcw className="w-4 h-4 mr-2" />
-                    Re-upload Folder
+                    <RotateCcw className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Re-upload Folder</span>
+                    <span className="sm:hidden">Re-upload</span>
                   </Button>
                 </div>
               )}
@@ -501,24 +526,23 @@ const OCREvaluation = () => {
           {/* Results Table */}
           {hasUploaded && candidates.length > 0 && (
             <Card className="border-2 border-slate-100 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-slate-500 text-white rounded-lg">
-                    <ScanLine className="h-5 w-5" />
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4">
+                  <div className="p-1.5 sm:p-2 bg-slate-500 text-white rounded-lg shrink-0">
+                    <ScanLine className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-slate-700">Evaluation Results</h2>
+                  <h2 className="text-lg sm:text-2xl font-semibold text-slate-700">Evaluation Results</h2>
                 </div>
 
-                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200">
+                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 -mx-4 sm:mx-0">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
-                        <TableHead className="font-semibold text-slate-700 py-4 w-16">Sl. No</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4">Candidate Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Segmentation Indexing</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4 text-center">OCR</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-4 text-center">Evaluation</TableHead>
-                        
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm">Sl. No</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm">Candidate Name</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm whitespace-nowrap">Segmentation</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm">OCR</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm">Evaluation</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -527,32 +551,32 @@ const OCREvaluation = () => {
                           key={candidate.id} 
                           className="border-b border-slate-100 last:border-b-0"
                         >
-                          <TableCell className="text-slate-600 py-4">
+                          <TableCell className="text-slate-600 py-3 sm:py-4 text-xs sm:text-sm">
                             {index + 1}
                           </TableCell>
-                          <TableCell className="py-4">
+                          <TableCell className="py-3 sm:py-4">
                             <button
                               onClick={() => setDetailCandidate(candidate)}
-                              className="font-medium text-teal-700 hover:text-teal-800 hover:underline cursor-pointer text-left"
+                              className="font-medium text-teal-700 hover:text-teal-800 hover:underline cursor-pointer text-left text-xs sm:text-sm"
                             >
                               {candidate.candidateName}
                             </button>
                           </TableCell>
-                          <TableCell className="py-4 text-center">
+                          <TableCell className="py-3 sm:py-4 text-center">
                             <StatusBadge 
                               status={candidate.phase1}
                               clickable={candidate.phase1 === "completed"}
                               onClick={() => handleOpenPhase1Review(candidate)}
                             />
                           </TableCell>
-                          <TableCell className="py-4 text-center">
+                          <TableCell className="py-3 sm:py-4 text-center">
                             <StatusBadge 
                               status={candidate.phase2} 
                               clickable={candidate.phase2 === "completed"}
                               onClick={() => handleOpenOcrReview(candidate)}
                             />
                           </TableCell>
-                          <TableCell className="py-4 text-center">
+                          <TableCell className="py-3 sm:py-4 text-center">
                             <StatusBadge 
                               status={candidate.phase3}
                               clickable={candidate.phase3 === "completed"}
