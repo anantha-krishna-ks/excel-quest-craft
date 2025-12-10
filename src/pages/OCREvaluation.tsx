@@ -553,11 +553,11 @@ const OCREvaluation = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm">Sl. No</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm">Candidate Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm whitespace-nowrap">Segmentation Indexing</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm">OCR</TableHead>
-                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-center text-xs sm:text-sm">Evaluation</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm text-left">Sl. No</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Candidate Name</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
+                        <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -566,10 +566,10 @@ const OCREvaluation = () => {
                           key={candidate.id} 
                           className="border-b border-slate-100 last:border-b-0"
                         >
-                          <TableCell className="text-slate-600 py-3 sm:py-4 text-xs sm:text-sm">
+                          <TableCell className="text-slate-600 py-3 sm:py-4 text-xs sm:text-sm text-left">
                             {index + 1}
                           </TableCell>
-                          <TableCell className="py-3 sm:py-4">
+                          <TableCell className="py-3 sm:py-4 text-left">
                             <button
                               onClick={() => setDetailCandidate(candidate)}
                               className="font-medium text-teal-700 hover:text-teal-800 hover:underline cursor-pointer text-left text-xs sm:text-sm"
@@ -577,21 +577,21 @@ const OCREvaluation = () => {
                               {candidate.candidateName}
                             </button>
                           </TableCell>
-                          <TableCell className="py-3 sm:py-4 text-center">
+                          <TableCell className="py-3 sm:py-4 text-left">
                             <StatusBadge 
                               status={candidate.phase1}
                               clickable={candidate.phase1 === "completed"}
                               onClick={() => handleOpenPhase1Review(candidate)}
                             />
                           </TableCell>
-                          <TableCell className="py-3 sm:py-4 text-center">
+                          <TableCell className="py-3 sm:py-4 text-left">
                             <StatusBadge 
                               status={candidate.phase2} 
                               clickable={candidate.phase2 === "completed"}
                               onClick={() => handleOpenOcrReview(candidate)}
                             />
                           </TableCell>
-                          <TableCell className="py-3 sm:py-4 text-center">
+                          <TableCell className="py-3 sm:py-4 text-left">
                             <StatusBadge 
                               status={candidate.phase3}
                               clickable={candidate.phase3 === "completed"}
