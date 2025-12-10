@@ -140,6 +140,7 @@ const OCREvaluation = () => {
   const [ocrActiveQuestionIndex, setOcrActiveQuestionIndex] = useState(0)
   const [evalActiveQuestionIndex, setEvalActiveQuestionIndex] = useState(0)
   const [showReuploadConfirm, setShowReuploadConfirm] = useState(false)
+  const [activeAnswerSheetIndex, setActiveAnswerSheetIndex] = useState(0)
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B'
@@ -302,6 +303,7 @@ const OCREvaluation = () => {
     setAnswerSheets(sheets)
     setFromPageInput("")
     setToPageInput("")
+    setActiveAnswerSheetIndex(0) // Reset to first page
   }
 
   const handleRepositionPages = () => {
@@ -1126,35 +1128,82 @@ const OCREvaluation = () => {
                       </div>
                     </div>
 
-                    {/* Answer Sheets Grid */}
-                    <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-                        {answerSheets.map((sheet, index) => (
-                          <div 
-                            key={sheet.pageNumber}
-                            id={`answer-sheet-${sheet.pageNumber}`}
-                            className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden"
-                          >
-                            <div className="flex items-center justify-between px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 bg-slate-50 border-b border-slate-200">
-                              <span className="text-xs sm:text-sm font-medium text-slate-700">
-                                Page {sheet.pageNumber}
-                              </span>
-                            </div>
-                            <div className="p-2 sm:p-2.5 md:p-3 bg-gray-100">
-                              <div className="relative bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
-                                <img 
-                                  src={sheet.imageUrl} 
-                                  alt={`Answer sheet page ${sheet.pageNumber}`}
-                                  className="w-full h-auto object-contain"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement
-                                    target.src = "/placeholder.svg"
-                                  }}
-                                />
-                              </div>
-                            </div>
+                    {/* Answer Sheet Viewer - Single Image Focus with Navigation */}
+                    <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:gap-4">
+                      {/* Main Image Viewer with Navigation */}
+                      <div className="flex-1 rounded-xl border border-slate-200 bg-white overflow-hidden">
+                        {/* Header with page info and navigation */}
+                        <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border-b border-slate-200">
+                          <div className="flex items-center gap-2">
+                            <Image className="w-4 h-4 text-teal-600" />
+                            <span className="text-xs sm:text-sm font-medium text-slate-700">
+                              Page {activeAnswerSheetIndex + 1} of {answerSheets.length}
+                            </span>
                           </div>
-                        ))}
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setActiveAnswerSheetIndex(prev => Math.max(0, prev - 1))}
+                              disabled={activeAnswerSheetIndex === 0}
+                              className="h-7 sm:h-8 w-7 sm:w-8 p-0"
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setActiveAnswerSheetIndex(prev => Math.min(answerSheets.length - 1, prev + 1))}
+                              disabled={activeAnswerSheetIndex === answerSheets.length - 1}
+                              className="h-7 sm:h-8 w-7 sm:w-8 p-0"
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        {/* Main Image Area */}
+                        <div className="p-3 sm:p-4 bg-slate-100 flex items-center justify-center min-h-[350px] sm:min-h-[400px] max-h-[50vh] sm:max-h-[55vh]">
+                          <div className="relative bg-white rounded-lg overflow-hidden shadow-md border border-slate-200">
+                            <img 
+                              src={answerSheets[activeAnswerSheetIndex]?.imageUrl} 
+                              alt={`Answer sheet page ${activeAnswerSheetIndex + 1}`}
+                              className="max-w-full max-h-[45vh] sm:max-h-[50vh] object-contain"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.src = "/placeholder.svg"
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Thumbnail Navigation Strip */}
+                      <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-white rounded-lg border border-slate-200">
+                        <span className="text-[10px] sm:text-xs font-medium text-slate-500 shrink-0">Quick Nav:</span>
+                        <div className="flex gap-1.5 sm:gap-2 overflow-x-auto py-0.5">
+                          {answerSheets.map((sheet, index) => (
+                            <button
+                              key={sheet.pageNumber}
+                              onClick={() => setActiveAnswerSheetIndex(index)}
+                              className={`shrink-0 w-10 h-14 sm:w-12 sm:h-16 rounded-md border-2 overflow-hidden transition-all ${
+                                index === activeAnswerSheetIndex 
+                                  ? 'ring-2 ring-teal-500 ring-offset-1 border-teal-400' 
+                                  : 'border-slate-200 opacity-50 hover:opacity-100 hover:border-slate-300'
+                              }`}
+                            >
+                              <img 
+                                src={sheet.imageUrl} 
+                                alt={`Page ${sheet.pageNumber}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.src = "/placeholder.svg"
+                                }}
+                              />
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </ScrollArea>
