@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -713,6 +713,63 @@ const OCREvaluation = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Status Count Widgets */}
+          {hasUploaded && candidates.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {/* Total Count */}
+              <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg">
+                <div className="p-2 bg-slate-100 rounded-lg">
+                  <Users className="h-4 w-4 text-slate-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Total</p>
+                  <p className="text-sm font-semibold text-slate-700">
+                    {candidates.length} / {candidates.length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Segmentation Count */}
+              <div className="flex items-center gap-3 p-3 bg-white border border-blue-200 rounded-lg">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Layers className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Segmentation</p>
+                  <p className="text-sm font-semibold text-blue-700">
+                    {candidates.filter(c => c.phase1 === "completed" || c.phase1 === "approved").length} / {candidates.length}
+                  </p>
+                </div>
+              </div>
+
+              {/* OCR Count */}
+              <div className="flex items-center gap-3 p-3 bg-white border border-purple-200 rounded-lg">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <ScanLine className="h-4 w-4 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">OCR</p>
+                  <p className="text-sm font-semibold text-purple-700">
+                    {candidates.filter(c => c.phase2 === "completed" || c.phase2 === "approved").length} / {candidates.length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Evaluation Count */}
+              <div className="flex items-center gap-3 p-3 bg-white border border-teal-200 rounded-lg">
+                <div className="p-2 bg-teal-100 rounded-lg">
+                  <CheckCircle className="h-4 w-4 text-teal-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Evaluation</p>
+                  <p className="text-sm font-semibold text-teal-700">
+                    {candidates.filter(c => c.phase3 === "completed" || c.phase3 === "approved").length} / {candidates.length}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Results Table */}
           {hasUploaded && candidates.length > 0 && (
