@@ -1020,13 +1020,16 @@ const OCREvaluation = () => {
       </Dialog>
 
       {/* OCR Review Dialog */}
-      <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); }}>
+      <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); setPhase2VisitedQuestions(new Set([0])); }}>
         <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
           {/* Dialog Header */}
           <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
             <DialogTitle className="flex items-center gap-1.5 sm:gap-2 text-slate-800 text-xs sm:text-sm md:text-base min-w-0">
               <ScanLine className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 shrink-0" />
               <span className="truncate">OCR Review - {ocrReviewCandidate?.candidateName}</span>
+              <span className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 text-[10px] sm:text-xs font-medium ml-2">
+                {phase2VisitedQuestions.size}/{mockQuestionsList.length} reviewed
+              </span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
               {isEditing ? (
@@ -1061,14 +1064,16 @@ const OCREvaluation = () => {
                   <Button
                     onClick={handleApprove}
                     size="sm"
-                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                    disabled={phase2VisitedQuestions.size < mockQuestionsList.length}
+                    title={phase2VisitedQuestions.size < mockQuestionsList.length ? "Review all questions before approving" : ""}
+                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Approve
                   </Button>
                 </>
               )}
               <button 
-                onClick={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); }}
+                onClick={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); setPhase2VisitedQuestions(new Set([0])); }}
                 className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
@@ -1086,28 +1091,45 @@ const OCREvaluation = () => {
                     {mockQuestionsList.map((question, index) => (
                       <button
                         key={question.id}
-                        onClick={() => setOcrActiveQuestionIndex(index)}
+                        onClick={() => {
+                          setOcrActiveQuestionIndex(index)
+                          setPhase2VisitedQuestions(prev => new Set([...prev, index]))
+                        }}
                         className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
                           ocrActiveQuestionIndex === index
                             ? 'bg-teal-600 text-white shadow-sm'
+                            : phase2VisitedQuestions.has(index)
+                            ? 'bg-teal-500 text-white'
                             : 'bg-white text-slate-600 border border-slate-200'
                         }`}
                       >
-                        {question.id}
+                        {phase2VisitedQuestions.has(index) && ocrActiveQuestionIndex !== index ? (
+                          <Check className="w-3.5 h-3.5" />
+                        ) : (
+                          question.id
+                        )}
                       </button>
                     ))}
                   </div>
                   {/* Navigation Arrows */}
                   <div className="flex items-center gap-1 shrink-0 ml-auto">
                     <button
-                      onClick={() => setOcrActiveQuestionIndex(Math.max(0, ocrActiveQuestionIndex - 1))}
+                      onClick={() => {
+                        const newIndex = Math.max(0, ocrActiveQuestionIndex - 1)
+                        setOcrActiveQuestionIndex(newIndex)
+                        setPhase2VisitedQuestions(prev => new Set([...prev, newIndex]))
+                      }}
                       disabled={ocrActiveQuestionIndex === 0}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4 text-slate-600" />
                     </button>
                     <button
-                      onClick={() => setOcrActiveQuestionIndex(Math.min(mockQuestionsList.length - 1, ocrActiveQuestionIndex + 1))}
+                      onClick={() => {
+                        const newIndex = Math.min(mockQuestionsList.length - 1, ocrActiveQuestionIndex + 1)
+                        setOcrActiveQuestionIndex(newIndex)
+                        setPhase2VisitedQuestions(prev => new Set([...prev, newIndex]))
+                      }}
                       disabled={ocrActiveQuestionIndex === mockQuestionsList.length - 1}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
@@ -1123,26 +1145,43 @@ const OCREvaluation = () => {
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
                     <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
                     <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                    <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-teal-500 transition-all duration-300" 
+                        style={{ width: `${(phase2VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                      />
+                    </div>
                   </div>
                   <ScrollArea className="flex-1">
                     <div className="p-1.5 lg:p-2 space-y-1">
                       {mockQuestionsList.map((question, index) => (
                         <button
                           key={question.id}
-                          onClick={() => setOcrActiveQuestionIndex(index)}
+                          onClick={() => {
+                            setOcrActiveQuestionIndex(index)
+                            setPhase2VisitedQuestions(prev => new Set([...prev, index]))
+                          }}
                           className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
                             ocrActiveQuestionIndex === index
                               ? 'bg-teal-600 text-white shadow-sm'
+                              : phase2VisitedQuestions.has(index)
+                              ? 'bg-teal-50 text-slate-700 border border-teal-200'
                               : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
                           }`}
                         >
                           <div className="flex items-start gap-2">
-                            <span className={`flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                            <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
                               ocrActiveQuestionIndex === index
                                 ? 'bg-white/20 text-white'
+                                : phase2VisitedQuestions.has(index)
+                                ? 'bg-teal-500 text-white'
                                 : 'bg-teal-100 text-teal-700'
                             }`}>
-                              {question.id}
+                              {phase2VisitedQuestions.has(index) && ocrActiveQuestionIndex !== index ? (
+                                <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                              ) : (
+                                question.id
+                              )}
                             </span>
                             <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
                               ocrActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
@@ -1661,13 +1700,16 @@ const OCREvaluation = () => {
       </Dialog>
 
       {/* Evaluation Review Dialog */}
-      <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); }}>
+      <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); }}>
         <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
           {/* Dialog Header */}
           <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
             <DialogTitle className="flex items-center gap-1.5 sm:gap-2 text-slate-800 text-xs sm:text-sm md:text-base min-w-0">
               <Award className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600 shrink-0" />
               <span className="truncate">Evaluation Review - {evaluationReviewCandidate?.candidateName}</span>
+              <span className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 text-[10px] sm:text-xs font-medium ml-2">
+                {phase3VisitedQuestions.size}/{mockQuestionsList.length} reviewed
+              </span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
               <Button
@@ -1681,14 +1723,17 @@ const OCREvaluation = () => {
                   toast.success(`Evaluation approved for ${evaluationReviewCandidate?.candidateName}`)
                   setEvaluationReviewCandidate(null)
                   setEvalActiveQuestionIndex(0)
+                  setPhase3VisitedQuestions(new Set([0]))
                 }}
                 size="sm"
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                disabled={phase3VisitedQuestions.size < mockQuestionsList.length}
+                title={phase3VisitedQuestions.size < mockQuestionsList.length ? "Review all questions before approving" : ""}
+                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Approve
               </Button>
               <button 
-                onClick={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); }}
+                onClick={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); }}
                 className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
@@ -1706,28 +1751,45 @@ const OCREvaluation = () => {
                     {mockQuestionsList.map((question, index) => (
                       <button
                         key={question.id}
-                        onClick={() => setEvalActiveQuestionIndex(index)}
+                        onClick={() => {
+                          setEvalActiveQuestionIndex(index)
+                          setPhase3VisitedQuestions(prev => new Set([...prev, index]))
+                        }}
                         className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
                           evalActiveQuestionIndex === index
                             ? 'bg-teal-600 text-white shadow-sm'
+                            : phase3VisitedQuestions.has(index)
+                            ? 'bg-teal-500 text-white'
                             : 'bg-white text-slate-600 border border-slate-200'
                         }`}
                       >
-                        {question.id}
+                        {phase3VisitedQuestions.has(index) && evalActiveQuestionIndex !== index ? (
+                          <Check className="w-3.5 h-3.5" />
+                        ) : (
+                          question.id
+                        )}
                       </button>
                     ))}
                   </div>
                   {/* Navigation Arrows */}
                   <div className="flex items-center gap-1 shrink-0 ml-auto">
                     <button
-                      onClick={() => setEvalActiveQuestionIndex(Math.max(0, evalActiveQuestionIndex - 1))}
+                      onClick={() => {
+                        const newIndex = Math.max(0, evalActiveQuestionIndex - 1)
+                        setEvalActiveQuestionIndex(newIndex)
+                        setPhase3VisitedQuestions(prev => new Set([...prev, newIndex]))
+                      }}
                       disabled={evalActiveQuestionIndex === 0}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4 text-slate-600" />
                     </button>
                     <button
-                      onClick={() => setEvalActiveQuestionIndex(Math.min(mockQuestionsList.length - 1, evalActiveQuestionIndex + 1))}
+                      onClick={() => {
+                        const newIndex = Math.min(mockQuestionsList.length - 1, evalActiveQuestionIndex + 1)
+                        setEvalActiveQuestionIndex(newIndex)
+                        setPhase3VisitedQuestions(prev => new Set([...prev, newIndex]))
+                      }}
                       disabled={evalActiveQuestionIndex === mockQuestionsList.length - 1}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
@@ -1743,26 +1805,43 @@ const OCREvaluation = () => {
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
                     <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
                     <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                    <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-teal-500 transition-all duration-300" 
+                        style={{ width: `${(phase3VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                      />
+                    </div>
                   </div>
                   <ScrollArea className="flex-1">
                     <div className="p-1.5 lg:p-2 space-y-1">
                       {mockQuestionsList.map((question, index) => (
                         <button
                           key={question.id}
-                          onClick={() => setEvalActiveQuestionIndex(index)}
+                          onClick={() => {
+                            setEvalActiveQuestionIndex(index)
+                            setPhase3VisitedQuestions(prev => new Set([...prev, index]))
+                          }}
                           className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
                             evalActiveQuestionIndex === index
                               ? 'bg-teal-600 text-white shadow-sm'
+                              : phase3VisitedQuestions.has(index)
+                              ? 'bg-teal-50 text-slate-700 border border-teal-200'
                               : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
                           }`}
                         >
                           <div className="flex items-start gap-2">
-                            <span className={`flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                            <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
                               evalActiveQuestionIndex === index
                                 ? 'bg-white/20 text-white'
+                                : phase3VisitedQuestions.has(index)
+                                ? 'bg-teal-500 text-white'
                                 : 'bg-teal-100 text-teal-700'
                             }`}>
-                              {question.id}
+                              {phase3VisitedQuestions.has(index) && evalActiveQuestionIndex !== index ? (
+                                <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                              ) : (
+                                question.id
+                              )}
                             </span>
                             <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
                               evalActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
