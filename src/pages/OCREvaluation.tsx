@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -1412,12 +1412,18 @@ const OCREvaluation = () => {
                           }`}
                         >
                           <div className="flex items-start gap-2">
-                            <span className={`flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                            <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
                               activeQuestionIndex === index
                                 ? 'bg-white/20 text-white'
+                                : phase1VisitedQuestions.has(index)
+                                ? 'bg-teal-500 text-white'
                                 : 'bg-teal-100 text-teal-700'
                             }`}>
-                              {question.id}
+                              {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index ? (
+                                <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                              ) : (
+                                question.id
+                              )}
                             </span>
                             <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
                               activeQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
@@ -1425,9 +1431,6 @@ const OCREvaluation = () => {
                               {question.text}
                             </p>
                           </div>
-                          {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index && (
-                            <CheckCircle className="absolute top-2 right-2 w-4 h-4 text-teal-500" />
-                          )}
                         </button>
                       ))}
                     </div>
