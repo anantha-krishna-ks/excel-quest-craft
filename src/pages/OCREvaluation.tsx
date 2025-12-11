@@ -447,6 +447,13 @@ const OCREvaluation = () => {
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4">
+            {/* Evaluator Display */}
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-teal-50 rounded-full border border-teal-200">
+              <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-teal-600" />
+              <span className="text-xs sm:text-sm font-medium text-teal-700">
+                {localStorage.getItem('userName') || 'Evaluator'}
+              </span>
+            </div>
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-purple-50 rounded-full border border-purple-200">
               <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
               <span className="text-xs sm:text-sm font-medium text-purple-600">
@@ -479,38 +486,99 @@ const OCREvaluation = () => {
               {!hasUploaded ? (
                 <div className="space-y-4">
                   <p className="text-xs sm:text-sm text-gray-600">
-                    Upload a folder containing candidate papers (supports up to 125 papers).
+                    Upload assessment files (supports ZIP files, individual PDFs, or a folder with up to 125 papers).
                   </p>
                   
-                  <div className="flex flex-col items-center justify-center p-6 sm:p-8 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
-                    <input
-                      type="file"
-                      id="folder-upload"
-                      // @ts-ignore - webkitdirectory is a valid attribute
-                      webkitdirectory=""
-                      multiple
-                      onChange={handleFolderUpload}
-                      className="hidden"
-                      disabled={isUploading}
-                    />
-                    <label
-                      htmlFor="folder-upload"
-                      className="flex flex-col items-center cursor-pointer"
-                    >
-                      {isUploading ? (
-                        <>
-                          <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-teal-600 mb-3 animate-spin" />
-                          <span className="text-sm sm:text-base font-medium text-teal-700 text-center">Processing files...</span>
-                          <span className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Please wait while we analyze your documents</span>
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-10 h-10 sm:w-12 sm:h-12 text-teal-600 mb-3" />
-                          <span className="text-sm sm:text-base font-medium text-teal-700 text-center">Click to select a folder</span>
-                          <span className="text-xs sm:text-sm text-gray-500 mt-1 text-center">Or drag and drop your assessment folder here</span>
-                        </>
-                      )}
-                    </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Folder Upload */}
+                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
+                      <input
+                        type="file"
+                        id="folder-upload"
+                        // @ts-ignore - webkitdirectory is a valid attribute
+                        webkitdirectory=""
+                        multiple
+                        onChange={handleFolderUpload}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="folder-upload"
+                        className="flex flex-col items-center cursor-pointer"
+                      >
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
+                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FolderOpen className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2" />
+                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Upload Folder</span>
+                            <span className="text-xs text-gray-500 mt-1 text-center">Select folder</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                    
+                    {/* ZIP Upload */}
+                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
+                      <input
+                        type="file"
+                        id="zip-upload"
+                        accept=".zip"
+                        onChange={handleFolderUpload}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="zip-upload"
+                        className="flex flex-col items-center cursor-pointer"
+                      >
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
+                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2" />
+                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Upload ZIP</span>
+                            <span className="text-xs text-gray-500 mt-1 text-center">.zip files</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                    
+                    {/* PDF Upload */}
+                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
+                      <input
+                        type="file"
+                        id="pdf-upload"
+                        accept=".pdf"
+                        multiple
+                        onChange={handleFolderUpload}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="pdf-upload"
+                        className="flex flex-col items-center cursor-pointer"
+                      >
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
+                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2" />
+                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Upload PDFs</span>
+                            <span className="text-xs text-gray-500 mt-1 text-center">Multiple PDFs</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
                   </div>
                 </div>
               ) : (
