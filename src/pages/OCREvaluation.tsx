@@ -146,6 +146,9 @@ const OCREvaluation = () => {
   const [phaseFilter, setPhaseFilter] = useState<"all" | "phase1" | "phase2" | "phase3">("all")
   const [statusFilter, setStatusFilter] = useState<"all" | PhaseStatus>("all")
   const [showUploadConfirm, setShowUploadConfirm] = useState(false)
+  const [phase1VisitedQuestions, setPhase1VisitedQuestions] = useState<Set<number>>(new Set([0]))
+  const [phase2VisitedQuestions, setPhase2VisitedQuestions] = useState<Set<number>>(new Set([0]))
+  const [phase3VisitedQuestions, setPhase3VisitedQuestions] = useState<Set<number>>(new Set([0]))
   const [pendingUploadData, setPendingUploadData] = useState<{
     folderName: string
     fileCount: number
@@ -1265,7 +1268,7 @@ const OCREvaluation = () => {
       </Dialog>
 
       {/* Phase 1 Answer Sheets Review Dialog */}
-      <Dialog open={!!phase1ReviewCandidate} onOpenChange={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}>
+      <Dialog open={!!phase1ReviewCandidate} onOpenChange={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); setPhase1VisitedQuestions(new Set([0])); }}>
         <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
           {/* Dialog Header */}
           <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
@@ -1274,15 +1277,34 @@ const OCREvaluation = () => {
               <span className="truncate">Segmentation Indexing - {phase1ReviewCandidate?.candidateName}</span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
+              {/* Progress Indicator */}
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
+                <span className="text-xs text-slate-600">
+                  {phase1VisitedQuestions.size}/{mockQuestionsList.length} reviewed
+                </span>
+                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-teal-500 rounded-full transition-all duration-300"
+                    style={{ width: `${(phase1VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                  />
+                </div>
+              </div>
               <Button
                 onClick={handlePhase1Approve}
                 size="sm"
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                disabled={phase1VisitedQuestions.size < mockQuestionsList.length}
+                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
+                title={phase1VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
               >
-                Approve
+                {phase1VisitedQuestions.size < mockQuestionsList.length ? (
+                  <span className="flex items-center gap-1">
+                    <span className="sm:hidden">{phase1VisitedQuestions.size}/{mockQuestionsList.length}</span>
+                    <span className="hidden sm:inline">Approve</span>
+                  </span>
+                ) : 'Approve'}
               </Button>
               <button 
-                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); }}
+                onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); setPhase1VisitedQuestions(new Set([0])); }}
                 className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
@@ -1300,28 +1322,44 @@ const OCREvaluation = () => {
                     {mockQuestionsList.map((question, index) => (
                       <button
                         key={question.id}
-                        onClick={() => setActiveQuestionIndex(index)}
-                        className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
+                        onClick={() => {
+                          setActiveQuestionIndex(index)
+                          setPhase1VisitedQuestions(prev => new Set([...prev, index]))
+                        }}
+                        className={`relative flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
                           activeQuestionIndex === index
                             ? 'bg-teal-600 text-white shadow-sm'
+                            : phase1VisitedQuestions.has(index)
+                            ? 'bg-teal-100 text-teal-700 border border-teal-300'
                             : 'bg-white text-slate-600 border border-slate-200'
                         }`}
                       >
                         {question.id}
+                        {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index && (
+                          <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 text-teal-600" />
+                        )}
                       </button>
                     ))}
                   </div>
                   {/* Navigation Arrows */}
                   <div className="flex items-center gap-1 shrink-0 ml-auto">
                     <button
-                      onClick={() => setActiveQuestionIndex(Math.max(0, activeQuestionIndex - 1))}
+                      onClick={() => {
+                        const newIndex = Math.max(0, activeQuestionIndex - 1)
+                        setActiveQuestionIndex(newIndex)
+                        setPhase1VisitedQuestions(prev => new Set([...prev, newIndex]))
+                      }}
                       disabled={activeQuestionIndex === 0}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4 text-slate-600" />
                     </button>
                     <button
-                      onClick={() => setActiveQuestionIndex(Math.min(mockQuestionsList.length - 1, activeQuestionIndex + 1))}
+                      onClick={() => {
+                        const newIndex = Math.min(mockQuestionsList.length - 1, activeQuestionIndex + 1)
+                        setActiveQuestionIndex(newIndex)
+                        setPhase1VisitedQuestions(prev => new Set([...prev, newIndex]))
+                      }}
                       disabled={activeQuestionIndex === mockQuestionsList.length - 1}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
@@ -1335,18 +1373,41 @@ const OCREvaluation = () => {
                 {/* Desktop: Left Sidebar Question List */}
                 <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
-                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
-                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                      <span className={`text-[10px] lg:text-xs font-medium px-2 py-0.5 rounded-full ${
+                        phase1VisitedQuestions.size === mockQuestionsList.length 
+                          ? 'bg-teal-100 text-teal-700' 
+                          : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {phase1VisitedQuestions.size}/{mockQuestionsList.length}
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            phase1VisitedQuestions.size === mockQuestionsList.length ? 'bg-teal-500' : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${(phase1VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <ScrollArea className="flex-1">
                     <div className="p-1.5 lg:p-2 space-y-1">
                       {mockQuestionsList.map((question, index) => (
                         <button
                           key={question.id}
-                          onClick={() => setActiveQuestionIndex(index)}
-                          className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
+                          onClick={() => {
+                            setActiveQuestionIndex(index)
+                            setPhase1VisitedQuestions(prev => new Set([...prev, index]))
+                          }}
+                          className={`relative w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
                             activeQuestionIndex === index
                               ? 'bg-teal-600 text-white shadow-sm'
+                              : phase1VisitedQuestions.has(index)
+                              ? 'bg-teal-50 text-slate-700 border border-teal-200'
                               : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
                           }`}
                         >
@@ -1364,6 +1425,9 @@ const OCREvaluation = () => {
                               {question.text}
                             </p>
                           </div>
+                          {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index && (
+                            <CheckCircle className="absolute top-2 right-2 w-4 h-4 text-teal-500" />
+                          )}
                         </button>
                       ))}
                     </div>
