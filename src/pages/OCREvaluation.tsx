@@ -152,6 +152,18 @@ const OCREvaluation = () => {
     totalSize: number
     candidates: CandidateData[]
   } | null>(null)
+  const [selectedSubject, setSelectedSubject] = useState("biology")
+
+  const subjects = [
+    { value: "biology", label: "Biology" },
+    { value: "chemistry", label: "Chemistry" },
+    { value: "physics", label: "Physics" },
+    { value: "mathematics", label: "Mathematics" },
+    { value: "english", label: "English" },
+    { value: "history", label: "History" },
+    { value: "geography", label: "Geography" },
+    { value: "economics", label: "Economics" },
+  ]
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B'
@@ -501,6 +513,31 @@ const OCREvaluation = () => {
       {/* Main Content */}
       <main className="p-4 sm:p-6">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+          {/* Subject Selection */}
+          <Card className="border border-slate-200 bg-white">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 sm:p-2 bg-teal-100 text-teal-700 rounded-lg shrink-0">
+                    <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </div>
+                  <label className="text-sm sm:text-base font-medium text-slate-700">Select Subject</label>
+                </div>
+                <select
+                  value={selectedSubject}
+                  onChange={(e) => setSelectedSubject(e.target.value)}
+                  className="h-10 px-3 py-2 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[200px]"
+                >
+                  {subjects.map((subject) => (
+                    <option key={subject.value} value={subject.value}>
+                      {subject.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Upload Section */}
           <Card className="border-2 border-teal-100 bg-teal-50">
             <CardContent className="p-4 sm:p-6">
