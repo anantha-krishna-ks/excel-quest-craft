@@ -152,17 +152,17 @@ const OCREvaluation = () => {
     totalSize: number
     candidates: CandidateData[]
   } | null>(null)
-  const [selectedSubject, setSelectedSubject] = useState("biology")
+  const [selectedSubject, setSelectedSubject] = useState("broadcast-journalism")
 
   const subjects = [
-    { value: "biology", label: "Biology" },
-    { value: "chemistry", label: "Chemistry" },
-    { value: "physics", label: "Physics" },
-    { value: "mathematics", label: "Mathematics" },
-    { value: "english", label: "English" },
-    { value: "history", label: "History" },
-    { value: "geography", label: "Geography" },
-    { value: "economics", label: "Economics" },
+    { value: "broadcast-journalism", label: "Broadcast Journalism" },
+    { value: "print-journalism", label: "Print Journalism" },
+    { value: "digital-media", label: "Digital Media" },
+    { value: "mass-communication", label: "Mass Communication" },
+    { value: "public-relations", label: "Public Relations" },
+    { value: "advertising", label: "Advertising" },
+    { value: "media-studies", label: "Media Studies" },
+    { value: "film-production", label: "Film Production" },
   ]
 
   const formatFileSize = (bytes: number): string => {
