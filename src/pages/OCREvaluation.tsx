@@ -145,6 +145,13 @@ const OCREvaluation = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [phaseFilter, setPhaseFilter] = useState<"all" | "phase1" | "phase2" | "phase3">("all")
   const [statusFilter, setStatusFilter] = useState<"all" | PhaseStatus>("all")
+  const [showUploadConfirm, setShowUploadConfirm] = useState(false)
+  const [pendingUploadData, setPendingUploadData] = useState<{
+    folderName: string
+    fileCount: number
+    totalSize: number
+    candidates: CandidateData[]
+  } | null>(null)
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B'
@@ -213,11 +220,8 @@ const OCREvaluation = () => {
 
     setTimeout(() => {
       const firstFilePath = files[0].webkitRelativePath
-      const extractedFolderName = firstFilePath.split('/')[0]
-      setFolderName(extractedFolderName)
-      setFileCount(files.length)
-      setTotalFileSize(totalSize)
-
+      const extractedFolderName = firstFilePath ? firstFilePath.split('/')[0] : files[0].name.replace(/\.[^/.]+$/, "")
+      
       const candidateNames = new Set<string>()
       Array.from(files).forEach(file => {
         const fileName = file.name.replace(/\.[^/.]+$/, "")
@@ -264,11 +268,35 @@ const OCREvaluation = () => {
             evaluationData: generateMockEvaluationData(),
           }))
 
-      setCandidates(mockCandidates)
-      setHasUploaded(true)
+      // Store pending data and show confirmation dialog
+      setPendingUploadData({
+        folderName: extractedFolderName,
+        fileCount: files.length,
+        totalSize: totalSize,
+        candidates: mockCandidates
+      })
       setIsUploading(false)
-      toast.success(`Successfully uploaded ${files.length} files from "${extractedFolderName}"`)
+      setShowUploadConfirm(true)
     }, 2000)
+  }
+
+  const handleUploadConfirm = () => {
+    if (pendingUploadData) {
+      setFolderName(pendingUploadData.folderName)
+      setFileCount(pendingUploadData.fileCount)
+      setTotalFileSize(pendingUploadData.totalSize)
+      setCandidates(pendingUploadData.candidates)
+      setHasUploaded(true)
+      setPendingUploadData(null)
+      setShowUploadConfirm(false)
+      toast.success("Upload confirmed successfully!")
+    }
+  }
+
+  const handleUploadCancel = () => {
+    setPendingUploadData(null)
+    setShowUploadConfirm(false)
+    toast.info("Upload cancelled")
   }
 
   const getRandomStatus = (phase: 1 | 2 | 3): PhaseStatus => {
@@ -1698,6 +1726,68 @@ const OCREvaluation = () => {
               className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
             >
               Yes, Re-upload
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Confirmation Dialog */}
+      <Dialog open={showUploadConfirm} onOpenChange={setShowUploadConfirm}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <CheckCircle className="w-5 h-5 text-teal-600" />
+              Upload Summary
+            </DialogTitle>
+            <DialogDescription className="text-slate-600 pt-2">
+              Please review the upload details before confirming.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {pendingUploadData && (
+            <div className="py-4 space-y-4">
+              <div className="bg-teal-50 border border-teal-200 rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <FolderOpen className="w-5 h-5 text-teal-600 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs text-slate-500">Folder Name</p>
+                    <p className="font-medium text-slate-800 truncate">{pendingUploadData.folderName}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4 pt-2 border-t border-teal-200">
+                  <div className="text-center">
+                    <p className="text-xl font-bold text-teal-700">{pendingUploadData.candidates.length}</p>
+                    <p className="text-xs text-slate-500">Candidates</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xl font-bold text-teal-700">{pendingUploadData.fileCount}</p>
+                    <p className="text-xs text-slate-500">Files</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xl font-bold text-teal-700">{formatFileSize(pendingUploadData.totalSize)}</p>
+                    <p className="text-xs text-slate-500">Total Size</p>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 text-center">
+                Click "OK" to proceed with the evaluation or "Cancel" to discard the upload.
+              </p>
+            </div>
+          )}
+          
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={handleUploadCancel}
+              className="w-full sm:w-auto border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUploadConfirm}
+              className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
+            >
+              OK
             </Button>
           </DialogFooter>
         </DialogContent>
