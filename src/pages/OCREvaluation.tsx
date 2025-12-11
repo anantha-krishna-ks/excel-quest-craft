@@ -647,32 +647,68 @@ const OCREvaluation = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/70 rounded-lg p-3 sm:p-4 border border-teal-200">
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 sm:p-2 bg-teal-100 rounded-lg shrink-0">
-                      <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{folderName}</p>
-                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-                        <span>{candidates.length} papers</span>
-                        <span className="text-gray-300">•</span>
-                        <span>{fileCount} files</span>
-                        <span className="text-gray-300">•</span>
-                        <span className="font-medium text-teal-600">{formatFileSize(totalFileSize)}</span>
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/70 rounded-lg p-3 sm:p-4 border border-teal-200">
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 sm:p-2 bg-teal-100 rounded-lg shrink-0">
+                        <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{folderName}</p>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+                          <span>{candidates.length} papers</span>
+                          <span className="text-gray-300">•</span>
+                          <span>{fileCount} files</span>
+                          <span className="text-gray-300">•</span>
+                          <span className="font-medium text-teal-600">{formatFileSize(totalFileSize)}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                      {/* Upload Missing PDFs */}
+                      <input
+                        type="file"
+                        id="missing-pdf-upload"
+                        accept=".pdf"
+                        multiple
+                        onChange={(e) => {
+                          const files = e.target.files
+                          if (files && files.length > 0) {
+                            const newSize = Array.from(files).reduce((acc, file) => acc + file.size, 0)
+                            setFileCount(prev => prev + files.length)
+                            setTotalFileSize(prev => prev + newSize)
+                            toast.success(`Added ${files.length} missing PDF(s) successfully!`)
+                          }
+                          e.target.value = ''
+                        }}
+                        className="hidden"
+                      />
+                      <label htmlFor="missing-pdf-upload">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800 shrink-0 cursor-pointer"
+                          asChild
+                        >
+                          <span>
+                            <Upload className="w-4 h-4 sm:mr-2" />
+                            <span className="hidden sm:inline">Upload Missing PDFs</span>
+                            <span className="sm:hidden">Add PDFs</span>
+                          </span>
+                        </Button>
+                      </label>
+                      <Button
+                        onClick={() => setShowReuploadConfirm(true)}
+                        variant="outline"
+                        size="sm"
+                        className="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800 shrink-0"
+                      >
+                        <RotateCcw className="w-4 h-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Re-upload Folder</span>
+                        <span className="sm:hidden">Re-upload</span>
+                      </Button>
+                    </div>
                   </div>
-                  <Button
-                    onClick={() => setShowReuploadConfirm(true)}
-                    variant="outline"
-                    size="sm"
-                    className="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800 shrink-0"
-                  >
-                    <RotateCcw className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Re-upload Folder</span>
-                    <span className="sm:hidden">Re-upload</span>
-                  </Button>
                 </div>
               )}
             </CardContent>
