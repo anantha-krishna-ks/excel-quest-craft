@@ -1782,7 +1782,7 @@ const OCREvaluation = () => {
                 onClick={() => setShowReEvaluationDialog(true)}
                 size="sm"
                 variant="outline"
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium"
+                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-amber-300 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 text-amber-700 font-medium"
               >
                 <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 <span className="hidden sm:inline">Re-evaluate</span>
