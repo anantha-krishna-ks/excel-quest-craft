@@ -2027,6 +2027,21 @@ const OCREvaluation = () => {
                   })()}
                 </div>
               </div>
+              
+              {/* Footer with Close Button */}
+              <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 bg-white shrink-0 flex justify-end">
+                <Button
+                  onClick={() => {
+                    setEvaluationReviewCandidate(null)
+                    setEvalActiveQuestionIndex(0)
+                    setPhase3VisitedQuestions(new Set([0]))
+                  }}
+                  variant="outline"
+                  className="px-6 border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+                >
+                  Close
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
