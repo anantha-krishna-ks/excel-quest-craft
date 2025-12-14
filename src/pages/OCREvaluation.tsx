@@ -2,7 +2,9 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -166,6 +168,8 @@ const OCREvaluation = () => {
   // Re-evaluation dialog state
   const [showReEvaluationDialog, setShowReEvaluationDialog] = useState(false)
   const [reEvaluationPrompt, setReEvaluationPrompt] = useState("")
+  // Multi-select state for download
+  const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set())
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -869,15 +873,116 @@ const OCREvaluation = () => {
                     return matchesSearch && matchesStatus
                   })
 
+                  // Check if a candidate has all phases approved
+                  const isFullyApproved = (candidate: CandidateData) => 
+                    candidate.phase1 === "approved" && 
+                    candidate.phase2 === "approved" && 
+                    candidate.phase3 === "approved"
+
+                  // Get downloadable candidates (all phases approved)
+                  const downloadableCandidates = filteredCandidates.filter(isFullyApproved)
+                  
+                  // Get selected downloadable candidates
+                  const selectedDownloadable = filteredCandidates.filter(
+                    c => selectedCandidates.has(c.id) && isFullyApproved(c)
+                  )
+
+                  const hasDownloadableSelected = selectedDownloadable.length > 0
+                  const hasAnyDownloadable = downloadableCandidates.length > 0
+
+                  // Handle select all
+                  const handleSelectAll = (checked: boolean) => {
+                    if (checked) {
+                      const allIds = new Set(filteredCandidates.map(c => c.id))
+                      setSelectedCandidates(allIds)
+                    } else {
+                      setSelectedCandidates(new Set())
+                    }
+                  }
+
+                  // Handle individual select
+                  const handleSelectCandidate = (id: string, checked: boolean) => {
+                    const newSelected = new Set(selectedCandidates)
+                    if (checked) {
+                      newSelected.add(id)
+                    } else {
+                      newSelected.delete(id)
+                    }
+                    setSelectedCandidates(newSelected)
+                  }
+
+                  // Handle download
+                  const handleDownload = (type: "selected" | "all") => {
+                    const toDownload = type === "selected" ? selectedDownloadable : downloadableCandidates
+                    if (toDownload.length === 0) {
+                      toast.error("No approved candidates available for download")
+                      return
+                    }
+                    toast.success(`Downloading ${toDownload.length} candidate${toDownload.length > 1 ? 's' : ''} data`)
+                    // In a real implementation, this would trigger actual file download
+                  }
+
+                  const allSelected = filteredCandidates.length > 0 && 
+                    filteredCandidates.every(c => selectedCandidates.has(c.id))
+                  const someSelected = filteredCandidates.some(c => selectedCandidates.has(c.id))
+
                   return (
                     <>
-                      <div className="text-sm text-slate-500 mb-3">
-                        Showing {filteredCandidates.length} of {candidates.length} candidates
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-sm text-slate-500">
+                          Showing {filteredCandidates.length} of {candidates.length} candidates
+                          {selectedCandidates.size > 0 && (
+                            <span className="ml-2 text-teal-600 font-medium">
+                              ({selectedCandidates.size} selected)
+                            </span>
+                          )}
+                        </div>
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              disabled={!hasDownloadableSelected && !hasAnyDownloadable}
+                              className="gap-2"
+                            >
+                              <Download className="w-4 h-4" />
+                              Download
+                              <ChevronDown className="w-3 h-3" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-white border border-slate-200 shadow-lg z-50">
+                            <DropdownMenuItem 
+                              onClick={() => handleDownload("selected")}
+                              disabled={!hasDownloadableSelected}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              Download Selected ({selectedDownloadable.length})
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDownload("all")}
+                              disabled={!hasAnyDownloadable}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <Users className="w-4 h-4" />
+                              Download All Approved ({downloadableCandidates.length})
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
+                      
                       <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 -mx-4 sm:mx-0">
                         <Table>
                           <TableHeader>
                             <TableRow className="bg-slate-50 border-b border-slate-200 hover:bg-slate-50">
+                              <TableHead className="w-10 py-3 sm:py-4">
+                                <Checkbox 
+                                  checked={allSelected}
+                                  onCheckedChange={handleSelectAll}
+                                  className="data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                />
+                              </TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm text-left">Sl. No</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Candidate Name</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
@@ -888,7 +993,7 @@ const OCREvaluation = () => {
                           <TableBody>
                             {filteredCandidates.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                                <TableCell colSpan={6} className="text-center py-8 text-slate-500">
                                   No candidates found matching your filters
                                 </TableCell>
                               </TableRow>
@@ -896,8 +1001,17 @@ const OCREvaluation = () => {
                               filteredCandidates.map((candidate, index) => (
                                 <TableRow 
                                   key={candidate.id} 
-                                  className="border-b border-slate-100 last:border-b-0"
+                                  className={`border-b border-slate-100 last:border-b-0 ${
+                                    selectedCandidates.has(candidate.id) ? 'bg-teal-50/50' : ''
+                                  }`}
                                 >
+                                  <TableCell className="py-3 sm:py-4">
+                                    <Checkbox 
+                                      checked={selectedCandidates.has(candidate.id)}
+                                      onCheckedChange={(checked) => handleSelectCandidate(candidate.id, checked as boolean)}
+                                      className="data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                    />
+                                  </TableCell>
                                   <TableCell className="text-slate-600 py-3 sm:py-4 text-xs sm:text-sm text-left">
                                     {index + 1}
                                   </TableCell>
