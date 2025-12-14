@@ -48,6 +48,8 @@ interface CandidateData {
   answerSheets?: AnswerSheetPage[]
   segmentImages?: SegmentImage[]
   evaluationData?: EvaluationData
+  evaluationMarks?: number
+  maxMarks?: number
 }
 
 const StatusBadge = ({ 
@@ -272,6 +274,8 @@ const OCREvaluation = () => {
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
             segmentImages: generateMockSegmentImages(),
             evaluationData: generateMockEvaluationData(),
+            evaluationMarks: Math.floor(Math.random() * 51) + 50,
+            maxMarks: 100,
           }))
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
             id: `candidate-${index + 1}`,
@@ -286,6 +290,8 @@ const OCREvaluation = () => {
             ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
             segmentImages: generateMockSegmentImages(),
             evaluationData: generateMockEvaluationData(),
+            evaluationMarks: Math.floor(Math.random() * 51) + 50,
+            maxMarks: 100,
           }))
 
       // Store pending data and show confirmation dialog
@@ -915,11 +921,33 @@ const OCREvaluation = () => {
                                     />
                                   </TableCell>
                                   <TableCell className="py-3 sm:py-4 text-left">
-                                    <StatusBadge 
-                                      status={candidate.phase3}
-                                      clickable={candidate.phase3 === "completed"}
-                                      onClick={() => setEvaluationReviewCandidate(candidate)}
-                                    />
+                                    {candidate.phase2 === "approved" && candidate.evaluationMarks !== undefined ? (
+                                      <div className="flex items-center gap-2">
+                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                          (candidate.evaluationMarks / (candidate.maxMarks || 100)) >= 0.6 
+                                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' 
+                                            : (candidate.evaluationMarks / (candidate.maxMarks || 100)) >= 0.4 
+                                            ? 'bg-amber-100 text-amber-700 border border-amber-200' 
+                                            : 'bg-red-100 text-red-700 border border-red-200'
+                                        }`}>
+                                          <Award className="w-3 h-3 mr-1" />
+                                          {candidate.evaluationMarks}/{candidate.maxMarks || 100}
+                                        </span>
+                                        <button
+                                          onClick={() => setEvaluationReviewCandidate(candidate)}
+                                          className="p-1 rounded hover:bg-slate-100 transition-colors"
+                                          title="View Evaluation Details"
+                                        >
+                                          <Eye className="w-4 h-4 text-slate-500" />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <StatusBadge 
+                                        status={candidate.phase3}
+                                        clickable={candidate.phase3 === "completed"}
+                                        onClick={() => setEvaluationReviewCandidate(candidate)}
+                                      />
+                                    )}
                                   </TableCell>
                                 </TableRow>
                               ))
