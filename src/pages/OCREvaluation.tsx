@@ -2029,8 +2029,8 @@ const OCREvaluation = () => {
                                   setEvalActiveQuestionIndex(0)
                                   setPhase3VisitedQuestions(new Set([0]))
                                 }}
-                                variant="outline"
-                                className="px-8 border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+                                variant="secondary"
+                                className="px-8"
                               >
                                 Close
                               </Button>
