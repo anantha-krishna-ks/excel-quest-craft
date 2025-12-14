@@ -161,6 +161,10 @@ const OCREvaluation = () => {
   const [editingSegmentId, setEditingSegmentId] = useState<number | null>(null)
   const [segmentOcrTexts, setSegmentOcrTexts] = useState<Record<number, string>>({})
   const [editedSegmentOcrText, setEditedSegmentOcrText] = useState("")
+  // Individual segment Evaluation editing states
+  const [editingEvalSegmentId, setEditingEvalSegmentId] = useState<number | null>(null)
+  const [evalSegmentTexts, setEvalSegmentTexts] = useState<Record<number, string>>({})
+  const [editedEvalSegmentText, setEditedEvalSegmentText] = useState("")
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -1720,7 +1724,7 @@ const OCREvaluation = () => {
       </Dialog>
 
       {/* Evaluation Review Dialog */}
-      <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); }}>
+      <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); setEditingEvalSegmentId(null); setEvalSegmentTexts({}); setEditedEvalSegmentText(""); }}>
         <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
           {/* Dialog Header */}
           <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
@@ -1919,87 +1923,110 @@ const OCREvaluation = () => {
                           </div>
                         </div>
 
-                        {/* Evaluation Details */}
-                        <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-                          {/* Score Banner */}
-                          <div className="mb-4 sm:mb-5 md:mb-6 rounded-lg sm:rounded-xl border border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 overflow-hidden">
-                            <div className="px-4 sm:px-5 md:px-6 py-4 sm:py-5 md:py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-                              <div className="flex items-center gap-2 sm:gap-3">
-                                <Award className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
-                                <h3 className="text-sm sm:text-base font-semibold text-slate-800">Evaluation Score</h3>
+                        {/* Side-by-side Segment Images with Evaluation Fields */}
+                        <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 space-y-4">
+                          {(evaluationReviewCandidate.segmentImages || generateMockSegmentImages()).map((segment) => {
+                            const isEditingThis = editingEvalSegmentId === segment.id
+                            const currentEvalText = evalSegmentTexts[segment.id] ?? `Score: ${evalData.evaluationScore}/${activeQuestion?.maxScore}\n\nExtracted Info:\n${evalData.extractedInfo}\n\nKeypoints:\n${evalData.keypoints.map(k => `• ${k}`).join('\n')}\n\nMissing Items:\n${evalData.missing.map(m => `• ${m}`).join('\n')}\n\nRationale:\n${evalData.rational}`
+                            
+                            return (
+                              <div key={segment.id} className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                                {/* Segment Header */}
+                                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-teal-100 text-teal-700">
+                                      <span className="text-xs font-bold">{segment.id}</span>
+                                    </div>
+                                    <span className="text-xs sm:text-sm font-medium text-slate-700">{segment.label}</span>
+                                  </div>
+                                  {/* Individual Edit/Save/Cancel Buttons */}
+                                  <div className="flex items-center gap-1.5">
+                                    {isEditingThis ? (
+                                      <>
+                                        <Button
+                                          size="sm"
+                                          onClick={() => {
+                                            setEvalSegmentTexts(prev => ({ ...prev, [segment.id]: editedEvalSegmentText }))
+                                            setEditingEvalSegmentId(null)
+                                            toast.success(`Evaluation for ${segment.label} saved`)
+                                          }}
+                                          className="h-7 px-2.5 text-xs bg-teal-600 hover:bg-teal-700 text-white"
+                                        >
+                                          Save
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setEditingEvalSegmentId(null)
+                                            setEditedEvalSegmentText("")
+                                          }}
+                                          className="h-7 px-2.5 text-xs border-slate-300"
+                                        >
+                                          Cancel
+                                        </Button>
+                                      </>
+                                    ) : (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          setEditingEvalSegmentId(segment.id)
+                                          setEditedEvalSegmentText(currentEvalText)
+                                        }}
+                                        className="h-7 px-2.5 text-xs border-slate-300"
+                                      >
+                                        <Edit2 className="w-3 h-3 mr-1" />
+                                        Update
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                {/* Side-by-side Content */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                                  {/* Left: Segment Image */}
+                                  <div className="p-3 sm:p-4">
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                      <Image className="w-3.5 h-3.5 text-teal-600" />
+                                      <span className="text-xs font-medium text-slate-600">Answer Sheet Segment</span>
+                                    </div>
+                                    <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
+                                      <img 
+                                        src={segment.imageUrl} 
+                                        alt={segment.label}
+                                        className="w-full h-48 sm:h-56 md:h-64 object-contain"
+                                        onError={(e) => {
+                                          const target = e.target as HTMLImageElement
+                                          target.src = "/placeholder.svg"
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Right: Evaluation Text */}
+                                  <div className="p-3 sm:p-4">
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                      <Award className="w-3.5 h-3.5 text-teal-600" />
+                                      <span className="text-xs font-medium text-slate-600">Evaluation Details</span>
+                                    </div>
+                                    {isEditingThis ? (
+                                      <Textarea
+                                        value={editedEvalSegmentText}
+                                        onChange={(e) => setEditedEvalSegmentText(e.target.value)}
+                                        className="min-h-[180px] sm:min-h-[210px] md:min-h-[240px] text-xs sm:text-sm font-mono bg-white border-slate-300 resize-none"
+                                        placeholder="Enter evaluation details..."
+                                      />
+                                    ) : (
+                                      <pre className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200 min-h-[180px] sm:min-h-[210px] md:min-h-[240px] overflow-auto">
+                                        {currentEvalText}
+                                      </pre>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex items-baseline gap-1.5 sm:gap-2">
-                                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
-                                <span className="text-lg sm:text-xl text-slate-400">/</span>
-                                <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Main Content - Single Column */}
-                          <div className="space-y-4 sm:space-y-5">
-                            {/* Extracted Info */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-indigo-600" />
-                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Extracted Info</h3>
-                              </div>
-                              <div className="p-3 sm:p-4">
-                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                  {evalData.extractedInfo}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Keypoints */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-2">
-                                <ListChecks className="w-4 h-4 text-emerald-600" />
-                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Keypoints</h3>
-                              </div>
-                              <div className="p-3 sm:p-4">
-                                <ul className="space-y-2">
-                                  {evalData.keypoints.map((point, index) => (
-                                    <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
-                                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                      <span>{point}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-
-                            {/* Missing Items */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-2">
-                                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Missing Items</h3>
-                              </div>
-                              <div className="p-3 sm:p-4">
-                                <ul className="space-y-2">
-                                  {evalData.missing.map((item, index) => (
-                                    <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
-                                      <X className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                                      <span>{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-
-                            {/* Rationale */}
-                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-2">
-                                <MessageSquare className="w-4 h-4 text-purple-600" />
-                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Rationale</h3>
-                              </div>
-                              <div className="p-3 sm:p-4">
-                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                  {evalData.rational}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
+                            )
+                          })}
                         </div>
                       </ScrollArea>
                     )
