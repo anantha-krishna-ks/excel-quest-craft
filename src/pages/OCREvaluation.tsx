@@ -161,13 +161,6 @@ const OCREvaluation = () => {
   const [editingSegmentId, setEditingSegmentId] = useState<number | null>(null)
   const [segmentOcrTexts, setSegmentOcrTexts] = useState<Record<number, string>>({})
   const [editedSegmentOcrText, setEditedSegmentOcrText] = useState("")
-  // Individual segment Evaluation editing states
-  const [editingEvalSegmentId, setEditingEvalSegmentId] = useState<number | null>(null)
-  const [evalSegmentTexts, setEvalSegmentTexts] = useState<Record<number, string>>({})
-  const [editedEvalSegmentText, setEditedEvalSegmentText] = useState("")
-  // Re-evaluation dialog state
-  const [showReEvaluationDialog, setShowReEvaluationDialog] = useState(false)
-  const [reEvaluationPrompt, setReEvaluationPrompt] = useState("")
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -922,23 +915,11 @@ const OCREvaluation = () => {
                                     />
                                   </TableCell>
                                   <TableCell className="py-3 sm:py-4 text-left">
-                                    {(candidate.phase2 === "approved" || candidate.phase3 === "approved" || candidate.phase3 === "completed") ? (
-                                      <button
-                                        onClick={() => setEvaluationReviewCandidate(candidate)}
-                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 hover:ring-2 hover:ring-emerald-300 transition-all cursor-pointer"
-                                      >
-                                        <CheckCircle className="w-3.5 h-3.5" />
-                                        <span className="text-xs font-bold">
-                                          {candidate.evaluationData?.evaluationScore ?? 7}/{candidate.evaluationData?.maxScore ?? 10}
-                                        </span>
-                                      </button>
-                                    ) : (
-                                      <StatusBadge 
-                                        status={candidate.phase3}
-                                        clickable={["completed", "in-progress", "pending"].includes(candidate.phase3)}
-                                        onClick={() => setEvaluationReviewCandidate(candidate)}
-                                      />
-                                    )}
+                                    <StatusBadge 
+                                      status={candidate.phase3}
+                                      clickable={candidate.phase3 === "completed"}
+                                      onClick={() => setEvaluationReviewCandidate(candidate)}
+                                    />
                                   </TableCell>
                                 </TableRow>
                               ))
@@ -1157,25 +1138,13 @@ const OCREvaluation = () => {
                 {/* Desktop: Left Sidebar Question List */}
                 <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
-                      <span className={`text-[10px] lg:text-xs font-medium px-2 py-0.5 rounded-full ${
-                        phase2VisitedQuestions.size === mockQuestionsList.length 
-                          ? 'bg-teal-100 text-teal-700' 
-                          : 'bg-amber-100 text-amber-700'
-                      }`}>
-                        {phase2VisitedQuestions.size}/{mockQuestionsList.length}
-                      </span>
-                    </div>
-                    <div className="mt-2">
-                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full transition-all duration-300 ${
-                            phase2VisitedQuestions.size === mockQuestionsList.length ? 'bg-teal-500' : 'bg-amber-500'
-                          }`}
-                          style={{ width: `${(phase2VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
-                        />
-                      </div>
+                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                    <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-teal-500 transition-all duration-300" 
+                        style={{ width: `${(phase2VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                      />
                     </div>
                   </div>
                   <ScrollArea className="flex-1">
@@ -1751,7 +1720,7 @@ const OCREvaluation = () => {
       </Dialog>
 
       {/* Evaluation Review Dialog */}
-      <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); setEditingEvalSegmentId(null); setEvalSegmentTexts({}); setEditedEvalSegmentText(""); }}>
+      <Dialog open={!!evaluationReviewCandidate} onOpenChange={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); }}>
         <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
           {/* Dialog Header */}
           <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
@@ -1773,13 +1742,29 @@ const OCREvaluation = () => {
                 </div>
               </div>
               <Button
-                onClick={() => setShowReEvaluationDialog(true)}
+                onClick={() => {
+                  setCandidates(prev => prev.map(c => {
+                    if (c.id === evaluationReviewCandidate?.id) {
+                      return { ...c, phase3: "approved" as any }
+                    }
+                    return c
+                  }))
+                  toast.success(`Evaluation approved for ${evaluationReviewCandidate?.candidateName}`)
+                  setEvaluationReviewCandidate(null)
+                  setEvalActiveQuestionIndex(0)
+                  setPhase3VisitedQuestions(new Set([0]))
+                }}
                 size="sm"
-                variant="outline"
-                className="px-2 sm:px-3 md:px-4 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-amber-300 text-amber-700 hover:bg-amber-50 font-medium"
+                disabled={phase3VisitedQuestions.size < mockQuestionsList.length}
+                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
+                title={phase3VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
               >
-                <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1" />
-                Re-evaluate
+                {phase3VisitedQuestions.size < mockQuestionsList.length ? (
+                  <span className="flex items-center gap-1">
+                    <span className="sm:hidden">{phase3VisitedQuestions.size}/{mockQuestionsList.length}</span>
+                    <span className="hidden sm:inline">Approve</span>
+                  </span>
+                ) : 'Approve'}
               </Button>
               <button 
                 onClick={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); }}
@@ -1852,25 +1837,13 @@ const OCREvaluation = () => {
                 {/* Desktop: Left Sidebar Question List */}
                 <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
-                      <span className={`text-[10px] lg:text-xs font-medium px-2 py-0.5 rounded-full ${
-                        phase3VisitedQuestions.size === mockQuestionsList.length 
-                          ? 'bg-teal-100 text-teal-700' 
-                          : 'bg-amber-100 text-amber-700'
-                      }`}>
-                        {phase3VisitedQuestions.size}/{mockQuestionsList.length}
-                      </span>
-                    </div>
-                    <div className="mt-2">
-                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full transition-all duration-300 ${
-                            phase3VisitedQuestions.size === mockQuestionsList.length ? 'bg-teal-500' : 'bg-amber-500'
-                          }`}
-                          style={{ width: `${(phase3VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
-                        />
-                      </div>
+                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                    <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-teal-500 transition-all duration-300" 
+                        style={{ width: `${(phase3VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                      />
                     </div>
                   </div>
                   <ScrollArea className="flex-1">
@@ -1946,110 +1919,87 @@ const OCREvaluation = () => {
                           </div>
                         </div>
 
-                        {/* Side-by-side Segment Images with Evaluation Fields */}
-                        <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 space-y-4">
-                          {(evaluationReviewCandidate.segmentImages || generateMockSegmentImages()).map((segment) => {
-                            const isEditingThis = editingEvalSegmentId === segment.id
-                            const currentEvalText = evalSegmentTexts[segment.id] ?? `Score: ${evalData.evaluationScore}/${activeQuestion?.maxScore}\n\nExtracted Info:\n${evalData.extractedInfo}\n\nKeypoints:\n${evalData.keypoints.map(k => `• ${k}`).join('\n')}\n\nMissing Items:\n${evalData.missing.map(m => `• ${m}`).join('\n')}\n\nRationale:\n${evalData.rational}`
-                            
-                            return (
-                              <div key={segment.id} className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
-                                {/* Segment Header */}
-                                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-teal-100 text-teal-700">
-                                      <span className="text-xs font-bold">{segment.id}</span>
-                                    </div>
-                                    <span className="text-xs sm:text-sm font-medium text-slate-700">{segment.label}</span>
-                                  </div>
-                                  {/* Individual Edit/Save/Cancel Buttons */}
-                                  <div className="flex items-center gap-1.5">
-                                    {isEditingThis ? (
-                                      <>
-                                        <Button
-                                          size="sm"
-                                          onClick={() => {
-                                            setEvalSegmentTexts(prev => ({ ...prev, [segment.id]: editedEvalSegmentText }))
-                                            setEditingEvalSegmentId(null)
-                                            toast.success(`Evaluation for ${segment.label} saved`)
-                                          }}
-                                          className="h-7 px-2.5 text-xs bg-teal-600 hover:bg-teal-700 text-white"
-                                        >
-                                          Save
-                                        </Button>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={() => {
-                                            setEditingEvalSegmentId(null)
-                                            setEditedEvalSegmentText("")
-                                          }}
-                                          className="h-7 px-2.5 text-xs border-slate-300"
-                                        >
-                                          Cancel
-                                        </Button>
-                                      </>
-                                    ) : (
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => {
-                                          setEditingEvalSegmentId(segment.id)
-                                          setEditedEvalSegmentText(currentEvalText)
-                                        }}
-                                        className="h-7 px-2.5 text-xs border-slate-300"
-                                      >
-                                        <Edit2 className="w-3 h-3 mr-1" />
-                                        Update
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                                
-                                {/* Side-by-side Content */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
-                                  {/* Left: Segment Image */}
-                                  <div className="p-3 sm:p-4">
-                                    <div className="flex items-center gap-1.5 mb-2">
-                                      <Image className="w-3.5 h-3.5 text-teal-600" />
-                                      <span className="text-xs font-medium text-slate-600">Answer Sheet Segment</span>
-                                    </div>
-                                    <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
-                                      <img 
-                                        src={segment.imageUrl} 
-                                        alt={segment.label}
-                                        className="w-full h-48 sm:h-56 md:h-64 object-contain"
-                                        onError={(e) => {
-                                          const target = e.target as HTMLImageElement
-                                          target.src = "/placeholder.svg"
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-                                  
-                                  {/* Right: Evaluation Text */}
-                                  <div className="p-3 sm:p-4">
-                                    <div className="flex items-center gap-1.5 mb-2">
-                                      <Award className="w-3.5 h-3.5 text-teal-600" />
-                                      <span className="text-xs font-medium text-slate-600">Evaluation Details</span>
-                                    </div>
-                                    {isEditingThis ? (
-                                      <Textarea
-                                        value={editedEvalSegmentText}
-                                        onChange={(e) => setEditedEvalSegmentText(e.target.value)}
-                                        className="min-h-[180px] sm:min-h-[210px] md:min-h-[240px] text-xs sm:text-sm font-mono bg-white border-slate-300 resize-none"
-                                        placeholder="Enter evaluation details..."
-                                      />
-                                    ) : (
-                                      <pre className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200 min-h-[180px] sm:min-h-[210px] md:min-h-[240px] overflow-auto">
-                                        {currentEvalText}
-                                      </pre>
-                                    )}
-                                  </div>
-                                </div>
+                        {/* Evaluation Details */}
+                        <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
+                          {/* Score Banner */}
+                          <div className="mb-4 sm:mb-5 md:mb-6 rounded-lg sm:rounded-xl border border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 overflow-hidden">
+                            <div className="px-4 sm:px-5 md:px-6 py-4 sm:py-5 md:py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <Award className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
+                                <h3 className="text-sm sm:text-base font-semibold text-slate-800">Evaluation Score</h3>
                               </div>
-                            )
-                          })}
+                              <div className="flex items-baseline gap-1.5 sm:gap-2">
+                                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
+                                <span className="text-lg sm:text-xl text-slate-400">/</span>
+                                <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Main Content - Single Column */}
+                          <div className="space-y-4 sm:space-y-5">
+                            {/* Extracted Info */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-indigo-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Extracted Info</h3>
+                              </div>
+                              <div className="p-3 sm:p-4">
+                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                  {evalData.extractedInfo}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Keypoints */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-emerald-50 border-b border-slate-200 flex items-center gap-2">
+                                <ListChecks className="w-4 h-4 text-emerald-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Keypoints</h3>
+                              </div>
+                              <div className="p-3 sm:p-4">
+                                <ul className="space-y-2">
+                                  {evalData.keypoints.map((point, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+                                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                      <span>{point}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+
+                            {/* Missing Items */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-amber-50 border-b border-slate-200 flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Missing Items</h3>
+                              </div>
+                              <div className="p-3 sm:p-4">
+                                <ul className="space-y-2">
+                                  {evalData.missing.map((item, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-slate-600">
+                                      <X className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                                      <span>{item}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+
+                            {/* Rationale */}
+                            <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                              <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-purple-50 border-b border-slate-200 flex items-center gap-2">
+                                <MessageSquare className="w-4 h-4 text-purple-600" />
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Rationale</h3>
+                              </div>
+                              <div className="p-3 sm:p-4">
+                                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                  {evalData.rational}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </ScrollArea>
                     )
@@ -2058,93 +2008,6 @@ const OCREvaluation = () => {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Re-evaluation Dialog */}
-      <Dialog open={showReEvaluationDialog} onOpenChange={(open) => { setShowReEvaluationDialog(open); if (!open) setReEvaluationPrompt(""); }}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-slate-800">
-              <RotateCcw className="w-5 h-5 text-amber-600" />
-              Request Re-evaluation
-            </DialogTitle>
-            <DialogDescription className="text-slate-600 pt-2">
-              Describe the changes or corrections needed for this evaluation. The system will re-process based on your instructions.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4 space-y-4">
-            {/* Current Question Context */}
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <p className="text-xs text-slate-500 mb-1">Current Question</p>
-              <p className="text-sm font-medium text-slate-700 line-clamp-2">
-                {mockQuestionsList[evalActiveQuestionIndex]?.text}
-              </p>
-            </div>
-            
-            {/* Prompt Input */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">
-                What changes are needed?
-              </label>
-              <Textarea
-                value={reEvaluationPrompt}
-                onChange={(e) => setReEvaluationPrompt(e.target.value)}
-                placeholder="E.g., The score should be higher because the student mentioned all key points. Please recalculate considering the additional context provided in paragraph 2..."
-                className="min-h-[120px] resize-none border-slate-300 focus:border-amber-400 focus:ring-amber-400"
-              />
-              <p className="text-xs text-slate-500">
-                Be specific about which aspects need correction or reconsideration.
-              </p>
-            </div>
-            
-            {/* Quick Suggestions */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-slate-600">Quick suggestions:</p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  "Recalculate score",
-                  "Add missing keypoints",
-                  "Review rationale",
-                  "Check extracted text"
-                ].map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    onClick={() => setReEvaluationPrompt(prev => prev ? `${prev} ${suggestion}.` : `${suggestion}.`)}
-                    className="px-2.5 py-1 text-xs rounded-full bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={() => { setShowReEvaluationDialog(false); setReEvaluationPrompt(""); }}
-              className="w-full sm:w-auto border-slate-300 text-slate-700 hover:bg-slate-50"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                if (!reEvaluationPrompt.trim()) {
-                  toast.error("Please describe the changes needed")
-                  return
-                }
-                toast.success("Re-evaluation request submitted successfully")
-                setShowReEvaluationDialog(false)
-                setReEvaluationPrompt("")
-              }}
-              disabled={!reEvaluationPrompt.trim()}
-              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white disabled:bg-slate-300"
-            >
-              Submit Re-evaluation
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
