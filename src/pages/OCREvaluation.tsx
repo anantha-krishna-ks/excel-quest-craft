@@ -165,6 +165,9 @@ const OCREvaluation = () => {
   const [editingEvalSegmentId, setEditingEvalSegmentId] = useState<number | null>(null)
   const [evalSegmentTexts, setEvalSegmentTexts] = useState<Record<number, string>>({})
   const [editedEvalSegmentText, setEditedEvalSegmentText] = useState("")
+  // Re-evaluation dialog state
+  const [showReEvaluationDialog, setShowReEvaluationDialog] = useState(false)
+  const [reEvaluationPrompt, setReEvaluationPrompt] = useState("")
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -1770,29 +1773,13 @@ const OCREvaluation = () => {
                 </div>
               </div>
               <Button
-                onClick={() => {
-                  setCandidates(prev => prev.map(c => {
-                    if (c.id === evaluationReviewCandidate?.id) {
-                      return { ...c, phase3: "approved" as any }
-                    }
-                    return c
-                  }))
-                  toast.success(`Evaluation approved for ${evaluationReviewCandidate?.candidateName}`)
-                  setEvaluationReviewCandidate(null)
-                  setEvalActiveQuestionIndex(0)
-                  setPhase3VisitedQuestions(new Set([0]))
-                }}
+                onClick={() => setShowReEvaluationDialog(true)}
                 size="sm"
-                disabled={phase3VisitedQuestions.size < mockQuestionsList.length}
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                title={phase3VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
+                variant="outline"
+                className="px-2 sm:px-3 md:px-4 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-amber-300 text-amber-700 hover:bg-amber-50 font-medium"
               >
-                {phase3VisitedQuestions.size < mockQuestionsList.length ? (
-                  <span className="flex items-center gap-1">
-                    <span className="sm:hidden">{phase3VisitedQuestions.size}/{mockQuestionsList.length}</span>
-                    <span className="hidden sm:inline">Approve</span>
-                  </span>
-                ) : 'Approve'}
+                <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1" />
+                Re-evaluate
               </Button>
               <button 
                 onClick={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); }}
@@ -2071,6 +2058,93 @@ const OCREvaluation = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Re-evaluation Dialog */}
+      <Dialog open={showReEvaluationDialog} onOpenChange={(open) => { setShowReEvaluationDialog(open); if (!open) setReEvaluationPrompt(""); }}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <RotateCcw className="w-5 h-5 text-amber-600" />
+              Request Re-evaluation
+            </DialogTitle>
+            <DialogDescription className="text-slate-600 pt-2">
+              Describe the changes or corrections needed for this evaluation. The system will re-process based on your instructions.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            {/* Current Question Context */}
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <p className="text-xs text-slate-500 mb-1">Current Question</p>
+              <p className="text-sm font-medium text-slate-700 line-clamp-2">
+                {mockQuestionsList[evalActiveQuestionIndex]?.text}
+              </p>
+            </div>
+            
+            {/* Prompt Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                What changes are needed?
+              </label>
+              <Textarea
+                value={reEvaluationPrompt}
+                onChange={(e) => setReEvaluationPrompt(e.target.value)}
+                placeholder="E.g., The score should be higher because the student mentioned all key points. Please recalculate considering the additional context provided in paragraph 2..."
+                className="min-h-[120px] resize-none border-slate-300 focus:border-amber-400 focus:ring-amber-400"
+              />
+              <p className="text-xs text-slate-500">
+                Be specific about which aspects need correction or reconsideration.
+              </p>
+            </div>
+            
+            {/* Quick Suggestions */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-slate-600">Quick suggestions:</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Recalculate score",
+                  "Add missing keypoints",
+                  "Review rationale",
+                  "Check extracted text"
+                ].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => setReEvaluationPrompt(prev => prev ? `${prev} ${suggestion}.` : `${suggestion}.`)}
+                    className="px-2.5 py-1 text-xs rounded-full bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => { setShowReEvaluationDialog(false); setReEvaluationPrompt(""); }}
+              className="w-full sm:w-auto border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!reEvaluationPrompt.trim()) {
+                  toast.error("Please describe the changes needed")
+                  return
+                }
+                toast.success("Re-evaluation request submitted successfully")
+                setShowReEvaluationDialog(false)
+                setReEvaluationPrompt("")
+              }}
+              disabled={!reEvaluationPrompt.trim()}
+              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white disabled:bg-slate-300"
+            >
+              Submit Re-evaluation
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
