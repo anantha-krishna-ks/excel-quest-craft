@@ -1138,8 +1138,10 @@ const OCREvaluation = () => {
                 {/* Desktop: Left Sidebar Question List */}
                 <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
-                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
-                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                      <span className="text-xs font-medium text-teal-600">{phase2VisitedQuestions.size}/{mockQuestionsList.length}</span>
+                    </div>
                     <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-teal-500 transition-all duration-300" 
