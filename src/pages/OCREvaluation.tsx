@@ -922,25 +922,19 @@ const OCREvaluation = () => {
                                   </TableCell>
                                   <TableCell className="py-3 sm:py-4 text-left">
                                     {candidate.phase2 === "approved" && candidate.evaluationMarks !== undefined ? (
-                                      <div className="flex items-center gap-2">
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                      <button
+                                        onClick={() => setEvaluationReviewCandidate(candidate)}
+                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
                                           (candidate.evaluationMarks / (candidate.maxMarks || 100)) >= 0.6 
-                                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' 
+                                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' 
                                             : (candidate.evaluationMarks / (candidate.maxMarks || 100)) >= 0.4 
-                                            ? 'bg-amber-100 text-amber-700 border border-amber-200' 
-                                            : 'bg-red-100 text-red-700 border border-red-200'
-                                        }`}>
-                                          <Award className="w-3 h-3 mr-1" />
-                                          {candidate.evaluationMarks}/{candidate.maxMarks || 100}
-                                        </span>
-                                        <button
-                                          onClick={() => setEvaluationReviewCandidate(candidate)}
-                                          className="p-1 rounded hover:bg-slate-100 transition-colors"
-                                          title="View Evaluation Details"
-                                        >
-                                          <Eye className="w-4 h-4 text-slate-500" />
-                                        </button>
-                                      </div>
+                                            ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' 
+                                            : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                                        }`}
+                                      >
+                                        <CheckCircle className="w-3.5 h-3.5" />
+                                        {candidate.evaluationMarks}/{candidate.maxMarks || 100}
+                                      </button>
                                     ) : (
                                       <StatusBadge 
                                         status={candidate.phase3}
