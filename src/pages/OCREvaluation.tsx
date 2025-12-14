@@ -19,6 +19,7 @@ interface SegmentImage {
   id: number
   imageUrl: string
   label: string
+  ocrText: string
 }
 
 interface EvaluationData {
@@ -156,6 +157,10 @@ const OCREvaluation = () => {
     candidates: CandidateData[]
   } | null>(null)
   const [selectedSubject, setSelectedSubject] = useState("broadcast-journalism")
+  // Individual segment OCR editing states
+  const [editingSegmentId, setEditingSegmentId] = useState<number | null>(null)
+  const [segmentOcrTexts, setSegmentOcrTexts] = useState<Record<number, string>>({})
+  const [editedSegmentOcrText, setEditedSegmentOcrText] = useState("")
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -218,9 +223,9 @@ const OCREvaluation = () => {
   // Mock segment images (handwritten answer segments)
   const generateMockSegmentImages = (): SegmentImage[] => {
     return [
-      { id: 1, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png", label: "Section A - Q1-10" },
-      { id: 2, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png", label: "Section B - Q11-20" },
-      { id: 3, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png", label: "Section C - Q21-30" },
+      { id: 1, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png", label: "Section A - Q1-10", ocrText: "Q1. The photosynthesis process occurs in the chloroplast of plant cells. During this process, light energy is converted into chemical energy stored in glucose molecules.\n\nQ2. The answer discusses cellular respiration and its role in ATP production through the electron transport chain." },
+      { id: 2, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png", label: "Section B - Q11-20", ocrText: "Q11. The mitochondria is known as the powerhouse of the cell because it produces ATP through oxidative phosphorylation.\n\nQ12. DNA replication is a semi-conservative process where each new double helix contains one original strand and one new strand." },
+      { id: 3, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png", label: "Section C - Q21-30", ocrText: "Q21. Evolution is driven by natural selection, where organisms with favorable traits are more likely to survive and reproduce.\n\nQ22. The nervous system coordinates body functions through electrical impulses transmitted along neurons." },
     ]
   }
 
@@ -1020,7 +1025,7 @@ const OCREvaluation = () => {
       </Dialog>
 
       {/* OCR Review Dialog */}
-      <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); setPhase2VisitedQuestions(new Set([0])); }}>
+      <Dialog open={!!ocrReviewCandidate} onOpenChange={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); setPhase2VisitedQuestions(new Set([0])); setEditingSegmentId(null); setSegmentOcrTexts({}); }}>
         <DialogContent className="max-w-[95vw] w-full h-[95vh] sm:h-[95vh] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden">
           {/* Dialog Header */}
           <div className="flex items-center justify-between gap-2 p-2 sm:p-3 md:p-4 border-b border-slate-200 bg-white shrink-0">
@@ -1032,48 +1037,24 @@ const OCREvaluation = () => {
               </span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
-              {isEditing ? (
-                <>
-                  <Button
-                    onClick={handleSaveEdits}
-                    size="sm"
-                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    onClick={handleCancelEdits}
-                    size="sm"
-                    variant="outline"
-                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    onClick={handleUpdate}
-                    size="sm"
-                    variant="outline"
-                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
-                  >
-                    <Edit2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                    <span className="hidden sm:inline">Update</span>
-                  </Button>
-                  <Button
-                    onClick={handleApprove}
-                    size="sm"
-                    disabled={phase2VisitedQuestions.size < mockQuestionsList.length}
-                    title={phase2VisitedQuestions.size < mockQuestionsList.length ? "Review all questions before approving" : ""}
-                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Approve
-                  </Button>
-                </>
-              )}
+              <Button
+                onClick={handleApprove}
+                size="sm"
+                disabled={phase2VisitedQuestions.size < mockQuestionsList.length}
+                title={phase2VisitedQuestions.size < mockQuestionsList.length ? "Review all questions before approving" : ""}
+                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Approve
+              </Button>
               <button 
-                onClick={() => { setOcrReviewCandidate(null); setIsEditing(false); setOcrActiveQuestionIndex(0); setPhase2VisitedQuestions(new Set([0])); }}
+                onClick={() => { 
+                  setOcrReviewCandidate(null); 
+                  setIsEditing(false); 
+                  setOcrActiveQuestionIndex(0); 
+                  setPhase2VisitedQuestions(new Set([0])); 
+                  setEditingSegmentId(null);
+                  setSegmentOcrTexts({});
+                }}
                 className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
@@ -1218,85 +1199,110 @@ const OCREvaluation = () => {
                       </div>
                     </div>
 
-                    {/* Two Column Cards */}
-                    <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-                        {/* Segment Card - with images */}
-                        <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
-                          <div className="p-2.5 sm:p-3 md:p-4 border-b border-slate-200 bg-white">
-                            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 flex items-center gap-2">
-                              <Image className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
-                              Segment
-                            </h3>
-                            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Handwritten answer sheet segments</p>
-                          </div>
-                          <div className="p-2.5 sm:p-3 md:p-4 space-y-3 sm:space-y-4">
-                            {/* Segment Images */}
-                            <div className="space-y-2 sm:space-y-3">
-                              {(ocrReviewCandidate.segmentImages || generateMockSegmentImages()).map((segment) => (
-                                <div key={segment.id} className="rounded-lg border border-slate-200 bg-white overflow-hidden">
-                                  <div className="px-2 sm:px-3 py-1.5 sm:py-2 bg-slate-50 border-b border-slate-200">
-                                    <span className="text-[10px] sm:text-xs font-medium text-slate-600">{segment.label}</span>
-                                  </div>
-                                  <div className="p-1.5 sm:p-2">
-                                    <img 
-                                      src={segment.imageUrl} 
-                                      alt={segment.label}
-                                      className="w-full h-24 sm:h-28 md:h-32 object-cover rounded"
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement
-                                        target.src = "/placeholder.svg"
-                                      }}
-                                    />
-                                  </div>
+                    {/* Side-by-side Segment Images with OCR Fields */}
+                    <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 space-y-4">
+                      {(ocrReviewCandidate.segmentImages || generateMockSegmentImages()).map((segment) => {
+                        const isEditingThis = editingSegmentId === segment.id
+                        const currentOcrText = segmentOcrTexts[segment.id] ?? segment.ocrText
+                        
+                        return (
+                          <div key={segment.id} className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
+                            {/* Segment Header */}
+                            <div className="px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center justify-center h-6 w-6 rounded-full bg-indigo-100 text-indigo-700">
+                                  <span className="text-xs font-bold">{segment.id}</span>
                                 </div>
-                              ))}
+                                <span className="text-xs sm:text-sm font-medium text-slate-700">{segment.label}</span>
+                              </div>
+                              {/* Individual Edit/Save/Cancel Buttons */}
+                              <div className="flex items-center gap-1.5">
+                                {isEditingThis ? (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => {
+                                        setSegmentOcrTexts(prev => ({ ...prev, [segment.id]: editedSegmentOcrText }))
+                                        setEditingSegmentId(null)
+                                        toast.success(`OCR text for ${segment.label} saved`)
+                                      }}
+                                      className="h-7 px-2.5 text-xs bg-teal-600 hover:bg-teal-700 text-white"
+                                    >
+                                      Save
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setEditingSegmentId(null)
+                                        setEditedSegmentOcrText("")
+                                      }}
+                                      className="h-7 px-2.5 text-xs border-slate-300"
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setEditingSegmentId(segment.id)
+                                      setEditedSegmentOcrText(currentOcrText)
+                                    }}
+                                    className="h-7 px-2.5 text-xs border-slate-300"
+                                  >
+                                    <Edit2 className="w-3 h-3 mr-1" />
+                                    Update
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                             
-                            {/* Segment Text Data */}
-                            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-slate-200">
-                              <p className="text-[10px] sm:text-xs font-medium text-slate-600 mb-1.5 sm:mb-2">Segment Data</p>
-                              {isEditing ? (
-                                <Textarea
-                                  value={editedSegmentData}
-                                  onChange={(e) => setEditedSegmentData(e.target.value)}
-                                  className="min-h-[80px] sm:min-h-[100px] md:min-h-[120px] text-xs sm:text-sm font-mono bg-white border-slate-300 resize-none"
-                                  placeholder="Enter segment data..."
-                                />
-                              ) : (
-                                <pre className="text-[10px] sm:text-xs md:text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-2 sm:p-3 rounded-lg border border-slate-200">
-                                  {ocrReviewCandidate.segmentData}
-                                </pre>
-                              )}
+                            {/* Side-by-side Content */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                              {/* Left: Segment Image */}
+                              <div className="p-3 sm:p-4">
+                                <div className="flex items-center gap-1.5 mb-2">
+                                  <Image className="w-3.5 h-3.5 text-indigo-600" />
+                                  <span className="text-xs font-medium text-slate-600">Answer Sheet Segment</span>
+                                </div>
+                                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
+                                  <img 
+                                    src={segment.imageUrl} 
+                                    alt={segment.label}
+                                    className="w-full h-48 sm:h-56 md:h-64 object-contain"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement
+                                      target.src = "/placeholder.svg"
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              
+                              {/* Right: OCR Text */}
+                              <div className="p-3 sm:p-4">
+                                <div className="flex items-center gap-1.5 mb-2">
+                                  <FileText className="w-3.5 h-3.5 text-indigo-600" />
+                                  <span className="text-xs font-medium text-slate-600">Extracted OCR Text</span>
+                                </div>
+                                {isEditingThis ? (
+                                  <Textarea
+                                    value={editedSegmentOcrText}
+                                    onChange={(e) => setEditedSegmentOcrText(e.target.value)}
+                                    className="min-h-[180px] sm:min-h-[210px] md:min-h-[240px] text-xs sm:text-sm font-mono bg-white border-slate-300 resize-none"
+                                    placeholder="Enter extracted text..."
+                                  />
+                                ) : (
+                                  <pre className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200 min-h-[180px] sm:min-h-[210px] md:min-h-[240px] overflow-auto">
+                                    {currentOcrText}
+                                  </pre>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-
-                        {/* OCR Card */}
-                        <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-indigo-50/50 overflow-hidden">
-                          <div className="p-2.5 sm:p-3 md:p-4 border-b border-slate-200 bg-white">
-                            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 flex items-center gap-2">
-                              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />
-                              OCR
-                            </h3>
-                            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Extracted text from segments</p>
-                          </div>
-                          <div className="p-2.5 sm:p-3 md:p-4">
-                            {isEditing ? (
-                              <Textarea
-                                value={editedOcrData}
-                                onChange={(e) => setEditedOcrData(e.target.value)}
-                                className="min-h-[250px] sm:min-h-[300px] md:min-h-[400px] text-xs sm:text-sm font-mono bg-white border-slate-300 resize-none"
-                                placeholder="Enter OCR data..."
-                              />
-                            ) : (
-                              <pre className="text-[10px] sm:text-xs md:text-sm text-slate-700 whitespace-pre-wrap font-mono leading-relaxed bg-white p-2 sm:p-3 md:p-4 rounded-lg border border-slate-200 min-h-[250px] sm:min-h-[300px] md:min-h-[400px]">
-                                {ocrReviewCandidate.ocrData}
-                              </pre>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                        )
+                      })}
                     </div>
                   </ScrollArea>
                 </div>
