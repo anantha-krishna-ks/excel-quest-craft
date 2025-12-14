@@ -1545,9 +1545,6 @@ const OCREvaluation = () => {
                           <span className="text-[10px] sm:text-xs md:text-sm text-slate-500 bg-white/70 px-1.5 sm:px-2 py-0.5 rounded shrink-0">
                             {phase1ReviewCandidate.registrationName}
                           </span>
-                          <span className="text-[10px] sm:text-xs md:text-sm font-medium text-slate-600 bg-white/70 px-1.5 sm:px-2 py-0.5 rounded ml-auto shrink-0">
-                            {answerSheets.length} pages
-                          </span>
                         </div>
                         {/* Reposition Controls Row */}
                         <div className="flex items-center gap-1.5 sm:gap-2">
