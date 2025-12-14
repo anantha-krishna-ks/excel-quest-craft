@@ -1142,13 +1142,25 @@ const OCREvaluation = () => {
                 {/* Desktop: Left Sidebar Question List */}
                 <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
-                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
-                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
-                    <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-teal-500 transition-all duration-300" 
-                        style={{ width: `${(phase2VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
-                      />
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                      <span className={`text-[10px] lg:text-xs font-medium px-2 py-0.5 rounded-full ${
+                        phase2VisitedQuestions.size === mockQuestionsList.length 
+                          ? 'bg-teal-100 text-teal-700' 
+                          : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {phase2VisitedQuestions.size}/{mockQuestionsList.length}
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            phase2VisitedQuestions.size === mockQuestionsList.length ? 'bg-teal-500' : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${(phase2VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                   <ScrollArea className="flex-1">
@@ -1841,13 +1853,25 @@ const OCREvaluation = () => {
                 {/* Desktop: Left Sidebar Question List */}
                 <div className="hidden md:flex w-64 lg:w-72 border-r border-slate-200 bg-slate-50 flex-col shrink-0">
                   <div className="px-3 lg:px-4 py-2.5 lg:py-3 border-b border-slate-200 bg-white shrink-0">
-                    <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
-                    <p className="text-[10px] lg:text-xs text-slate-500 mt-0.5">{mockQuestionsList.length} questions</p>
-                    <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-teal-500 transition-all duration-300" 
-                        style={{ width: `${(phase3VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
-                      />
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs lg:text-sm font-semibold text-slate-700">Questions</h4>
+                      <span className={`text-[10px] lg:text-xs font-medium px-2 py-0.5 rounded-full ${
+                        phase3VisitedQuestions.size === mockQuestionsList.length 
+                          ? 'bg-teal-100 text-teal-700' 
+                          : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {phase3VisitedQuestions.size}/{mockQuestionsList.length}
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            phase3VisitedQuestions.size === mockQuestionsList.length ? 'bg-teal-500' : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${(phase3VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                   <ScrollArea className="flex-1">
