@@ -878,12 +878,13 @@ const OCREvaluation = () => {
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Marks</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {filteredCandidates.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                                <TableCell colSpan={6} className="text-center py-8 text-slate-500">
                                   No candidates found matching your filters
                                 </TableCell>
                               </TableRow>
@@ -924,6 +925,21 @@ const OCREvaluation = () => {
                                       clickable={candidate.phase3 === "completed"}
                                       onClick={() => setEvaluationReviewCandidate(candidate)}
                                     />
+                                  </TableCell>
+                                  <TableCell className="py-3 sm:py-4 text-left">
+                                    {(candidate.phase2 === "approved" || candidate.phase2 === "completed" || candidate.phase3 === "approved" || candidate.phase3 === "completed") ? (
+                                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200">
+                                        <span className="text-lg font-bold text-teal-700">
+                                          {candidate.evaluationData?.evaluationScore ?? 7}
+                                        </span>
+                                        <span className="text-slate-400">/</span>
+                                        <span className="text-sm font-medium text-slate-500">
+                                          {candidate.evaluationData?.maxScore ?? 10}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs text-slate-400 italic">—</span>
+                                    )}
                                   </TableCell>
                                 </TableRow>
                               ))
