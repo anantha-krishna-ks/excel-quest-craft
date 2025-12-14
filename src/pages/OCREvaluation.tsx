@@ -2020,27 +2020,27 @@ const OCREvaluation = () => {
                                 </p>
                               </div>
                             </div>
+
+                            {/* Close Button at bottom of scroll content */}
+                            <div className="pt-6 pb-2 flex justify-center">
+                              <Button
+                                onClick={() => {
+                                  setEvaluationReviewCandidate(null)
+                                  setEvalActiveQuestionIndex(0)
+                                  setPhase3VisitedQuestions(new Set([0]))
+                                }}
+                                variant="outline"
+                                className="px-8 border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+                              >
+                                Close
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </ScrollArea>
                     )
                   })()}
                 </div>
-              </div>
-              
-              {/* Footer with Close Button */}
-              <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 bg-white shrink-0 flex justify-end">
-                <Button
-                  onClick={() => {
-                    setEvaluationReviewCandidate(null)
-                    setEvalActiveQuestionIndex(0)
-                    setPhase3VisitedQuestions(new Set([0]))
-                  }}
-                  variant="outline"
-                  className="px-6 border-slate-300 hover:bg-slate-50 hover:text-slate-700"
-                >
-                  Close
-                </Button>
               </div>
             </div>
           )}
