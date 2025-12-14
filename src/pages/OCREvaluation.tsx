@@ -873,18 +873,17 @@ const OCREvaluation = () => {
                     return matchesSearch && matchesStatus
                   })
 
-                  // Check if a candidate has all phases approved
-                  const isFullyApproved = (candidate: CandidateData) => 
+                  // Check if a candidate has Segmentation and OCR phases approved (Evaluation doesn't require approval)
+                  const isDownloadReady = (candidate: CandidateData) => 
                     candidate.phase1 === "approved" && 
-                    candidate.phase2 === "approved" && 
-                    candidate.phase3 === "approved"
+                    candidate.phase2 === "approved"
 
-                  // Get downloadable candidates (all phases approved)
-                  const downloadableCandidates = filteredCandidates.filter(isFullyApproved)
+                  // Get downloadable candidates (Segmentation and OCR approved)
+                  const downloadableCandidates = filteredCandidates.filter(isDownloadReady)
                   
                   // Get selected downloadable candidates
                   const selectedDownloadable = filteredCandidates.filter(
-                    c => selectedCandidates.has(c.id) && isFullyApproved(c)
+                    c => selectedCandidates.has(c.id) && isDownloadReady(c)
                   )
 
                   const hasDownloadableSelected = selectedDownloadable.length > 0
