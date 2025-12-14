@@ -1596,10 +1596,6 @@ const OCREvaluation = () => {
                               <Target className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-teal-600" />
                               Max Score: <span className="font-semibold text-teal-700">{mockQuestionsList[activeQuestionIndex]?.maxScore}</span>
                             </span>
-                            <span className="flex items-center gap-1">
-                              <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
-                              Pages: <span className="font-semibold text-slate-700">{mockQuestionsList[activeQuestionIndex]?.pages}</span>
-                            </span>
                           </div>
                         </div>
                       </div>
