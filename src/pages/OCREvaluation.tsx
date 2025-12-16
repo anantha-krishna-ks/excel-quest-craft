@@ -124,7 +124,9 @@ const StatusBadge = ({
 }
 
 const OCREvaluation = () => {
-  const [isUploading, setIsUploading] = useState(false)
+  const [isFolderUploading, setIsFolderUploading] = useState(false)
+  const [isZipUploading, setIsZipUploading] = useState(false)
+  const [isPdfUploading, setIsPdfUploading] = useState(false)
   const [hasUploaded, setHasUploaded] = useState(false)
   const [folderName, setFolderName] = useState("")
   const [fileCount, setFileCount] = useState(0)
@@ -170,6 +172,8 @@ const OCREvaluation = () => {
   const [reEvaluationPrompt, setReEvaluationPrompt] = useState("")
   // Multi-select state for download
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set())
+  // Image popup state
+  const [popupImage, setPopupImage] = useState<{ url: string; label: string } | null>(null)
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -242,7 +246,7 @@ const OCREvaluation = () => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
-    setIsUploading(true)
+    setIsFolderUploading(true)
 
     // Calculate total file size
     const totalSize = Array.from(files).reduce((acc, file) => acc + file.size, 0)
@@ -308,7 +312,114 @@ const OCREvaluation = () => {
         totalSize: totalSize,
         candidates: mockCandidates
       })
-      setIsUploading(false)
+      setIsFolderUploading(false)
+      setShowUploadConfirm(true)
+    }, 2000)
+  }
+
+  const handleZipUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsZipUploading(true)
+
+    // Calculate total file size
+    const totalSize = Array.from(files).reduce((acc, file) => acc + file.size, 0)
+
+    setTimeout(() => {
+      const extractedFolderName = files[0].name.replace(/\.[^/.]+$/, "")
+      
+      const candidateNames = new Set<string>()
+      Array.from(files).forEach(file => {
+        const fileName = file.name.replace(/\.[^/.]+$/, "")
+        const namePart = fileName.split('_')[0] || fileName
+        if (namePart) candidateNames.add(namePart)
+      })
+
+      const centres = ["Delhi Centre", "Mumbai Centre", "Bangalore Centre", "Chennai Centre", "Kolkata Centre"]
+      const addresses = [
+        "123, Connaught Place, New Delhi - 110001",
+        "456, Bandra West, Mumbai - 400050",
+        "789, MG Road, Bangalore - 560001",
+        "321, Anna Nagar, Chennai - 600040",
+        "654, Park Street, Kolkata - 700016"
+      ]
+      
+      const mockCandidates: CandidateData[] = Array.from({ length: Math.min(50, 125) }, (_, index) => ({
+        id: `candidate-${index + 1}`,
+        candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
+        registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+        centreName: centres[index % centres.length],
+        centreAddress: addresses[index % addresses.length],
+        phase1: getRandomStatus(1),
+        phase2: getRandomStatus(2),
+        phase3: getRandomStatus(3),
+        segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+        ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+        segmentImages: generateMockSegmentImages(),
+        evaluationData: generateMockEvaluationData(),
+        evaluationMarks: Math.floor(Math.random() * 51) + 50,
+        maxMarks: 100,
+      }))
+
+      // Store pending data and show confirmation dialog
+      setPendingUploadData({
+        folderName: extractedFolderName,
+        fileCount: files.length,
+        totalSize: totalSize,
+        candidates: mockCandidates
+      })
+      setIsZipUploading(false)
+      setShowUploadConfirm(true)
+    }, 2000)
+  }
+
+  const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsPdfUploading(true)
+
+    // Calculate total file size
+    const totalSize = Array.from(files).reduce((acc, file) => acc + file.size, 0)
+
+    setTimeout(() => {
+      const extractedFolderName = `PDFs_${files.length}_files`
+      
+      const centres = ["Delhi Centre", "Mumbai Centre", "Bangalore Centre", "Chennai Centre", "Kolkata Centre"]
+      const addresses = [
+        "123, Connaught Place, New Delhi - 110001",
+        "456, Bandra West, Mumbai - 400050",
+        "789, MG Road, Bangalore - 560001",
+        "321, Anna Nagar, Chennai - 600040",
+        "654, Park Street, Kolkata - 700016"
+      ]
+      
+      const mockCandidates: CandidateData[] = Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
+        id: `candidate-${index + 1}`,
+        candidateName: `PDF Candidate ${String(index + 1).padStart(3, '0')}`,
+        registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+        centreName: centres[index % centres.length],
+        centreAddress: addresses[index % addresses.length],
+        phase1: getRandomStatus(1),
+        phase2: getRandomStatus(2),
+        phase3: getRandomStatus(3),
+        segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+        ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+        segmentImages: generateMockSegmentImages(),
+        evaluationData: generateMockEvaluationData(),
+        evaluationMarks: Math.floor(Math.random() * 51) + 50,
+        maxMarks: 100,
+      }))
+
+      // Store pending data and show confirmation dialog
+      setPendingUploadData({
+        folderName: extractedFolderName,
+        fileCount: files.length,
+        totalSize: totalSize,
+        candidates: mockCandidates
+      })
+      setIsPdfUploading(false)
       setShowUploadConfirm(true)
     }, 2000)
   }
@@ -572,7 +683,7 @@ const OCREvaluation = () => {
               {!hasUploaded ? (
                 <div className="space-y-4">
                   <p className="text-xs sm:text-sm text-gray-600">
-                    Upload assessment files (supports ZIP files, individual PDFs, or a folder with up to 125 papers).
+                    Upload assessment files (supports ZIP files, individual PDFs, or a Folder)
                   </p>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -586,13 +697,13 @@ const OCREvaluation = () => {
                         multiple
                         onChange={handleFolderUpload}
                         className="hidden"
-                        disabled={isUploading}
+                        disabled={isFolderUploading}
                       />
                       <label
                         htmlFor="folder-upload"
                         className="flex flex-col items-center cursor-pointer"
                       >
-                        {isUploading ? (
+                        {isFolderUploading ? (
                           <>
                             <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
                             <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
@@ -613,15 +724,15 @@ const OCREvaluation = () => {
                         type="file"
                         id="zip-upload"
                         accept=".zip"
-                        onChange={handleFolderUpload}
+                        onChange={handleZipUpload}
                         className="hidden"
-                        disabled={isUploading}
+                        disabled={isZipUploading}
                       />
                       <label
                         htmlFor="zip-upload"
                         className="flex flex-col items-center cursor-pointer"
                       >
-                        {isUploading ? (
+                        {isZipUploading ? (
                           <>
                             <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
                             <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
@@ -643,15 +754,15 @@ const OCREvaluation = () => {
                         id="pdf-upload"
                         accept=".pdf"
                         multiple
-                        onChange={handleFolderUpload}
+                        onChange={handlePdfUpload}
                         className="hidden"
-                        disabled={isUploading}
+                        disabled={isPdfUploading}
                       />
                       <label
                         htmlFor="pdf-upload"
                         className="flex flex-col items-center cursor-pointer"
                       >
-                        {isUploading ? (
+                        {isPdfUploading ? (
                           <>
                             <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
                             <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
@@ -677,8 +788,8 @@ const OCREvaluation = () => {
                       <div className="min-w-0">
                         <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{folderName}</p>
                         <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-                          <span>{candidates.length} papers</span>
-                          <span className="text-gray-300">•</span>
+                          {/* <span>{candidates.length} papers</span> */}
+                          {/* <span className="text-gray-300">•</span> */}
                           <span>{fileCount} files</span>
                           <span className="text-gray-300">•</span>
                           <span className="font-medium text-teal-600">{formatFileSize(totalFileSize)}</span>
@@ -724,9 +835,9 @@ const OCREvaluation = () => {
                         size="sm"
                         className="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800 shrink-0"
                       >
-                        <RotateCcw className="w-4 h-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Re-upload Folder</span>
-                        <span className="sm:hidden">Re-upload</span>
+                        {/* <RotateCcw className="w-4 h-4 sm:mr-2" /> */}
+                        <span className="hidden sm:inline">Cancle Upload</span>
+                        {/* <span className="sm:hidden"></span> */}
                       </Button>
                     </div>
                   </div>
@@ -838,14 +949,14 @@ const OCREvaluation = () => {
                       onChange={(e) => setStatusFilter(e.target.value as "all" | PhaseStatus)}
                       className="h-10 px-3 py-2 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-300 focus:ring-1 focus:ring-teal-200 focus:outline-none"
                     >
-                      <option value="all">All Statuses</option>
-                      <option value="completed">Completed</option>
+                      <option value="all">All Status</option>
+                      {/* <option value="completed">Completed</option> */}
                       <option value="in-progress">In Progress</option>
                       <option value="pending">Pending</option>
                       <option value="approved">Approved</option>
-                      <option value="yet-to-segmentation">Yet to Segmentation</option>
-                      <option value="yet-to-ocr">Yet to OCR</option>
-                      <option value="yet-to-evaluation">Yet to Evaluation</option>
+                      <option value="yet-to-segmentation">Yet to Start</option>
+                      {/* <option value="yet-to-ocr">Yet to OCR</option> */}
+                      {/* <option value="yet-to-evaluation">Yet to Evaluation</option> */}
                     </select>
                   </div>
                 </div>
@@ -1221,28 +1332,40 @@ const OCREvaluation = () => {
                 <div className="flex items-center gap-2 px-2 py-2">
                   <span className="text-xs font-medium text-slate-500 shrink-0">Q:</span>
                   <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-                    {mockQuestionsList.map((question, index) => (
-                      <button
-                        key={question.id}
-                        onClick={() => {
-                          setOcrActiveQuestionIndex(index)
-                          setPhase2VisitedQuestions(prev => new Set([...prev, index]))
-                        }}
-                        className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
-                          ocrActiveQuestionIndex === index
-                            ? 'bg-teal-600 text-white shadow-sm'
-                            : phase2VisitedQuestions.has(index)
-                            ? 'bg-teal-500 text-white'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                        }`}
-                      >
-                        {phase2VisitedQuestions.has(index) && ocrActiveQuestionIndex !== index ? (
-                          <Check className="w-3.5 h-3.5" />
-                        ) : (
-                          question.id
-                        )}
-                      </button>
-                    ))}
+                    {mockQuestionsList.map((question, index) => {
+                      const isCurrentQuestion = ocrActiveQuestionIndex === index
+                      const isPreviousQuestion = index < ocrActiveQuestionIndex
+                      const isNextQuestion = index === ocrActiveQuestionIndex + 1
+                      const isClickable = isCurrentQuestion || isPreviousQuestion || (isNextQuestion && phase2VisitedQuestions.has(ocrActiveQuestionIndex))
+                      
+                      return (
+                        <button
+                          key={question.id}
+                          onClick={() => {
+                            if (isClickable) {
+                              setOcrActiveQuestionIndex(index)
+                              setPhase2VisitedQuestions(prev => new Set([...prev, index]))
+                            }
+                          }}
+                          disabled={!isClickable}
+                          className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
+                            isCurrentQuestion
+                              ? 'bg-teal-600 text-white shadow-sm'
+                              : phase2VisitedQuestions.has(index)
+                              ? 'bg-teal-500 text-white'
+                              : isClickable
+                              ? 'bg-white text-slate-600 border border-slate-200 hover:border-teal-300'
+                              : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                          }`}
+                        >
+                          {phase2VisitedQuestions.has(index) && ocrActiveQuestionIndex !== index ? (
+                            <Check className="w-3.5 h-3.5" />
+                          ) : (
+                            question.id
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
                   {/* Navigation Arrows */}
                   <div className="flex items-center gap-1 shrink-0 ml-auto">
@@ -1260,10 +1383,13 @@ const OCREvaluation = () => {
                     <button
                       onClick={() => {
                         const newIndex = Math.min(mockQuestionsList.length - 1, ocrActiveQuestionIndex + 1)
-                        setOcrActiveQuestionIndex(newIndex)
-                        setPhase2VisitedQuestions(prev => new Set([...prev, newIndex]))
+                        // Only allow navigation to next question if current question has been visited
+                        if (phase2VisitedQuestions.has(ocrActiveQuestionIndex)) {
+                          setOcrActiveQuestionIndex(newIndex)
+                          setPhase2VisitedQuestions(prev => new Set([...prev, newIndex]))
+                        }
                       }}
-                      disabled={ocrActiveQuestionIndex === mockQuestionsList.length - 1}
+                      disabled={ocrActiveQuestionIndex === mockQuestionsList.length - 1 || !phase2VisitedQuestions.has(ocrActiveQuestionIndex)}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronRight className="w-4 h-4 text-slate-600" />
@@ -1299,43 +1425,57 @@ const OCREvaluation = () => {
                   </div>
                   <ScrollArea className="flex-1">
                     <div className="p-1.5 lg:p-2 space-y-1">
-                      {mockQuestionsList.map((question, index) => (
-                        <button
-                          key={question.id}
-                          onClick={() => {
-                            setOcrActiveQuestionIndex(index)
-                            setPhase2VisitedQuestions(prev => new Set([...prev, index]))
-                          }}
-                          className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
-                            ocrActiveQuestionIndex === index
-                              ? 'bg-teal-600 text-white shadow-sm'
-                              : phase2VisitedQuestions.has(index)
-                              ? 'bg-teal-50 text-slate-700 border border-teal-200'
-                              : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
-                              ocrActiveQuestionIndex === index
-                                ? 'bg-white/20 text-white'
+                      {mockQuestionsList.map((question, index) => {
+                        const isCurrentQuestion = ocrActiveQuestionIndex === index
+                        const isPreviousQuestion = index < ocrActiveQuestionIndex
+                        const isNextQuestion = index === ocrActiveQuestionIndex + 1
+                        const isClickable = isCurrentQuestion || isPreviousQuestion || (isNextQuestion && phase2VisitedQuestions.has(ocrActiveQuestionIndex))
+                        
+                        return (
+                          <button
+                            key={question.id}
+                            onClick={() => {
+                              if (isClickable) {
+                                setOcrActiveQuestionIndex(index)
+                                setPhase2VisitedQuestions(prev => new Set([...prev, index]))
+                              }
+                            }}
+                            disabled={!isClickable}
+                            className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
+                              isCurrentQuestion
+                                ? 'bg-teal-600 text-white shadow-sm'
                                 : phase2VisitedQuestions.has(index)
-                                ? 'bg-teal-500 text-white'
-                                : 'bg-teal-100 text-teal-700'
-                            }`}>
-                              {phase2VisitedQuestions.has(index) && ocrActiveQuestionIndex !== index ? (
-                                <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
-                              ) : (
-                                question.id
-                              )}
-                            </span>
-                            <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
-                              ocrActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
-                            }`}>
-                              {question.text}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                                ? 'bg-teal-50 text-slate-700 border border-teal-200'
+                                : isClickable
+                                ? 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                                : 'bg-slate-50 text-slate-400 border border-slate-200 cursor-not-allowed'
+                            }`}
+                          >
+                            <div className="flex items-start gap-2">
+                              <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                                isCurrentQuestion
+                                  ? 'bg-white/20 text-white'
+                                  : phase2VisitedQuestions.has(index)
+                                  ? 'bg-teal-500 text-white'
+                                  : isClickable
+                                  ? 'bg-teal-100 text-teal-700'
+                                  : 'bg-slate-200 text-slate-400'
+                              }`}>
+                                {phase2VisitedQuestions.has(index) && ocrActiveQuestionIndex !== index ? (
+                                  <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                                ) : (
+                                  question.id
+                                )}
+                              </span>
+                              <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
+                                isCurrentQuestion ? 'text-white/90' : isClickable ? 'text-slate-600' : 'text-slate-400'
+                              }`}>
+                                {question.text}
+                              </p>
+                            </div>
+                          </button>
+                        )
+                      })}
                     </div>
                   </ScrollArea>
                 </div>
@@ -1390,7 +1530,8 @@ const OCREvaluation = () => {
                                         setEditingSegmentId(null)
                                         toast.success(`OCR text for ${segment.label} saved`)
                                       }}
-                                      className="h-7 px-2.5 text-xs bg-teal-600 hover:bg-teal-700 text-white"
+                                      disabled={!editedSegmentOcrText.trim()}
+                                      className="h-7 px-2.5 text-xs bg-teal-600 hover:bg-teal-700 text-white disabled:bg-slate-300 disabled:cursor-not-allowed"
                                     >
                                       Save
                                     </Button>
@@ -1431,11 +1572,12 @@ const OCREvaluation = () => {
                                   <Image className="w-3.5 h-3.5 text-indigo-600" />
                                   <span className="text-xs font-medium text-slate-600">Answer Sheet Segment</span>
                                 </div>
-                                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50">
+                                <div className="rounded-lg border border-slate-200 overflow-hidden bg-slate-50 cursor-pointer hover:border-teal-300 transition-colors">
                                   <img 
                                     src={segment.imageUrl} 
                                     alt={segment.label}
                                     className="w-full h-48 sm:h-56 md:h-64 object-contain"
+                                    onClick={() => setPopupImage({ url: segment.imageUrl, label: segment.label })}
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement
                                       target.src = "/placeholder.svg"
@@ -1473,6 +1615,36 @@ const OCREvaluation = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Popup Dialog */}
+      <Dialog open={!!popupImage} onOpenChange={() => setPopupImage(null)}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden [&>button]:hidden bg-transparent">
+          <div className="relative w-full h-full min-h-[400px] bg-transparent flex items-center justify-center">
+            <button 
+              onClick={() => setPopupImage(null)}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/90 hover:bg-white transition-colors"
+            >
+              <X className="w-5 h-5 text-slate-700" />
+            </button>
+            <div className="w-full h-full flex items-center justify-center p-4">
+              <img 
+                src={popupImage?.url} 
+                alt={popupImage?.label}
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = "/placeholder.svg"
+                }}
+              />
+            </div>
+            <div className="absolute bottom-4 left-4 right-4 text-center">
+              <p className="text-slate-800 text-sm font-medium bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full inline-block">
+                {popupImage?.label}
+              </p>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -1528,27 +1700,40 @@ const OCREvaluation = () => {
                 <div className="flex items-center gap-2 px-2 py-2">
                   <span className="text-xs font-medium text-slate-500 shrink-0">Q:</span>
                   <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-                    {mockQuestionsList.map((question, index) => (
-                      <button
-                        key={question.id}
-                        onClick={() => {
-                          setActiveQuestionIndex(index)
-                          setPhase1VisitedQuestions(prev => new Set([...prev, index]))
-                        }}
-                        className={`relative flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
-                          activeQuestionIndex === index
-                            ? 'bg-teal-600 text-white shadow-sm'
-                            : phase1VisitedQuestions.has(index)
-                            ? 'bg-teal-100 text-teal-700 border border-teal-300'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                        }`}
-                      >
-                        {question.id}
-                        {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index && (
-                          <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 text-teal-600" />
-                        )}
-                      </button>
-                    ))}
+                    {mockQuestionsList.map((question, index) => {
+                      const isCurrentQuestion = activeQuestionIndex === index
+                      const isPreviousQuestion = index < activeQuestionIndex
+                      const isNextQuestion = index === activeQuestionIndex + 1
+                      const isClickable = isCurrentQuestion || isPreviousQuestion || (isNextQuestion && phase1VisitedQuestions.has(activeQuestionIndex))
+                      
+                      return (
+                        <button
+                          key={question.id}
+                          onClick={() => {
+                            if (isClickable) {
+                              setActiveQuestionIndex(index)
+                              setPhase1VisitedQuestions(prev => new Set([...prev, index]))
+                            }
+                          }}
+                          disabled={!isClickable}
+                          className={`relative flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
+                            isCurrentQuestion
+                              ? 'bg-teal-600 text-white shadow-sm'
+                              : phase1VisitedQuestions.has(index)
+                              ? 'bg-teal-500 text-white'
+                              : isClickable
+                              ? 'bg-white text-slate-600 border border-slate-200 hover:border-teal-300'
+                              : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                          }`}
+                        >
+                          {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index ? (
+                            <Check className="w-3.5 h-3.5" />
+                          ) : (
+                            question.id
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
                   {/* Navigation Arrows */}
                   <div className="flex items-center gap-1 shrink-0 ml-auto">
@@ -1566,10 +1751,13 @@ const OCREvaluation = () => {
                     <button
                       onClick={() => {
                         const newIndex = Math.min(mockQuestionsList.length - 1, activeQuestionIndex + 1)
-                        setActiveQuestionIndex(newIndex)
-                        setPhase1VisitedQuestions(prev => new Set([...prev, newIndex]))
+                        // Only allow navigation to next question if current question has been visited
+                        if (phase1VisitedQuestions.has(activeQuestionIndex)) {
+                          setActiveQuestionIndex(newIndex)
+                          setPhase1VisitedQuestions(prev => new Set([...prev, newIndex]))
+                        }
                       }}
-                      disabled={activeQuestionIndex === mockQuestionsList.length - 1}
+                      disabled={activeQuestionIndex === mockQuestionsList.length - 1 || !phase1VisitedQuestions.has(activeQuestionIndex)}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronRight className="w-4 h-4 text-slate-600" />
@@ -1605,43 +1793,57 @@ const OCREvaluation = () => {
                   </div>
                   <ScrollArea className="flex-1">
                     <div className="p-1.5 lg:p-2 space-y-1">
-                      {mockQuestionsList.map((question, index) => (
-                        <button
-                          key={question.id}
-                          onClick={() => {
-                            setActiveQuestionIndex(index)
-                            setPhase1VisitedQuestions(prev => new Set([...prev, index]))
-                          }}
-                          className={`relative w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
-                            activeQuestionIndex === index
-                              ? 'bg-teal-600 text-white shadow-sm'
-                              : phase1VisitedQuestions.has(index)
-                              ? 'bg-teal-50 text-slate-700 border border-teal-200'
-                              : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
-                              activeQuestionIndex === index
-                                ? 'bg-white/20 text-white'
+                      {mockQuestionsList.map((question, index) => {
+                        const isCurrentQuestion = activeQuestionIndex === index
+                        const isPreviousQuestion = index < activeQuestionIndex
+                        const isNextQuestion = index === activeQuestionIndex + 1
+                        const isClickable = isCurrentQuestion || isPreviousQuestion || (isNextQuestion && phase1VisitedQuestions.has(activeQuestionIndex))
+                        
+                        return (
+                          <button
+                            key={question.id}
+                            onClick={() => {
+                              if (isClickable) {
+                                setActiveQuestionIndex(index)
+                                setPhase1VisitedQuestions(prev => new Set([...prev, index]))
+                              }
+                            }}
+                            disabled={!isClickable}
+                            className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
+                              isCurrentQuestion
+                                ? 'bg-teal-600 text-white shadow-sm'
                                 : phase1VisitedQuestions.has(index)
-                                ? 'bg-teal-500 text-white'
-                                : 'bg-teal-100 text-teal-700'
-                            }`}>
-                              {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index ? (
-                                <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
-                              ) : (
-                                question.id
-                              )}
-                            </span>
-                            <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
-                              activeQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
-                            }`}>
-                              {question.text}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                                ? 'bg-teal-50 text-slate-700 border border-teal-200'
+                                : isClickable
+                                ? 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                                : 'bg-slate-50 text-slate-400 border border-slate-200 cursor-not-allowed'
+                            }`}
+                          >
+                            <div className="flex items-start gap-2">
+                              <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                                isCurrentQuestion
+                                  ? 'bg-white/20 text-white'
+                                  : phase1VisitedQuestions.has(index)
+                                  ? 'bg-teal-500 text-white'
+                                  : isClickable
+                                  ? 'bg-teal-100 text-teal-700'
+                                  : 'bg-slate-200 text-slate-400'
+                              }`}>
+                                {phase1VisitedQuestions.has(index) && activeQuestionIndex !== index ? (
+                                  <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                                ) : (
+                                  question.id
+                                )}
+                              </span>
+                              <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
+                                isCurrentQuestion ? 'text-white/90' : isClickable ? 'text-slate-600' : 'text-slate-400'
+                              }`}>
+                                {question.text}
+                              </p>
+                            </div>
+                          </button>
+                        )
+                      })}
                     </div>
                   </ScrollArea>
                 </div>
@@ -1872,6 +2074,13 @@ const OCREvaluation = () => {
               <span className="truncate">Evaluation Review - {evaluationReviewCandidate?.candidateName}</span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
+              {/* Total Marks Display */}
+              <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-lg">
+                <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
+                <span className="text-xs sm:text-sm font-medium text-amber-700">
+                  Total: {mockQuestionsList.reduce((sum, q) => sum + q.maxScore, 0)} marks
+                </span>
+              </div>
               {/* Progress Indicator */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
                 <span className="text-xs text-slate-600">
@@ -1909,28 +2118,40 @@ const OCREvaluation = () => {
                 <div className="flex items-center gap-2 px-2 py-2">
                   <span className="text-xs font-medium text-slate-500 shrink-0">Q:</span>
                   <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-                    {mockQuestionsList.map((question, index) => (
-                      <button
-                        key={question.id}
-                        onClick={() => {
-                          setEvalActiveQuestionIndex(index)
-                          setPhase3VisitedQuestions(prev => new Set([...prev, index]))
-                        }}
-                        className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
-                          evalActiveQuestionIndex === index
-                            ? 'bg-teal-600 text-white shadow-sm'
-                            : phase3VisitedQuestions.has(index)
-                            ? 'bg-teal-500 text-white'
-                            : 'bg-white text-slate-600 border border-slate-200'
-                        }`}
-                      >
-                        {phase3VisitedQuestions.has(index) && evalActiveQuestionIndex !== index ? (
-                          <Check className="w-3.5 h-3.5" />
-                        ) : (
-                          question.id
-                        )}
-                      </button>
-                    ))}
+                    {mockQuestionsList.map((question, index) => {
+                      const isCurrentQuestion = evalActiveQuestionIndex === index
+                      const isPreviousQuestion = index < evalActiveQuestionIndex
+                      const isNextQuestion = index === evalActiveQuestionIndex + 1
+                      const isClickable = isCurrentQuestion || isPreviousQuestion || (isNextQuestion && phase3VisitedQuestions.has(evalActiveQuestionIndex))
+                      
+                      return (
+                        <button
+                          key={question.id}
+                          onClick={() => {
+                            if (isClickable) {
+                              setEvalActiveQuestionIndex(index)
+                              setPhase3VisitedQuestions(prev => new Set([...prev, index]))
+                            }
+                          }}
+                          disabled={!isClickable}
+                          className={`flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold shrink-0 transition-all ${
+                            isCurrentQuestion
+                              ? 'bg-teal-600 text-white shadow-sm'
+                              : phase3VisitedQuestions.has(index)
+                              ? 'bg-teal-500 text-white'
+                              : isClickable
+                              ? 'bg-white text-slate-600 border border-slate-200 hover:border-teal-300'
+                              : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                          }`}
+                        >
+                          {phase3VisitedQuestions.has(index) && evalActiveQuestionIndex !== index ? (
+                            <Check className="w-3.5 h-3.5" />
+                          ) : (
+                            question.id
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
                   {/* Navigation Arrows */}
                   <div className="flex items-center gap-1 shrink-0 ml-auto">
@@ -1948,10 +2169,13 @@ const OCREvaluation = () => {
                     <button
                       onClick={() => {
                         const newIndex = Math.min(mockQuestionsList.length - 1, evalActiveQuestionIndex + 1)
-                        setEvalActiveQuestionIndex(newIndex)
-                        setPhase3VisitedQuestions(prev => new Set([...prev, newIndex]))
+                        // Only allow navigation to next question if current question has been visited
+                        if (phase3VisitedQuestions.has(evalActiveQuestionIndex)) {
+                          setEvalActiveQuestionIndex(newIndex)
+                          setPhase3VisitedQuestions(prev => new Set([...prev, newIndex]))
+                        }
                       }}
-                      disabled={evalActiveQuestionIndex === mockQuestionsList.length - 1}
+                      disabled={evalActiveQuestionIndex === mockQuestionsList.length - 1 || !phase3VisitedQuestions.has(evalActiveQuestionIndex)}
                       className="p-1.5 rounded-md hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronRight className="w-4 h-4 text-slate-600" />
@@ -1975,43 +2199,57 @@ const OCREvaluation = () => {
                   </div>
                   <ScrollArea className="flex-1">
                     <div className="p-1.5 lg:p-2 space-y-1">
-                      {mockQuestionsList.map((question, index) => (
-                        <button
-                          key={question.id}
-                          onClick={() => {
-                            setEvalActiveQuestionIndex(index)
-                            setPhase3VisitedQuestions(prev => new Set([...prev, index]))
-                          }}
-                          className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
-                            evalActiveQuestionIndex === index
-                              ? 'bg-teal-600 text-white shadow-sm'
-                              : phase3VisitedQuestions.has(index)
-                              ? 'bg-teal-50 text-slate-700 border border-teal-200'
-                              : 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
-                              evalActiveQuestionIndex === index
-                                ? 'bg-white/20 text-white'
+                      {mockQuestionsList.map((question, index) => {
+                        const isCurrentQuestion = evalActiveQuestionIndex === index
+                        const isPreviousQuestion = index < evalActiveQuestionIndex
+                        const isNextQuestion = index === evalActiveQuestionIndex + 1
+                        const isClickable = isCurrentQuestion || isPreviousQuestion || (isNextQuestion && phase3VisitedQuestions.has(evalActiveQuestionIndex))
+                        
+                        return (
+                          <button
+                            key={question.id}
+                            onClick={() => {
+                              if (isClickable) {
+                                setEvalActiveQuestionIndex(index)
+                                setPhase3VisitedQuestions(prev => new Set([...prev, index]))
+                              }
+                            }}
+                            disabled={!isClickable}
+                            className={`w-full text-left px-2.5 lg:px-3 py-2.5 lg:py-3 rounded-lg transition-all ${
+                              isCurrentQuestion
+                                ? 'bg-teal-600 text-white shadow-sm'
                                 : phase3VisitedQuestions.has(index)
-                                ? 'bg-teal-500 text-white'
-                                : 'bg-teal-100 text-teal-700'
-                            }`}>
-                              {phase3VisitedQuestions.has(index) && evalActiveQuestionIndex !== index ? (
-                                <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
-                              ) : (
-                                question.id
-                              )}
-                            </span>
-                            <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
-                              evalActiveQuestionIndex === index ? 'text-white/90' : 'text-slate-600'
-                            }`}>
-                              {question.text}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                                ? 'bg-teal-50 text-slate-700 border border-teal-200'
+                                : isClickable
+                                ? 'bg-white text-slate-700 border border-slate-200 hover:border-teal-300'
+                                : 'bg-slate-50 text-slate-400 border border-slate-200 cursor-not-allowed'
+                            }`}
+                          >
+                            <div className="flex items-start gap-2">
+                              <span className={`relative flex items-center justify-center h-5 w-5 lg:h-6 lg:w-6 rounded-full text-[10px] lg:text-xs font-bold shrink-0 ${
+                                isCurrentQuestion
+                                  ? 'bg-white/20 text-white'
+                                  : phase3VisitedQuestions.has(index)
+                                  ? 'bg-teal-500 text-white'
+                                  : isClickable
+                                  ? 'bg-teal-100 text-teal-700'
+                                  : 'bg-slate-200 text-slate-400'
+                              }`}>
+                                {phase3VisitedQuestions.has(index) && evalActiveQuestionIndex !== index ? (
+                                  <Check className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+                                ) : (
+                                  question.id
+                                )}
+                              </span>
+                              <p className={`text-[10px] lg:text-xs leading-relaxed line-clamp-2 ${
+                                isCurrentQuestion ? 'text-white/90' : isClickable ? 'text-slate-600' : 'text-slate-400'
+                              }`}>
+                                {question.text}
+                              </p>
+                            </div>
+                          </button>
+                        )
+                      })}
                     </div>
                   </ScrollArea>
                 </div>
@@ -2069,7 +2307,7 @@ const OCREvaluation = () => {
                             <div className="rounded-lg sm:rounded-xl border border-slate-200 bg-white overflow-hidden">
                               <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-50 border-b border-slate-200 flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-indigo-600" />
-                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">Extracted Info</h3>
+                                <h3 className="text-xs sm:text-sm font-semibold text-slate-800">OCR Data</h3>
                               </div>
                               <div className="p-3 sm:p-4">
                                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -2159,10 +2397,10 @@ const OCREvaluation = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-slate-800">
               <RotateCcw className="w-5 h-5 text-teal-600" />
-              Confirm Re-upload
+              Confirm Cancle
             </DialogTitle>
             <DialogDescription className="text-slate-600 pt-2">
-              Are you sure you want to re-upload a new folder? This will clear all current candidate data and evaluation progress.
+              Are you sure you want to Cancle? This will clear all current candidate data and evaluation progress.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-4">
@@ -2177,7 +2415,7 @@ const OCREvaluation = () => {
               onClick={handleReuploadConfirm}
               className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white"
             >
-              Yes, Re-upload
+              Yes, Cancle
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2206,11 +2444,11 @@ const OCREvaluation = () => {
                     <p className="font-medium text-slate-800 truncate">{pendingUploadData.folderName}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4 pt-2 border-t border-teal-200">
-                  <div className="text-center">
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-teal-200">
+                  {/* <div className="text-center">
                     <p className="text-xl font-bold text-teal-700">{pendingUploadData.candidates.length}</p>
                     <p className="text-xs text-slate-500">Candidates</p>
-                  </div>
+                  </div> */}
                   <div className="text-center">
                     <p className="text-xl font-bold text-teal-700">{pendingUploadData.fileCount}</p>
                     <p className="text-xs text-slate-500">Files</p>
