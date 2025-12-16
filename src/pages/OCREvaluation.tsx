@@ -11,7 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
+import ocrAnswerSheet1 from "@/assets/ocr-answer-sheet-1.png"
+import ocrAnswerSheet2 from "@/assets/ocr-answer-sheet-2.png"
+import ocrAnswerSheet3 from "@/assets/ocr-answer-sheet-3.png"
 interface AnswerSheetPage {
   pageNumber: number
   imageUrl: string
@@ -227,9 +229,9 @@ const OCREvaluation = () => {
   // Mock answer sheet images
   const generateMockAnswerSheets = (): AnswerSheetPage[] => {
     return [
-      { pageNumber: 1, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png" },
-      { pageNumber: 2, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png" },
-      { pageNumber: 3, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png" },
+      { pageNumber: 1, imageUrl: ocrAnswerSheet1 },
+      { pageNumber: 2, imageUrl: ocrAnswerSheet2 },
+      { pageNumber: 3, imageUrl: ocrAnswerSheet3 },
     ]
   }
 
