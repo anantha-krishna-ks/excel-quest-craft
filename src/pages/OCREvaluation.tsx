@@ -238,9 +238,9 @@ const OCREvaluation = () => {
   // Mock segment images (handwritten answer segments)
   const generateMockSegmentImages = (): SegmentImage[] => {
     return [
-      { id: 1, imageUrl: "/lovable-uploads/a13547e7-af5f-49b0-bb15-9b344d6cd72e.png", label: "Section A - Q1-10", ocrText: "Q1. The photosynthesis process occurs in the chloroplast of plant cells. During this process, light energy is converted into chemical energy stored in glucose molecules.\n\nQ2. The answer discusses cellular respiration and its role in ATP production through the electron transport chain." },
-      { id: 2, imageUrl: "/lovable-uploads/b401ff6b-c99f-41b0-8578-92b80ce62cd0.png", label: "Section B - Q11-20", ocrText: "Q11. The mitochondria is known as the powerhouse of the cell because it produces ATP through oxidative phosphorylation.\n\nQ12. DNA replication is a semi-conservative process where each new double helix contains one original strand and one new strand." },
-      { id: 3, imageUrl: "/lovable-uploads/b5b0f5a8-9552-4635-8c44-d5e6f994179c.png", label: "Section C - Q21-30", ocrText: "Q21. Evolution is driven by natural selection, where organisms with favorable traits are more likely to survive and reproduce.\n\nQ22. The nervous system coordinates body functions through electrical impulses transmitted along neurons." },
+      { id: 1, imageUrl: ocrAnswerSheet1, label: "Section A - Q1-10", ocrText: "Q1. The photosynthesis process occurs in the chloroplast of plant cells. During this process, light energy is converted into chemical energy stored in glucose molecules.\n\nQ2. The answer discusses cellular respiration and its role in ATP production through the electron transport chain." },
+      { id: 2, imageUrl: ocrAnswerSheet2, label: "Section B - Q11-20", ocrText: "Q11. The mitochondria is known as the powerhouse of the cell because it produces ATP through oxidative phosphorylation.\n\nQ12. DNA replication is a semi-conservative process where each new double helix contains one original strand and one new strand." },
+      { id: 3, imageUrl: ocrAnswerSheet3, label: "Section C - Q21-30", ocrText: "Q21. Evolution is driven by natural selection, where organisms with favorable traits are more likely to survive and reproduce.\n\nQ22. The nervous system coordinates body functions through electrical impulses transmitted along neurons." },
     ]
   }
 
