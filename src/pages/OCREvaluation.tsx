@@ -2072,49 +2072,51 @@ const OCREvaluation = () => {
                                 </div>
                                 <span className="text-xs sm:text-sm font-medium text-slate-700">{segment.label}</span>
                               </div>
-                              {/* Individual Edit/Save/Cancel Buttons */}
-                              <div className="flex items-center gap-1.5">
-                                {isEditingThis ? (
-                                  <>
-                                    <Button
-                                      size="sm"
-                                      onClick={() => {
-                                        setSegmentOcrTexts(prev => ({ ...prev, [segment.id]: editedSegmentOcrText }))
-                                        setEditingSegmentId(null)
-                                        toast.success(`OCR text for ${segment.label} saved`)
-                                      }}
-                                      disabled={!editedSegmentOcrText.trim()}
-                                      className="h-7 px-2.5 text-xs bg-teal-600 hover:bg-teal-700 text-white disabled:bg-slate-300 disabled:cursor-not-allowed"
-                                    >
-                                      Save
-                                    </Button>
+                              {/* Individual Edit/Save/Cancel Buttons - Only show when quickApprove is ON */}
+                              {ocrReviewCandidate?.quickApprove && (
+                                <div className="flex items-center gap-1.5">
+                                  {isEditingThis ? (
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        onClick={() => {
+                                          setSegmentOcrTexts(prev => ({ ...prev, [segment.id]: editedSegmentOcrText }))
+                                          setEditingSegmentId(null)
+                                          toast.success(`OCR text for ${segment.label} saved`)
+                                        }}
+                                        disabled={!editedSegmentOcrText.trim()}
+                                        className="h-7 px-2.5 text-xs bg-teal-600 hover:bg-teal-700 text-white disabled:bg-slate-300 disabled:cursor-not-allowed"
+                                      >
+                                        Save
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => {
+                                          setEditingSegmentId(null)
+                                          setEditedSegmentOcrText("")
+                                        }}
+                                        className="h-7 px-2.5 text-xs border-slate-300"
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </>
+                                  ) : (
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => {
-                                        setEditingSegmentId(null)
-                                        setEditedSegmentOcrText("")
+                                        setEditingSegmentId(segment.id)
+                                        setEditedSegmentOcrText(currentOcrText)
                                       }}
                                       className="h-7 px-2.5 text-xs border-slate-300"
                                     >
-                                      Cancel
+                                      <Edit2 className="w-3 h-3 mr-1" />
+                                      Update
                                     </Button>
-                                  </>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      setEditingSegmentId(segment.id)
-                                      setEditedSegmentOcrText(currentOcrText)
-                                    }}
-                                    className="h-7 px-2.5 text-xs border-slate-300"
-                                  >
-                                    <Edit2 className="w-3 h-3 mr-1" />
-                                    Update
-                                  </Button>
-                                )}
-                              </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                             
                             {/* Side-by-side Content */}
@@ -2411,38 +2413,40 @@ const OCREvaluation = () => {
                             {phase1ReviewCandidate.registrationName}
                           </span>
                         </div>
-                        {/* Reposition Controls Row */}
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <div className="flex items-center gap-1 sm:gap-2 bg-white rounded-lg border border-slate-200 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5">
-                            <span className="text-[10px] sm:text-xs font-medium text-slate-500">From</span>
-                            <Input
-                              type="number"
-                              placeholder="#"
-                              value={fromPageInput}
-                              onChange={(e) => setFromPageInput(e.target.value)}
-                              className="w-8 sm:w-10 md:w-14 h-5 sm:h-6 md:h-7 text-[10px] sm:text-xs md:text-sm border-slate-300 text-center px-1"
-                              min={1}
-                              max={answerSheets.length}
-                            />
-                            <span className="text-[10px] sm:text-xs font-medium text-slate-500">To</span>
-                            <Input
-                              type="number"
-                              placeholder="#"
-                              value={toPageInput}
-                              onChange={(e) => setToPageInput(e.target.value)}
-                              className="w-8 sm:w-10 md:w-14 h-5 sm:h-6 md:h-7 text-[10px] sm:text-xs md:text-sm border-slate-300 text-center px-1"
-                              min={1}
-                              max={answerSheets.length}
-                            />
-                            <Button
-                              onClick={handleRepositionPages}
-                              size="sm"
-                              className="h-5 sm:h-6 md:h-7 px-1.5 sm:px-2 md:px-3 bg-teal-600 hover:bg-teal-700 text-white text-[10px] sm:text-xs"
-                            >
-                              Reposition
-                            </Button>
+                        {/* Reposition Controls Row - Only show when quickApprove is ON */}
+                        {phase1ReviewCandidate?.quickApprove && (
+                          <div className="flex items-center gap-1.5 sm:gap-2">
+                            <div className="flex items-center gap-1 sm:gap-2 bg-white rounded-lg border border-slate-200 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5">
+                              <span className="text-[10px] sm:text-xs font-medium text-slate-500">From</span>
+                              <Input
+                                type="number"
+                                placeholder="#"
+                                value={fromPageInput}
+                                onChange={(e) => setFromPageInput(e.target.value)}
+                                className="w-8 sm:w-10 md:w-14 h-5 sm:h-6 md:h-7 text-[10px] sm:text-xs md:text-sm border-slate-300 text-center px-1"
+                                min={1}
+                                max={answerSheets.length}
+                              />
+                              <span className="text-[10px] sm:text-xs font-medium text-slate-500">To</span>
+                              <Input
+                                type="number"
+                                placeholder="#"
+                                value={toPageInput}
+                                onChange={(e) => setToPageInput(e.target.value)}
+                                className="w-8 sm:w-10 md:w-14 h-5 sm:h-6 md:h-7 text-[10px] sm:text-xs md:text-sm border-slate-300 text-center px-1"
+                                min={1}
+                                max={answerSheets.length}
+                              />
+                              <Button
+                                onClick={handleRepositionPages}
+                                size="sm"
+                                className="h-5 sm:h-6 md:h-7 px-1.5 sm:px-2 md:px-3 bg-teal-600 hover:bg-teal-700 text-white text-[10px] sm:text-xs"
+                              >
+                                Reposition
+                              </Button>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
 
