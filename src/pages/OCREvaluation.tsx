@@ -39,6 +39,15 @@ interface EvaluationData {
 
 type PhaseStatus = "yet-to-segmentation" | "yet-to-ocr" | "yet-to-evaluation" | "in-progress" | "completed" | "pending" | "approved"
 
+interface UploadedFolder {
+  id: string
+  name: string
+  fileCount: number
+  size: number
+  type: "folder" | "zip" | "pdf"
+  uploadedAt: string
+}
+
 interface Workspace {
   id: string
   name: string
@@ -47,6 +56,7 @@ interface Workspace {
   totalSize: number
   candidateCount: number
   status: "active" | "completed" | "archived"
+  uploadedFolders?: UploadedFolder[]
 }
 
 interface CandidateData {
@@ -141,9 +151,45 @@ const StatusBadge = ({
 const OCREvaluation = () => {
   // Workspace states
   const [workspaces, setWorkspaces] = useState<Workspace[]>([
-    { id: "ws-1", name: "Broadcast Journalism - Batch 1", createdAt: "2024-01-15", fileCount: 45, totalSize: 125000000, candidateCount: 45, status: "active" },
-    { id: "ws-2", name: "Print Journalism - Midterm", createdAt: "2024-01-10", fileCount: 32, totalSize: 89000000, candidateCount: 32, status: "completed" },
-    { id: "ws-3", name: "Digital Media - Final Exam", createdAt: "2024-01-05", fileCount: 28, totalSize: 76000000, candidateCount: 28, status: "archived" },
+    { 
+      id: "ws-1", 
+      name: "Broadcast Journalism - Batch 1", 
+      createdAt: "2024-01-15", 
+      fileCount: 45, 
+      totalSize: 125000000, 
+      candidateCount: 45, 
+      status: "active",
+      uploadedFolders: [
+        { id: "f1", name: "Batch_1_Papers", fileCount: 20, size: 55000000, type: "folder", uploadedAt: "2024-01-15" },
+        { id: "f2", name: "Additional_Papers.zip", fileCount: 15, size: 42000000, type: "zip", uploadedAt: "2024-01-16" },
+        { id: "f3", name: "Late_Submissions", fileCount: 10, size: 28000000, type: "folder", uploadedAt: "2024-01-17" },
+      ]
+    },
+    { 
+      id: "ws-2", 
+      name: "Print Journalism - Midterm", 
+      createdAt: "2024-01-10", 
+      fileCount: 32, 
+      totalSize: 89000000, 
+      candidateCount: 32, 
+      status: "completed",
+      uploadedFolders: [
+        { id: "f4", name: "Midterm_Papers.zip", fileCount: 32, size: 89000000, type: "zip", uploadedAt: "2024-01-10" },
+      ]
+    },
+    { 
+      id: "ws-3", 
+      name: "Digital Media - Final Exam", 
+      createdAt: "2024-01-05", 
+      fileCount: 28, 
+      totalSize: 76000000, 
+      candidateCount: 28, 
+      status: "archived",
+      uploadedFolders: [
+        { id: "f5", name: "Final_Papers", fileCount: 18, size: 50000000, type: "folder", uploadedAt: "2024-01-05" },
+        { id: "f6", name: "Supplementary_Papers", fileCount: 10, size: 26000000, type: "folder", uploadedAt: "2024-01-06" },
+      ]
+    },
   ])
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null)
   const [showCreateWorkspaceDialog, setShowCreateWorkspaceDialog] = useState(false)
@@ -950,6 +996,61 @@ const OCREvaluation = () => {
                 </CardContent>
               </Card>
 
+          {/* Uploaded Folders Section - Show only when workspace has multiple folders */}
+          {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 && (
+            <Card className="border border-slate-200 bg-white">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-amber-100 text-amber-700 rounded-lg">
+                    <FolderOpen className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-800">Uploaded Folders</h3>
+                    <p className="text-xs text-slate-500">{selectedWorkspace.uploadedFolders.length} folders/archives in this workspace</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {selectedWorkspace.uploadedFolders.map((folder) => (
+                    <div
+                      key={folder.id}
+                      className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg bg-slate-50/50"
+                    >
+                      <div className={`p-2 rounded-lg ${
+                        folder.type === 'folder' ? 'bg-amber-100 text-amber-600' :
+                        folder.type === 'zip' ? 'bg-purple-100 text-purple-600' :
+                        'bg-blue-100 text-blue-600'
+                      }`}>
+                        {folder.type === 'folder' ? (
+                          <FolderOpen className="h-4 w-4" />
+                        ) : folder.type === 'zip' ? (
+                          <HardDrive className="h-4 w-4" />
+                        ) : (
+                          <FileText className="h-4 w-4" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-700 truncate">{folder.name}</p>
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <span>{folder.fileCount} files</span>
+                          <span>•</span>
+                          <span>{(folder.size / (1024 * 1024)).toFixed(1)} MB</span>
+                        </div>
+                      </div>
+                      <span className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full ${
+                        folder.type === 'folder' ? 'bg-amber-100 text-amber-700' :
+                        folder.type === 'zip' ? 'bg-purple-100 text-purple-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {folder.type}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Status Count Widgets */}
           {hasUploaded && candidates.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1463,6 +1564,33 @@ const OCREvaluation = () => {
                 
                 // Simulate workspace creation
                 setTimeout(() => {
+                  // Group files into folders based on file type
+                  const uploadedFolders: UploadedFolder[] = []
+                  const pdfFiles = newWorkspaceFiles.filter(f => f.name.endsWith('.pdf'))
+                  const zipFiles = newWorkspaceFiles.filter(f => f.name.endsWith('.zip'))
+                  
+                  if (pdfFiles.length > 0) {
+                    uploadedFolders.push({
+                      id: `f-pdf-${Date.now()}`,
+                      name: "PDF Files",
+                      fileCount: pdfFiles.length,
+                      size: pdfFiles.reduce((acc, f) => acc + f.size, 0),
+                      type: "pdf",
+                      uploadedAt: new Date().toISOString().split('T')[0]
+                    })
+                  }
+                  
+                  zipFiles.forEach((file, index) => {
+                    uploadedFolders.push({
+                      id: `f-zip-${Date.now()}-${index}`,
+                      name: file.name,
+                      fileCount: Math.floor(Math.random() * 20) + 5, // Simulated file count inside zip
+                      size: file.size,
+                      type: "zip",
+                      uploadedAt: new Date().toISOString().split('T')[0]
+                    })
+                  })
+                  
                   const newWorkspace: Workspace = {
                     id: `ws-${Date.now()}`,
                     name: newWorkspaceName,
@@ -1470,7 +1598,8 @@ const OCREvaluation = () => {
                     fileCount: newWorkspaceFiles.length,
                     totalSize: newWorkspaceFiles.reduce((acc, f) => acc + f.size, 0),
                     candidateCount: newWorkspaceFiles.length,
-                    status: "active"
+                    status: "active",
+                    uploadedFolders: uploadedFolders.length > 0 ? uploadedFolders : undefined
                   }
                   
                   setWorkspaces(prev => [newWorkspace, ...prev])
