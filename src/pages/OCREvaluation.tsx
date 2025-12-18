@@ -996,8 +996,8 @@ const OCREvaluation = () => {
                 </CardContent>
               </Card>
 
-          {/* Uploaded Folders Section - Show only when workspace has multiple folders */}
-          {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 && (
+          {/* Uploaded Folders Section - Show when workspace has uploaded folders */}
+          {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length >= 1 && (
             <Card className="border border-slate-200 bg-white">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 mb-4">
