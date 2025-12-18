@@ -1205,94 +1205,101 @@ const OCREvaluation = () => {
               />
             </div>
 
-            {/* File Upload */}
+            {/* File Upload - Unified Dropzone */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
                 Upload Files <span className="text-red-500">*</span>
               </label>
-              <div className="grid grid-cols-3 gap-3">
-                {/* Folder Upload */}
-                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
+              
+              {newWorkspaceFiles.length === 0 ? (
+                <div
+                  className="relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50/50 hover:border-teal-400 hover:bg-teal-50/30 transition-all cursor-pointer group"
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    e.currentTarget.classList.add('border-teal-400', 'bg-teal-50/50')
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault()
+                    e.currentTarget.classList.remove('border-teal-400', 'bg-teal-50/50')
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    e.currentTarget.classList.remove('border-teal-400', 'bg-teal-50/50')
+                    const files = e.dataTransfer.files
+                    if (files && files.length > 0) {
+                      setNewWorkspaceFiles(Array.from(files))
+                      toast.success(`${files.length} file(s) added`)
+                    }
+                  }}
+                  onClick={() => document.getElementById('workspace-unified-upload')?.click()}
+                >
                   <input
                     type="file"
-                    id="workspace-folder-upload"
-                    // @ts-ignore
-                    webkitdirectory=""
+                    id="workspace-unified-upload"
                     multiple
+                    accept=".pdf,.zip"
                     onChange={(e) => {
                       const files = e.target.files
                       if (files && files.length > 0) {
                         setNewWorkspaceFiles(Array.from(files))
-                        toast.success(`${files.length} files selected`)
+                        toast.success(`${files.length} file(s) selected`)
                       }
                     }}
                     className="hidden"
                   />
-                  <label htmlFor="workspace-folder-upload" className="flex flex-col items-center cursor-pointer">
-                    <FolderOpen className="w-8 h-8 text-slate-400 mb-2" />
-                    <span className="text-xs font-medium text-slate-600">Folder</span>
-                  </label>
-                </div>
-
-                {/* ZIP Upload */}
-                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
-                  <input
-                    type="file"
-                    id="workspace-zip-upload"
-                    accept=".zip"
-                    onChange={(e) => {
-                      const files = e.target.files
-                      if (files && files.length > 0) {
-                        setNewWorkspaceFiles(Array.from(files))
-                        toast.success(`ZIP file selected`)
-                      }
-                    }}
-                    className="hidden"
-                  />
-                  <label htmlFor="workspace-zip-upload" className="flex flex-col items-center cursor-pointer">
-                    <Upload className="w-8 h-8 text-slate-400 mb-2" />
-                    <span className="text-xs font-medium text-slate-600">ZIP</span>
-                  </label>
-                </div>
-
-                {/* PDF Upload */}
-                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
-                  <input
-                    type="file"
-                    id="workspace-pdf-upload"
-                    accept=".pdf"
-                    multiple
-                    onChange={(e) => {
-                      const files = e.target.files
-                      if (files && files.length > 0) {
-                        setNewWorkspaceFiles(Array.from(files))
-                        toast.success(`${files.length} PDF(s) selected`)
-                      }
-                    }}
-                    className="hidden"
-                  />
-                  <label htmlFor="workspace-pdf-upload" className="flex flex-col items-center cursor-pointer">
-                    <FileText className="w-8 h-8 text-slate-400 mb-2" />
-                    <span className="text-xs font-medium text-slate-600">PDFs</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Selected Files Info */}
-              {newWorkspaceFiles.length > 0 && (
-                <div className="flex items-center justify-between p-3 bg-teal-50 rounded-lg border border-teal-200">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-teal-600" />
-                    <span className="text-sm text-teal-700">{newWorkspaceFiles.length} file(s) selected</span>
+                  
+                  <div className="flex items-center justify-center w-14 h-14 rounded-full bg-teal-100 mb-4 group-hover:bg-teal-200 transition-colors">
+                    <Upload className="w-7 h-7 text-teal-600" />
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setNewWorkspaceFiles([])}
-                    className="text-slate-500 hover:text-slate-700 h-7 px-2"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+                  
+                  <p className="text-sm font-medium text-slate-700 mb-1">
+                    Drop files here or click to browse
+                  </p>
+                  <p className="text-xs text-slate-500 text-center">
+                    Supports PDF files, ZIP archives, or folders
+                  </p>
+                  
+                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-200 w-full justify-center">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <FileText className="w-4 h-4" />
+                      <span>PDF</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <FolderOpen className="w-4 h-4" />
+                      <span>ZIP</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <FolderOpen className="w-4 h-4" />
+                      <span>Folder</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-teal-50 rounded-xl border border-teal-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-teal-100">
+                        <CheckCircle className="w-5 h-5 text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-teal-800">
+                          {newWorkspaceFiles.length} file(s) selected
+                        </p>
+                        <p className="text-xs text-teal-600">
+                          {(newWorkspaceFiles.reduce((acc, f) => acc + f.size, 0) / (1024 * 1024)).toFixed(2)} MB total
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setNewWorkspaceFiles([])}
+                      className="text-teal-600 hover:text-teal-800 hover:bg-teal-100 h-8 px-3"
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Clear
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
