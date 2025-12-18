@@ -2620,7 +2620,29 @@ const OCREvaluation = () => {
                                 <h3 className="text-sm sm:text-base font-semibold text-slate-800">Evaluation Score</h3>
                               </div>
                               <div className="flex items-baseline gap-1.5 sm:gap-2">
-                                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600">{evalData.evaluationScore}</span>
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  min="0"
+                                  max={activeQuestion?.maxScore || 10}
+                                  value={evalData.evaluationScore}
+                                  onChange={(e) => {
+                                    const value = parseFloat(e.target.value);
+                                    if (!isNaN(value) && value >= 0 && value <= (activeQuestion?.maxScore || 10)) {
+                                      const roundedValue = Math.round(value * 10) / 10;
+                                      setEvaluationReviewCandidate(prev => {
+                                        if (!prev) return prev;
+                                        const updatedData = { ...prev.evaluationData };
+                                        const questionKey = `q${activeQuestion?.id || 1}`;
+                                        if (updatedData[questionKey]) {
+                                          updatedData[questionKey] = { ...updatedData[questionKey], evaluationScore: roundedValue };
+                                        }
+                                        return { ...prev, evaluationData: updatedData };
+                                      });
+                                    }
+                                  }}
+                                  className="w-16 sm:w-20 md:w-24 text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600 bg-transparent border-b-2 border-teal-300 focus:border-teal-500 focus:outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                />
                                 <span className="text-lg sm:text-xl text-slate-400">/</span>
                                 <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
                               </div>
