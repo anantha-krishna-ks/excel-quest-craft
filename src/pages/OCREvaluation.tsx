@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus, BookOpen } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
@@ -64,6 +65,7 @@ interface CandidateData {
   evaluationData?: EvaluationData
   evaluationMarks?: number
   maxMarks?: number
+  quickApprove?: boolean
 }
 
 const StatusBadge = ({ 
@@ -1197,12 +1199,13 @@ const OCREvaluation = () => {
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-center whitespace-nowrap">Quick Approve</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {filteredCandidates.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-slate-500">
+                                <TableCell colSpan={7} className="text-center py-8 text-slate-500">
                                   No candidates found matching your filters
                                 </TableCell>
                               </TableRow>
@@ -1268,6 +1271,17 @@ const OCREvaluation = () => {
                                         onClick={() => setEvaluationReviewCandidate(candidate)}
                                       />
                                     )}
+                                  </TableCell>
+                                  <TableCell className="py-3 sm:py-4 text-center">
+                                    <Switch
+                                      checked={candidate.quickApprove || false}
+                                      onCheckedChange={(checked) => {
+                                        setCandidates(prev => prev.map(c => 
+                                          c.id === candidate.id ? { ...c, quickApprove: checked } : c
+                                        ))
+                                      }}
+                                      className="data-[state=checked]:bg-teal-600"
+                                    />
                                   </TableCell>
                                 </TableRow>
                               ))
@@ -1597,11 +1611,11 @@ const OCREvaluation = () => {
               <Button
                 onClick={handleApprove}
                 size="sm"
-                disabled={phase2VisitedQuestions.size < mockQuestionsList.length}
+                disabled={!ocrReviewCandidate?.quickApprove && phase2VisitedQuestions.size < mockQuestionsList.length}
                 className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                title={phase2VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
+                title={!ocrReviewCandidate?.quickApprove && phase2VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
               >
-                {phase2VisitedQuestions.size < mockQuestionsList.length ? (
+                {!ocrReviewCandidate?.quickApprove && phase2VisitedQuestions.size < mockQuestionsList.length ? (
                   <span className="flex items-center gap-1">
                     <span className="sm:hidden">{phase2VisitedQuestions.size}/{mockQuestionsList.length}</span>
                     <span className="hidden sm:inline">Approve</span>
@@ -1972,11 +1986,11 @@ const OCREvaluation = () => {
               <Button
                 onClick={handlePhase1Approve}
                 size="sm"
-                disabled={phase1VisitedQuestions.size < mockQuestionsList.length}
+                disabled={!phase1ReviewCandidate?.quickApprove && phase1VisitedQuestions.size < mockQuestionsList.length}
                 className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                title={phase1VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
+                title={!phase1ReviewCandidate?.quickApprove && phase1VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
               >
-                {phase1VisitedQuestions.size < mockQuestionsList.length ? (
+                {!phase1ReviewCandidate?.quickApprove && phase1VisitedQuestions.size < mockQuestionsList.length ? (
                   <span className="flex items-center gap-1">
                     <span className="sm:hidden">{phase1VisitedQuestions.size}/{mockQuestionsList.length}</span>
                     <span className="hidden sm:inline">Approve</span>
