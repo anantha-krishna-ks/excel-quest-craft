@@ -66,6 +66,7 @@ interface CandidateData {
   evaluationMarks?: number
   maxMarks?: number
   quickApprove?: boolean
+  standardsMet?: { met: number; total: number }
 }
 
 const StatusBadge = ({ 
@@ -288,6 +289,7 @@ const OCREvaluation = () => {
       evaluationData: generateMockEvaluationData(),
       evaluationMarks: Math.floor(Math.random() * 51) + 50,
       maxMarks: 100,
+      standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
     }))
   }
 
@@ -345,6 +347,7 @@ const OCREvaluation = () => {
             evaluationData: generateMockEvaluationData(),
             evaluationMarks: Math.floor(Math.random() * 51) + 50,
             maxMarks: 100,
+            standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
           }))
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
             id: `candidate-${index + 1}`,
@@ -361,6 +364,7 @@ const OCREvaluation = () => {
             evaluationData: generateMockEvaluationData(),
             evaluationMarks: Math.floor(Math.random() * 51) + 50,
             maxMarks: 100,
+            standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
           }))
 
       // Store pending data and show confirmation dialog
@@ -418,6 +422,7 @@ const OCREvaluation = () => {
         evaluationData: generateMockEvaluationData(),
         evaluationMarks: Math.floor(Math.random() * 51) + 50,
         maxMarks: 100,
+        standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
       }))
 
       // Store pending data and show confirmation dialog
@@ -468,6 +473,7 @@ const OCREvaluation = () => {
         evaluationData: generateMockEvaluationData(),
         evaluationMarks: Math.floor(Math.random() * 51) + 50,
         maxMarks: 100,
+        standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
       }))
 
       // Store pending data and show confirmation dialog
@@ -1236,11 +1242,18 @@ const OCREvaluation = () => {
                                     </button>
                                   </TableCell>
                                   <TableCell className="py-3 sm:py-4 text-left">
-                                    <StatusBadge 
-                                      status={candidate.phase1}
-                                      clickable={candidate.phase1 === "completed"}
-                                      onClick={() => handleOpenPhase1Review(candidate)}
-                                    />
+                                    <div className="flex items-center gap-2">
+                                      <StatusBadge 
+                                        status={candidate.phase1}
+                                        clickable={candidate.phase1 === "completed"}
+                                        onClick={() => handleOpenPhase1Review(candidate)}
+                                      />
+                                      {candidate.phase1 === "completed" && candidate.standardsMet && (
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                          {candidate.standardsMet.met}/{candidate.standardsMet.total}
+                                        </span>
+                                      )}
+                                    </div>
                                   </TableCell>
                                   <TableCell className="py-3 sm:py-4 text-left">
                                     <StatusBadge 
