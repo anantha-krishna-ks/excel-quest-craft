@@ -820,10 +820,9 @@ const OCREvaluation = () => {
                       <div className="flex items-center gap-2 flex-wrap">
                         {/* Subject Dropdown */}
                         <div className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
-                          <div className="flex sm:hidden items-center justify-center w-6 h-6 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-md">
+                          <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-md">
                             <BookOpen className="h-3 w-3 text-white" />
                           </div>
-                          <span className="hidden sm:inline text-xs font-medium text-slate-500">Subject:</span>
                           <select
                             value={selectedSubject}
                             onChange={(e) => setSelectedSubject(e.target.value)}
@@ -840,10 +839,9 @@ const OCREvaluation = () => {
                         
                         {/* Workspace Dropdown */}
                         <div className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 hover:border-teal-300 transition-colors">
-                          <div className="flex sm:hidden items-center justify-center w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-500 rounded-md">
+                          <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-500 rounded-md">
                             <FolderOpen className="h-3 w-3 text-white" />
                           </div>
-                          <span className="hidden sm:inline text-xs font-medium text-slate-500">Workspace:</span>
                           <select
                             value={selectedWorkspace.id}
                             onChange={(e) => {
