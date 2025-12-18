@@ -226,6 +226,7 @@ const OCREvaluation = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [phaseFilter, setPhaseFilter] = useState<"all" | "phase1" | "phase2" | "phase3">("all")
   const [statusFilter, setStatusFilter] = useState<"all" | PhaseStatus>("all")
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [showUploadConfirm, setShowUploadConfirm] = useState(false)
   const [phase1VisitedQuestions, setPhase1VisitedQuestions] = useState<Set<number>>(new Set([0]))
   const [phase2VisitedQuestions, setPhase2VisitedQuestions] = useState<Set<number>>(new Set([0]))
@@ -997,33 +998,6 @@ const OCREvaluation = () => {
                   </div>
                 </CardContent>
               </Card>
-
-          {/* Category Pills - Show uploaded folders as category tabs */}
-          {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length >= 1 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {selectedWorkspace.uploadedFolders.map((folder) => (
-                <div
-                  key={folder.id}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm ${
-                    folder.type === 'folder' ? 'bg-amber-50 border-amber-200 text-amber-700' :
-                    folder.type === 'zip' ? 'bg-purple-50 border-purple-200 text-purple-700' :
-                    'bg-blue-50 border-blue-200 text-blue-700'
-                  }`}
-                >
-                  {folder.type === 'folder' ? (
-                    <FolderOpen className="h-3.5 w-3.5" />
-                  ) : folder.type === 'zip' ? (
-                    <HardDrive className="h-3.5 w-3.5" />
-                  ) : (
-                    <FileText className="h-3.5 w-3.5" />
-                  )}
-                  <span className="font-medium truncate max-w-[150px]">{folder.name}</span>
-                  <span className="text-xs opacity-70">{folder.fileCount}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Status Count Widgets */}
           {hasUploaded && candidates.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1273,9 +1247,6 @@ const OCREvaluation = () => {
                               </TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm text-left">Sl. No</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Candidate Name</TableHead>
-                              {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 && (
-                                <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Category</TableHead>
-                              )}
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
@@ -1285,11 +1256,170 @@ const OCREvaluation = () => {
                           <TableBody>
                             {filteredCandidates.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 ? 8 : 7} className="text-center py-8 text-slate-500">
+                                <TableCell colSpan={7} className="text-center py-8 text-slate-500">
                                   No candidates found matching your filters
                                 </TableCell>
                               </TableRow>
+                            ) : selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 ? (
+                              // Group candidates by category when multiple folders exist
+                              (() => {
+                                const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
+                                  const category = candidate.category || "Uncategorized"
+                                  if (!acc[category]) acc[category] = []
+                                  acc[category].push(candidate)
+                                  return acc
+                                }, {} as Record<string, CandidateData[]>)
+
+                                let globalIndex = 0
+
+                                return Object.entries(groupedCandidates).map(([category, categoryCandidates], catIndex) => {
+                                  const isExpanded = expandedCategories.has(category)
+                                  const folder = selectedWorkspace.uploadedFolders?.find(f => f.name === category)
+                                  const folderIndex = selectedWorkspace.uploadedFolders?.findIndex(f => f.name === category) ?? 0
+                                  
+                                  const colorClass = folderIndex % 3 === 0 
+                                    ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                                    : folderIndex % 3 === 1 
+                                    ? 'bg-purple-50 text-purple-700 border-purple-200' 
+                                    : 'bg-blue-50 text-blue-700 border-blue-200'
+
+                                  return (
+                                    <>
+                                      {/* Category Parent Row */}
+                                      <TableRow 
+                                        key={`category-${category}`}
+                                        className={`border-b border-slate-200 cursor-pointer ${colorClass.split(' ')[0]}`}
+                                        onClick={() => {
+                                          setExpandedCategories(prev => {
+                                            const next = new Set(prev)
+                                            if (next.has(category)) {
+                                              next.delete(category)
+                                            } else {
+                                              next.add(category)
+                                            }
+                                            return next
+                                          })
+                                        }}
+                                      >
+                                        <TableCell colSpan={7} className="py-2.5 px-4">
+                                          <div className="flex items-center gap-3">
+                                            <div className={`p-1 rounded ${isExpanded ? 'bg-slate-200' : 'bg-slate-100'}`}>
+                                              {isExpanded ? (
+                                                <ChevronDown className="h-4 w-4 text-slate-600" />
+                                              ) : (
+                                                <ChevronRight className="h-4 w-4 text-slate-600" />
+                                              )}
+                                            </div>
+                                            <div className={`p-1.5 rounded ${
+                                              folderIndex % 3 === 0 ? 'bg-amber-100' : 
+                                              folderIndex % 3 === 1 ? 'bg-purple-100' : 'bg-blue-100'
+                                            }`}>
+                                              {folder?.type === 'zip' ? (
+                                                <HardDrive className="h-4 w-4" />
+                                              ) : (
+                                                <FolderOpen className="h-4 w-4" />
+                                              )}
+                                            </div>
+                                            <span className="font-medium text-sm text-slate-800">{category}</span>
+                                            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                                              {categoryCandidates.length} candidates
+                                            </span>
+                                          </div>
+                                        </TableCell>
+                                      </TableRow>
+                                      
+                                      {/* Child Candidate Rows */}
+                                      {isExpanded && categoryCandidates.map((candidate) => {
+                                        globalIndex++
+                                        return (
+                                          <TableRow 
+                                            key={candidate.id} 
+                                            className={`border-b border-slate-100 last:border-b-0 ${
+                                              selectedCandidates.has(candidate.id) ? 'bg-teal-50/50' : ''
+                                            }`}
+                                          >
+                                            <TableCell className="py-3 sm:py-4 pl-6">
+                                              <Checkbox 
+                                                checked={selectedCandidates.has(candidate.id)}
+                                                onCheckedChange={(checked) => handleSelectCandidate(candidate.id, checked as boolean)}
+                                                className="data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                              />
+                                            </TableCell>
+                                            <TableCell className="text-slate-600 py-3 sm:py-4 text-xs sm:text-sm text-left pl-6">
+                                              {globalIndex}
+                                            </TableCell>
+                                            <TableCell className="py-3 sm:py-4 text-left">
+                                              <button
+                                                onClick={() => setDetailCandidate(candidate)}
+                                                className="font-medium text-teal-700 hover:text-teal-800 hover:underline cursor-pointer text-left text-xs sm:text-sm"
+                                              >
+                                                {candidate.candidateName}
+                                              </button>
+                                            </TableCell>
+                                            <TableCell className="py-3 sm:py-4 text-left">
+                                              <div className="flex items-center gap-2">
+                                                <StatusBadge 
+                                                  status={candidate.phase1}
+                                                  clickable={candidate.phase1 === "completed"}
+                                                  onClick={() => handleOpenPhase1Review(candidate)}
+                                                />
+                                                {candidate.phase1 === "completed" && candidate.standardsMet && (
+                                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                                    {candidate.standardsMet.met}/{candidate.standardsMet.total}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </TableCell>
+                                            <TableCell className="py-3 sm:py-4 text-left">
+                                              <StatusBadge 
+                                                status={candidate.phase2} 
+                                                clickable={candidate.phase2 === "completed"}
+                                                onClick={() => handleOpenOcrReview(candidate)}
+                                              />
+                                            </TableCell>
+                                            <TableCell className="py-3 sm:py-4 text-left">
+                                              {candidate.phase2 === "approved" && candidate.evaluationMarks !== undefined ? (
+                                                <button
+                                                  onClick={() => setEvaluationReviewCandidate(candidate)}
+                                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
+                                                    (candidate.evaluationMarks / (candidate.maxMarks || 100)) >= 0.6 
+                                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' 
+                                                      : (candidate.evaluationMarks / (candidate.maxMarks || 100)) >= 0.4 
+                                                      ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' 
+                                                      : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                                                  }`}
+                                                >
+                                                  <CheckCircle className="w-3.5 h-3.5" />
+                                                  {candidate.evaluationMarks}/{candidate.maxMarks || 100}
+                                                </button>
+                                              ) : (
+                                                <StatusBadge 
+                                                  status={candidate.phase3}
+                                                  clickable={candidate.phase3 === "completed"}
+                                                  onClick={() => setEvaluationReviewCandidate(candidate)}
+                                                />
+                                              )}
+                                            </TableCell>
+                                            <TableCell className="py-3 sm:py-4 text-center">
+                                              <Switch
+                                                checked={candidate.quickApprove || false}
+                                                onCheckedChange={(checked) => {
+                                                  setCandidates(prev => prev.map(c => 
+                                                    c.id === candidate.id ? { ...c, quickApprove: checked } : c
+                                                  ))
+                                                }}
+                                                className="data-[state=checked]:bg-teal-600"
+                                              />
+                                            </TableCell>
+                                          </TableRow>
+                                        )
+                                      })}
+                                    </>
+                                  )
+                                })
+                              })()
                             ) : (
+                              // Flat list when single folder or no folders
                               filteredCandidates.map((candidate, index) => (
                                 <TableRow 
                                   key={candidate.id} 
@@ -1315,24 +1445,6 @@ const OCREvaluation = () => {
                                       {candidate.candidateName}
                                     </button>
                                   </TableCell>
-                                  {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 && (
-                                    <TableCell className="py-3 sm:py-4 text-left">
-                                      {candidate.category ? (
-                                        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${
-                                          selectedWorkspace.uploadedFolders.findIndex(f => f.name === candidate.category) % 3 === 0 
-                                            ? 'bg-amber-50 text-amber-700 border border-amber-200' 
-                                            : selectedWorkspace.uploadedFolders.findIndex(f => f.name === candidate.category) % 3 === 1 
-                                            ? 'bg-purple-50 text-purple-700 border border-purple-200' 
-                                            : 'bg-blue-50 text-blue-700 border border-blue-200'
-                                        }`}>
-                                          <FolderOpen className="h-3 w-3" />
-                                          {candidate.category}
-                                        </span>
-                                      ) : (
-                                        <span className="text-slate-400 text-xs">—</span>
-                                      )}
-                                    </TableCell>
-                                  )}
                                   <TableCell className="py-3 sm:py-4 text-left">
                                     <div className="flex items-center gap-2">
                                       <StatusBadge 
