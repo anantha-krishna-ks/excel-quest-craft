@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus, BookOpen } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -812,14 +812,17 @@ const OCREvaluation = () => {
                           Back
                         </Button>
                       </div>
-                      <div className="flex items-center gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 flex-wrap">
                         {/* Subject Dropdown */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500">Subject:</span>
+                        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-xl border border-slate-200/80">
+                          <div className="flex items-center justify-center w-7 h-7 bg-teal-500/10 rounded-lg">
+                            <BookOpen className="h-3.5 w-3.5 text-teal-600" />
+                          </div>
                           <select
                             value={selectedSubject}
                             onChange={(e) => setSelectedSubject(e.target.value)}
-                            className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[160px]"
+                            className="h-8 px-2 pr-7 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[140px]"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.25rem center', backgroundSize: '1rem' }}
                           >
                             {subjects.map((subject) => (
                               <option key={subject.value} value={subject.value}>
@@ -828,9 +831,14 @@ const OCREvaluation = () => {
                             ))}
                           </select>
                         </div>
+                        
+                        <div className="w-px h-8 bg-slate-200 hidden sm:block" />
+                        
                         {/* Workspace Dropdown */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500">Workspace:</span>
+                        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-teal-50 to-emerald-50/50 rounded-xl border border-teal-200/80">
+                          <div className="flex items-center justify-center w-7 h-7 bg-teal-500/15 rounded-lg">
+                            <FolderOpen className="h-3.5 w-3.5 text-teal-600" />
+                          </div>
                           <select
                             value={selectedWorkspace.id}
                             onChange={(e) => {
@@ -844,7 +852,8 @@ const OCREvaluation = () => {
                                 setCandidates(mockCandidates)
                               }
                             }}
-                            className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[180px]"
+                            className="h-8 px-2 pr-7 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[160px]"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.25rem center', backgroundSize: '1rem' }}
                           >
                             {workspaces.map((workspace) => (
                               <option key={workspace.id} value={workspace.id}>
