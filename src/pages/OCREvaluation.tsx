@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus, BookOpen } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus, BookOpen, Save } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -204,6 +204,8 @@ const OCREvaluation = () => {
   // Added files dialog state
   const [showAddedFilesDialog, setShowAddedFilesDialog] = useState(false)
   const [addedFilesInfo, setAddedFilesInfo] = useState<{ files: File[]; totalSize: number } | null>(null)
+  // Evaluation score editing state
+  const [editedEvalScore, setEditedEvalScore] = useState<string>("")
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -2619,16 +2621,35 @@ const OCREvaluation = () => {
                                 <Award className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
                                 <h3 className="text-sm sm:text-base font-semibold text-slate-800">Evaluation Score</h3>
                               </div>
-                              <div className="flex items-baseline gap-1.5 sm:gap-2">
-                                <input
-                                  type="number"
-                                  step="0.1"
-                                  min="0"
-                                  max={activeQuestion?.maxScore || 10}
-                                  value={evalData.evaluationScore}
-                                  onChange={(e) => {
-                                    const value = parseFloat(e.target.value);
-                                    if (!isNaN(value) && value >= 0 && value <= (activeQuestion?.maxScore || 10)) {
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="flex items-baseline gap-1.5 sm:gap-2">
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={editedEvalScore || evalData.evaluationScore.toString()}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      // Allow empty, numbers, and single decimal point
+                                      if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                                        setEditedEvalScore(val);
+                                      }
+                                    }}
+                                    onFocus={() => {
+                                      if (!editedEvalScore) {
+                                        setEditedEvalScore(evalData.evaluationScore.toString());
+                                      }
+                                    }}
+                                    className="w-16 sm:w-20 md:w-24 text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600 bg-transparent border-b-2 border-teal-300 focus:border-teal-500 focus:outline-none text-center"
+                                  />
+                                  <span className="text-lg sm:text-xl text-slate-400">/</span>
+                                  <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    const value = parseFloat(editedEvalScore);
+                                    const maxScore = activeQuestion?.maxScore || 10;
+                                    if (!isNaN(value) && value >= 0 && value <= maxScore) {
                                       const roundedValue = Math.round(value * 10) / 10;
                                       setEvaluationReviewCandidate(prev => {
                                         if (!prev) return prev;
@@ -2639,12 +2660,18 @@ const OCREvaluation = () => {
                                         }
                                         return { ...prev, evaluationData: updatedData };
                                       });
+                                      setEditedEvalScore("");
+                                      toast.success(`Evaluation score updated to ${roundedValue}`);
+                                    } else {
+                                      toast.error(`Please enter a value between 0 and ${maxScore}`);
                                     }
                                   }}
-                                  className="w-16 sm:w-20 md:w-24 text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600 bg-transparent border-b-2 border-teal-300 focus:border-teal-500 focus:outline-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                />
-                                <span className="text-lg sm:text-xl text-slate-400">/</span>
-                                <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
+                                  disabled={!editedEvalScore}
+                                  className="bg-teal-600 hover:bg-teal-700 text-white"
+                                >
+                                  <Save className="w-4 h-4 mr-1" />
+                                  Save
+                                </Button>
                               </div>
                             </div>
                           </div>
