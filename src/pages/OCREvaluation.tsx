@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -794,44 +794,134 @@ const OCREvaluation = () => {
               {/* Workspace Header - Show when workspace is selected */}
               <Card className="border border-slate-200 bg-white">
                 <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedWorkspace(null)
-                          setHasUploaded(false)
-                          setCandidates([])
-                        }}
-                        className="text-slate-600"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-1" />
-                        Back
-                      </Button>
-                      <div className="h-6 w-px bg-slate-200" />
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-teal-100 text-teal-700 rounded-lg">
-                          <FolderOpen className="h-4 w-4" />
+                  <div className="flex flex-col gap-4">
+                    {/* Top Row - Back button and dropdowns */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedWorkspace(null)
+                            setHasUploaded(false)
+                            setCandidates([])
+                          }}
+                          className="text-slate-600"
+                        >
+                          <ArrowLeft className="w-4 h-4 mr-1" />
+                          Back
+                        </Button>
+                      </div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {/* Subject Dropdown */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-500">Subject:</span>
+                          <select
+                            value={selectedSubject}
+                            onChange={(e) => setSelectedSubject(e.target.value)}
+                            className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[160px]"
+                          >
+                            {subjects.map((subject) => (
+                              <option key={subject.value} value={subject.value}>
+                                {subject.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                        <div>
-                          <h2 className="text-base font-semibold text-slate-800">{selectedWorkspace.name}</h2>
-                          <p className="text-xs text-slate-500">{selectedWorkspace.fileCount} files • {selectedWorkspace.candidateCount} candidates</p>
+                        {/* Workspace Dropdown */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-500">Workspace:</span>
+                          <select
+                            value={selectedWorkspace.id}
+                            onChange={(e) => {
+                              const workspace = workspaces.find(w => w.id === e.target.value)
+                              if (workspace) {
+                                setSelectedWorkspace(workspace)
+                                setFolderName(workspace.name)
+                                setFileCount(workspace.fileCount)
+                                setTotalFileSize(workspace.totalSize)
+                                const mockCandidates = generateMockCandidates(workspace.candidateCount)
+                                setCandidates(mockCandidates)
+                              }
+                            }}
+                            className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[180px]"
+                          >
+                            {workspaces.map((workspace) => (
+                              <option key={workspace.id} value={workspace.id}>
+                                {workspace.name}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={selectedSubject}
-                        onChange={(e) => setSelectedSubject(e.target.value)}
-                        className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none"
-                      >
-                        {subjects.map((subject) => (
-                          <option key={subject.value} value={subject.value}>
-                            {subject.label}
-                          </option>
-                        ))}
-                      </select>
+
+                    {/* Bottom Row - File details and Add Missing Files */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-slate-100">
+                      {/* File Details */}
+                      <div className="flex items-center gap-4 flex-wrap">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg">
+                          <FolderOpen className="h-4 w-4 text-teal-600" />
+                          <span className="text-sm font-medium text-slate-700">{selectedWorkspace.name}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-slate-600">
+                          <span className="flex items-center gap-1.5">
+                            <FileText className="h-4 w-4 text-slate-400" />
+                            {selectedWorkspace.fileCount} files
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <HardDrive className="h-4 w-4 text-slate-400" />
+                            {(selectedWorkspace.totalSize / (1024 * 1024)).toFixed(1)} MB
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Users className="h-4 w-4 text-slate-400" />
+                            {selectedWorkspace.candidateCount} candidates
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Add Missing Files Button */}
+                      <div className="relative">
+                        <input
+                          type="file"
+                          id="add-missing-files"
+                          multiple
+                          accept=".pdf,.zip"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files.length > 0) {
+                              const newFiles = Array.from(e.target.files)
+                              const additionalSize = newFiles.reduce((acc, file) => acc + file.size, 0)
+                              const additionalCount = newFiles.length
+                              
+                              // Update workspace with new files
+                              setSelectedWorkspace(prev => prev ? {
+                                ...prev,
+                                fileCount: prev.fileCount + additionalCount,
+                                totalSize: prev.totalSize + additionalSize
+                              } : null)
+                              
+                              // Update workspaces list
+                              setWorkspaces(prev => prev.map(w => 
+                                w.id === selectedWorkspace.id 
+                                  ? { ...w, fileCount: w.fileCount + additionalCount, totalSize: w.totalSize + additionalSize }
+                                  : w
+                              ))
+                              
+                              toast.success(`Added ${additionalCount} file${additionalCount > 1 ? 's' : ''} to workspace`)
+                              e.target.value = ''
+                            }
+                          }}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-dashed border-teal-300 text-teal-600 hover:bg-teal-50 hover:border-teal-400"
+                        >
+                          <Plus className="w-4 h-4 mr-1.5" />
+                          Add Missing Files
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
