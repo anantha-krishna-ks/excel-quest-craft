@@ -2438,6 +2438,15 @@ const OCREvaluation = () => {
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
+              {/* Manual Marking Toggle */}
+              <div className="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
+                <span className="text-xs font-medium text-slate-600">Manual Marking</span>
+                <Switch
+                  checked={manualMarkingEnabled}
+                  onCheckedChange={setManualMarkingEnabled}
+                  className="data-[state=checked]:bg-teal-600"
+                />
+              </div>
               {/* Total Marks Display */}
               <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-lg">
                 <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
@@ -2658,15 +2667,6 @@ const OCREvaluation = () => {
                                 <h3 className="text-sm sm:text-base font-semibold text-slate-800">Evaluation Score</h3>
                               </div>
                               <div className="flex items-center gap-3 sm:gap-4">
-                                {/* Manual Marking Toggle */}
-                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/60 rounded-lg border border-teal-200">
-                                  <span className="text-xs font-medium text-slate-600">Manual Marking</span>
-                                  <Switch
-                                    checked={manualMarkingEnabled}
-                                    onCheckedChange={setManualMarkingEnabled}
-                                    className="data-[state=checked]:bg-teal-600"
-                                  />
-                                </div>
                                 <div className="flex items-baseline gap-1.5 sm:gap-2">
                                   <input
                                     type="text"
