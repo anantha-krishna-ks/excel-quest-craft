@@ -2454,18 +2454,6 @@ const OCREvaluation = () => {
                   Total: {mockQuestionsList.reduce((sum, q) => sum + q.maxScore, 0)} marks
                 </span>
               </div>
-              {/* Progress Indicator */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
-                <span className="text-xs text-slate-600">
-                  {phase3VisitedQuestions.size}/{mockQuestionsList.length} reviewed
-                </span>
-                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-teal-500 rounded-full transition-all duration-300"
-                    style={{ width: `${(phase3VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
-                  />
-                </div>
-              </div>
               <Button
                 onClick={() => setShowReEvaluationDialog(true)}
                 size="sm"
