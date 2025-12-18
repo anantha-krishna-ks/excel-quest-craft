@@ -1839,32 +1839,29 @@ const OCREvaluation = () => {
               <span className="truncate">OCR Review - {ocrReviewCandidate?.candidateName}</span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
-              {/* Progress Indicator */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
-                <span className="text-xs text-slate-600">
-                  {phase2VisitedQuestions.size}/{mockQuestionsList.length} reviewed
-                </span>
-                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-teal-500 rounded-full transition-all duration-300"
-                    style={{ width: `${(phase2VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-              <Button
-                onClick={handleApprove}
-                size="sm"
-                disabled={!ocrReviewCandidate?.quickApprove && phase2VisitedQuestions.size < mockQuestionsList.length}
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                title={!ocrReviewCandidate?.quickApprove && phase2VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
-              >
-                {!ocrReviewCandidate?.quickApprove && phase2VisitedQuestions.size < mockQuestionsList.length ? (
-                  <span className="flex items-center gap-1">
-                    <span className="sm:hidden">{phase2VisitedQuestions.size}/{mockQuestionsList.length}</span>
-                    <span className="hidden sm:inline">Approve</span>
-                  </span>
-                ) : 'Approve'}
-              </Button>
+              {ocrReviewCandidate?.quickApprove && (
+                <>
+                  {/* Progress Indicator */}
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
+                    <span className="text-xs text-slate-600">
+                      {phase2VisitedQuestions.size}/{mockQuestionsList.length} reviewed
+                    </span>
+                    <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-teal-500 rounded-full transition-all duration-300"
+                        style={{ width: `${(phase2VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleApprove}
+                    size="sm"
+                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                  >
+                    Approve
+                  </Button>
+                </>
+              )}
               <button 
                 onClick={() => { 
                   setOcrReviewCandidate(null); 
@@ -2214,32 +2211,29 @@ const OCREvaluation = () => {
               <span className="truncate">Segmentation Indexing - {phase1ReviewCandidate?.candidateName}</span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
-              {/* Progress Indicator */}
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
-                <span className="text-xs text-slate-600">
-                  {phase1VisitedQuestions.size}/{mockQuestionsList.length} reviewed
-                </span>
-                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-teal-500 rounded-full transition-all duration-300"
-                    style={{ width: `${(phase1VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-              <Button
-                onClick={handlePhase1Approve}
-                size="sm"
-                disabled={!phase1ReviewCandidate?.quickApprove && phase1VisitedQuestions.size < mockQuestionsList.length}
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                title={!phase1ReviewCandidate?.quickApprove && phase1VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
-              >
-                {!phase1ReviewCandidate?.quickApprove && phase1VisitedQuestions.size < mockQuestionsList.length ? (
-                  <span className="flex items-center gap-1">
-                    <span className="sm:hidden">{phase1VisitedQuestions.size}/{mockQuestionsList.length}</span>
-                    <span className="hidden sm:inline">Approve</span>
-                  </span>
-                ) : 'Approve'}
-              </Button>
+              {phase1ReviewCandidate?.quickApprove && (
+                <>
+                  {/* Progress Indicator */}
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
+                    <span className="text-xs text-slate-600">
+                      {phase1VisitedQuestions.size}/{mockQuestionsList.length} reviewed
+                    </span>
+                    <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-teal-500 rounded-full transition-all duration-300"
+                        style={{ width: `${(phase1VisitedQuestions.size / mockQuestionsList.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handlePhase1Approve}
+                    size="sm"
+                    className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium"
+                  >
+                    Approve
+                  </Button>
+                </>
+              )}
               <button 
                 onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); setPhase1VisitedQuestions(new Set([0])); }}
                 className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
