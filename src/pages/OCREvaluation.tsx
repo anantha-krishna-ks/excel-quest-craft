@@ -2851,8 +2851,8 @@ const OCREvaluation = () => {
 
       {/* Added Files Success Dialog */}
       <Dialog open={showAddedFilesDialog} onOpenChange={setShowAddedFilesDialog}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto">
-          <DialogHeader className="pb-4">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg mx-auto max-h-[85vh] flex flex-col">
+          <DialogHeader className="pb-4 flex-shrink-0">
             <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mb-3">
               <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
@@ -2863,7 +2863,7 @@ const OCREvaluation = () => {
           </DialogHeader>
           
           {addedFilesInfo && (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3 sm:space-y-4 overflow-y-auto flex-1 min-h-0">
               {/* Summary Stats */}
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-slate-50 rounded-lg sm:rounded-xl">
@@ -2891,7 +2891,7 @@ const OCREvaluation = () => {
                 <div className="px-3 py-2 bg-slate-50 border-b border-slate-200">
                   <span className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Added Files</span>
                 </div>
-                <ScrollArea className="max-h-[140px] sm:max-h-[180px]">
+                <ScrollArea className="max-h-[200px] sm:max-h-[280px]">
                   <div className="divide-y divide-slate-100">
                     {addedFilesInfo.files.map((file, index) => (
                       <div key={index} className="flex items-center justify-between px-2 sm:px-3 py-2 sm:py-2.5 gap-2">
@@ -2929,7 +2929,7 @@ const OCREvaluation = () => {
             </div>
           )}
           
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-4 flex-shrink-0">
             <Button
               onClick={() => {
                 setShowAddedFilesDialog(false)
