@@ -996,59 +996,30 @@ const OCREvaluation = () => {
                 </CardContent>
               </Card>
 
-          {/* Uploaded Folders Section - Show when workspace has uploaded folders */}
+          {/* Category Pills - Show uploaded folders as category tabs */}
           {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length >= 1 && (
-            <Card className="border border-slate-200 bg-white">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-amber-100 text-amber-700 rounded-lg">
-                    <FolderOpen className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-800">Uploaded Folders</h3>
-                    <p className="text-xs text-slate-500">{selectedWorkspace.uploadedFolders.length} folders/archives in this workspace</p>
-                  </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {selectedWorkspace.uploadedFolders.map((folder) => (
+                <div
+                  key={folder.id}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm ${
+                    folder.type === 'folder' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                    folder.type === 'zip' ? 'bg-purple-50 border-purple-200 text-purple-700' :
+                    'bg-blue-50 border-blue-200 text-blue-700'
+                  }`}
+                >
+                  {folder.type === 'folder' ? (
+                    <FolderOpen className="h-3.5 w-3.5" />
+                  ) : folder.type === 'zip' ? (
+                    <HardDrive className="h-3.5 w-3.5" />
+                  ) : (
+                    <FileText className="h-3.5 w-3.5" />
+                  )}
+                  <span className="font-medium truncate max-w-[150px]">{folder.name}</span>
+                  <span className="text-xs opacity-70">{folder.fileCount}</span>
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {selectedWorkspace.uploadedFolders.map((folder) => (
-                    <div
-                      key={folder.id}
-                      className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg bg-slate-50/50"
-                    >
-                      <div className={`p-2 rounded-lg ${
-                        folder.type === 'folder' ? 'bg-amber-100 text-amber-600' :
-                        folder.type === 'zip' ? 'bg-purple-100 text-purple-600' :
-                        'bg-blue-100 text-blue-600'
-                      }`}>
-                        {folder.type === 'folder' ? (
-                          <FolderOpen className="h-4 w-4" />
-                        ) : folder.type === 'zip' ? (
-                          <HardDrive className="h-4 w-4" />
-                        ) : (
-                          <FileText className="h-4 w-4" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-700 truncate">{folder.name}</p>
-                        <div className="flex items-center gap-2 text-xs text-slate-500">
-                          <span>{folder.fileCount} files</span>
-                          <span>•</span>
-                          <span>{(folder.size / (1024 * 1024)).toFixed(1)} MB</span>
-                        </div>
-                      </div>
-                      <span className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full ${
-                        folder.type === 'folder' ? 'bg-amber-100 text-amber-700' :
-                        folder.type === 'zip' ? 'bg-purple-100 text-purple-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
-                        {folder.type}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
           )}
 
           {/* Status Count Widgets */}
