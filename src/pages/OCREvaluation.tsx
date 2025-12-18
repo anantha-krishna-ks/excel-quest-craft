@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -46,6 +46,12 @@ interface Workspace {
   totalSize: number
   candidateCount: number
   status: "active" | "completed" | "archived"
+}
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 interface CandidateData {
@@ -703,28 +709,17 @@ const OCREvaluation = () => {
               {/* Workspace List Section */}
               <Card className="border border-slate-200 bg-white">
                 <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-teal-100 text-teal-700 rounded-lg">
-                        <Layers className="h-5 w-5" />
+                  <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-teal-100 text-teal-700 rounded-lg">
+                          <Layers className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h2 className="text-lg font-semibold text-slate-800">Workspaces</h2>
+                          <p className="text-sm text-slate-500">Select or create a workspace to start evaluation</p>
+                        </div>
                       </div>
-                      <div>
-                        <h2 className="text-lg font-semibold text-slate-800">Workspaces</h2>
-                        <p className="text-sm text-slate-500">Select or create a workspace to start evaluation</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <select
-                        value={selectedSubject}
-                        onChange={(e) => setSelectedSubject(e.target.value)}
-                        className="h-10 px-3 py-2 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[180px]"
-                      >
-                        {subjects.map((subject) => (
-                          <option key={subject.value} value={subject.value}>
-                            {subject.label}
-                          </option>
-                        ))}
-                      </select>
                       <Button
                         onClick={() => setShowCreateWorkspaceDialog(true)}
                         className="bg-teal-600 hover:bg-teal-700 text-white"
@@ -733,6 +728,50 @@ const OCREvaluation = () => {
                         Create New Workspace
                       </Button>
                     </div>
+                    
+                    {/* Filters Row */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                      <div className="flex flex-col gap-1.5 min-w-[180px]">
+                        <label className="text-xs font-medium text-slate-600">Subject</label>
+                        <select
+                          value={selectedSubject}
+                          onChange={(e) => setSelectedSubject(e.target.value)}
+                          className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none"
+                        >
+                          {subjects.map((subject) => (
+                            <option key={subject.value} value={subject.value}>
+                              {subject.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1.5 min-w-[200px]">
+                        <label className="text-xs font-medium text-slate-600">Workspace</label>
+                        <select
+                          className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none"
+                          defaultValue=""
+                          onChange={(e) => {
+                            const workspace = workspaces.find(w => w.id === e.target.value);
+                            if (workspace) {
+                              setSelectedWorkspace(workspace);
+                              setHasUploaded(true);
+                              setFolderName(workspace.name);
+                              setFileCount(workspace.fileCount);
+                              setTotalFileSize(workspace.totalSize);
+                              const mockCandidates = generateMockCandidates(workspace.candidateCount);
+                              setCandidates(mockCandidates);
+                            }
+                          }}
+                        >
+                          <option value="" disabled>Select a workspace...</option>
+                          {workspaces.map((workspace) => (
+                            <option key={workspace.id} value={workspace.id}>
+                              {workspace.name} ({workspace.fileCount} files)
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Workspace Grid */}
@@ -740,41 +779,75 @@ const OCREvaluation = () => {
                     {workspaces.map((workspace) => (
                       <div
                         key={workspace.id}
-                        onClick={() => {
-                          setSelectedWorkspace(workspace)
-                          setHasUploaded(true)
-                          setFolderName(workspace.name)
-                          setFileCount(workspace.fileCount)
-                          setTotalFileSize(workspace.totalSize)
-                          // Generate mock candidates for the workspace
-                          const mockCandidates = generateMockCandidates(workspace.candidateCount)
-                          setCandidates(mockCandidates)
-                        }}
-                        className="p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-teal-400 hover:bg-teal-50/50 transition-all group"
+                        className="p-4 border border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50/50 transition-all group"
                       >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="p-2 bg-teal-100 text-teal-600 rounded-lg group-hover:bg-teal-200">
-                            <FolderOpen className="h-5 w-5" />
+                        <div 
+                          onClick={() => {
+                            setSelectedWorkspace(workspace)
+                            setHasUploaded(true)
+                            setFolderName(workspace.name)
+                            setFileCount(workspace.fileCount)
+                            setTotalFileSize(workspace.totalSize)
+                            const mockCandidates = generateMockCandidates(workspace.candidateCount)
+                            setCandidates(mockCandidates)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="p-2 bg-teal-100 text-teal-600 rounded-lg group-hover:bg-teal-200">
+                              <FolderOpen className="h-5 w-5" />
+                            </div>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              workspace.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
+                              workspace.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                              'bg-slate-100 text-slate-600'
+                            }`}>
+                              {workspace.status.charAt(0).toUpperCase() + workspace.status.slice(1)}
+                            </span>
                           </div>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            workspace.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
-                            workspace.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                            'bg-slate-100 text-slate-600'
-                          }`}>
-                            {workspace.status.charAt(0).toUpperCase() + workspace.status.slice(1)}
-                          </span>
+                          <h3 className="font-medium text-slate-800 mb-1 truncate">{workspace.name}</h3>
+                          <p className="text-xs text-slate-500 mb-3">Created: {workspace.createdAt}</p>
+                          <div className="flex items-center gap-3 text-xs text-slate-600 mb-3">
+                            <span className="flex items-center gap-1">
+                              <FileText className="h-3.5 w-3.5" />
+                              {workspace.fileCount} files
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <HardDrive className="h-3.5 w-3.5" />
+                              {formatFileSize(workspace.totalSize)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3.5 w-3.5" />
+                              {workspace.candidateCount} candidates
+                            </span>
+                          </div>
                         </div>
-                        <h3 className="font-medium text-slate-800 mb-1 truncate">{workspace.name}</h3>
-                        <p className="text-xs text-slate-500 mb-3">Created: {workspace.createdAt}</p>
-                        <div className="flex items-center gap-3 text-xs text-slate-600">
-                          <span className="flex items-center gap-1">
-                            <FileText className="h-3.5 w-3.5" />
-                            {workspace.fileCount} files
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3.5 w-3.5" />
-                            {workspace.candidateCount} candidates
-                          </span>
+                        <div className="pt-3 border-t border-slate-100">
+                          <label className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-teal-600 bg-teal-50 rounded-md cursor-pointer hover:bg-teal-100 transition-colors">
+                            <Upload className="h-3.5 w-3.5" />
+                            Add Supplementary Files
+                            <input
+                              type="file"
+                              multiple
+                              accept=".pdf,.zip"
+                              className="hidden"
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files.length > 0) {
+                                  const files = Array.from(e.target.files);
+                                  const addedSize = files.reduce((sum, file) => sum + file.size, 0);
+                                  
+                                  // Update the workspace with new files
+                                  setWorkspaces(prev => prev.map(w => 
+                                    w.id === workspace.id 
+                                      ? { ...w, fileCount: w.fileCount + files.length, totalSize: w.totalSize + addedSize }
+                                      : w
+                                  ));
+                                  toast.success(`Added ${files.length} supplementary file(s) to ${workspace.name}`);
+                                }
+                              }}
+                            />
+                          </label>
                         </div>
                       </div>
                     ))}
