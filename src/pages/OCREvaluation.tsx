@@ -198,6 +198,9 @@ const OCREvaluation = () => {
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set())
   // Image popup state
   const [popupImage, setPopupImage] = useState<{ url: string; label: string } | null>(null)
+  // Added files dialog state
+  const [showAddedFilesDialog, setShowAddedFilesDialog] = useState(false)
+  const [addedFilesInfo, setAddedFilesInfo] = useState<{ files: File[]; totalSize: number } | null>(null)
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -920,7 +923,9 @@ const OCREvaluation = () => {
                                   : w
                               ))
                               
-                              toast.success(`Added ${additionalCount} file${additionalCount > 1 ? 's' : ''} to workspace`)
+                              // Show dialog with file info
+                              setAddedFilesInfo({ files: newFiles, totalSize: additionalSize })
+                              setShowAddedFilesDialog(true)
                               e.target.value = ''
                             }
                           }}
@@ -2839,6 +2844,101 @@ const OCREvaluation = () => {
               disabled={!reEvaluationPrompt.trim()}
             >
               Submit Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Added Files Success Dialog */}
+      <Dialog open={showAddedFilesDialog} onOpenChange={setShowAddedFilesDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="pb-4">
+            <div className="mx-auto w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mb-3">
+              <CheckCircle className="w-7 h-7 text-white" />
+            </div>
+            <DialogTitle className="text-center text-xl">Files Added Successfully</DialogTitle>
+            <DialogDescription className="text-center text-slate-500">
+              Your files have been added to the workspace
+            </DialogDescription>
+          </DialogHeader>
+          
+          {addedFilesInfo && (
+            <div className="space-y-4">
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Files Added</p>
+                    <p className="text-lg font-semibold text-slate-800">{addedFilesInfo.files.length}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <HardDrive className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Total Size</p>
+                    <p className="text-lg font-semibold text-slate-800">{formatFileSize(addedFilesInfo.totalSize)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* File List */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="px-3 py-2 bg-slate-50 border-b border-slate-200">
+                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Added Files</span>
+                </div>
+                <ScrollArea className="max-h-[180px]">
+                  <div className="divide-y divide-slate-100">
+                    {addedFilesInfo.files.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between px-3 py-2.5">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                            file.name.endsWith('.pdf') ? 'bg-red-100' : 'bg-amber-100'
+                          }`}>
+                            {file.name.endsWith('.pdf') ? (
+                              <FileText className={`w-4 h-4 ${file.name.endsWith('.pdf') ? 'text-red-600' : 'text-amber-600'}`} />
+                            ) : (
+                              <Layers className="w-4 h-4 text-amber-600" />
+                            )}
+                          </div>
+                          <span className="text-sm text-slate-700 truncate">{file.name}</span>
+                        </div>
+                        <span className="text-xs text-slate-400 ml-2 flex-shrink-0">{formatFileSize(file.size)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+
+              {/* Workspace Info */}
+              {selectedWorkspace && (
+                <div className="flex items-center justify-between p-3 bg-teal-50 rounded-xl border border-teal-100">
+                  <div className="flex items-center gap-2">
+                    <FolderOpen className="w-4 h-4 text-teal-600" />
+                    <span className="text-sm font-medium text-teal-700">{selectedWorkspace.name}</span>
+                  </div>
+                  <span className="text-xs text-teal-600">
+                    {selectedWorkspace.fileCount} total files
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter className="mt-4">
+            <Button
+              onClick={() => {
+                setShowAddedFilesDialog(false)
+                setAddedFilesInfo(null)
+                toast.success("Files integrated into workspace")
+              }}
+              className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white"
+            >
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>
