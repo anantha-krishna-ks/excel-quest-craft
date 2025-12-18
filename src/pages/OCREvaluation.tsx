@@ -619,9 +619,11 @@ const OCREvaluation = () => {
     return { phase1: "approved", phase2: "approved", phase3: "approved", hasEvaluationMarks: true, quickApprove: true }
   }
 
-  // Helper to check if Quick Approve can be enabled - only when both phases are approved
+  // Helper to check if Quick Approve can be enabled - when both phases are completed or approved
   const canEnableQuickApprove = (candidate: CandidateData): boolean => {
-    return candidate.phase1 === "approved" && candidate.phase2 === "approved"
+    const phase1Ready = candidate.phase1 === "completed" || candidate.phase1 === "approved"
+    const phase2Ready = candidate.phase2 === "completed" || candidate.phase2 === "approved"
+    return phase1Ready && phase2Ready
   }
 
   const handleReuploadConfirm = () => {
