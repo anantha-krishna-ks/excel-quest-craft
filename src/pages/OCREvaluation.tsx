@@ -614,10 +614,9 @@ const OCREvaluation = () => {
     return { phase1: "approved", phase2: "approved", phase3: "approved", hasEvaluationMarks: true }
   }
 
-  // Helper to check if Quick Approve can be enabled
+  // Helper to check if Quick Approve can be enabled - only when both phases are approved
   const canEnableQuickApprove = (candidate: CandidateData): boolean => {
-    return (candidate.phase1 === "completed" || candidate.phase1 === "approved") && 
-           (candidate.phase2 === "completed" || candidate.phase2 === "approved")
+    return candidate.phase1 === "approved" && candidate.phase2 === "approved"
   }
 
   const handleReuploadConfirm = () => {
@@ -1432,11 +1431,11 @@ const OCREvaluation = () => {
                                             </TableCell>
                                             <TableCell className="py-3 sm:py-4 text-left">
                                               <div className="flex items-center gap-2">
-                                                <StatusBadge 
-                                                  status={candidate.phase1}
-                                                  clickable={candidate.phase1 === "completed"}
-                                                  onClick={() => handleOpenPhase1Review(candidate)}
-                                                />
+                                    <StatusBadge 
+                                      status={candidate.phase1}
+                                      clickable={candidate.phase1 === "completed" || candidate.phase1 === "approved"}
+                                      onClick={() => handleOpenPhase1Review(candidate)}
+                                    />
                                                 {candidate.phase1 === "completed" && candidate.standardsMet && (
                                                   <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                                                     {candidate.standardsMet.met}/{candidate.standardsMet.total}
@@ -1445,11 +1444,11 @@ const OCREvaluation = () => {
                                               </div>
                                             </TableCell>
                                             <TableCell className="py-3 sm:py-4 text-left">
-                                              <StatusBadge 
-                                                status={candidate.phase2} 
-                                                clickable={candidate.phase2 === "completed"}
-                                                onClick={() => handleOpenOcrReview(candidate)}
-                                              />
+                                    <StatusBadge 
+                                      status={candidate.phase2} 
+                                      clickable={candidate.phase2 === "completed" || candidate.phase2 === "approved"}
+                                      onClick={() => handleOpenOcrReview(candidate)}
+                                    />
                                             </TableCell>
                                             <TableCell className="py-3 sm:py-4 text-left">
                                               {candidate.evaluationMarks !== undefined ? (
@@ -1521,11 +1520,11 @@ const OCREvaluation = () => {
                                   </TableCell>
                                   <TableCell className="py-3 sm:py-4 text-left">
                                     <div className="flex items-center gap-2">
-                                      <StatusBadge 
-                                        status={candidate.phase1}
-                                        clickable={candidate.phase1 === "completed"}
-                                        onClick={() => handleOpenPhase1Review(candidate)}
-                                      />
+                                    <StatusBadge 
+                                      status={candidate.phase1}
+                                      clickable={candidate.phase1 === "completed" || candidate.phase1 === "approved"}
+                                      onClick={() => handleOpenPhase1Review(candidate)}
+                                    />
                                       {candidate.phase1 === "completed" && candidate.standardsMet && (
                                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                                           {candidate.standardsMet.met}/{candidate.standardsMet.total}
@@ -1536,7 +1535,7 @@ const OCREvaluation = () => {
                                   <TableCell className="py-3 sm:py-4 text-left">
                                     <StatusBadge 
                                       status={candidate.phase2} 
-                                      clickable={candidate.phase2 === "completed"}
+                                      clickable={candidate.phase2 === "completed" || candidate.phase2 === "approved"}
                                       onClick={() => handleOpenOcrReview(candidate)}
                                     />
                                   </TableCell>
