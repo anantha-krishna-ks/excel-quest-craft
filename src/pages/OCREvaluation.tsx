@@ -77,6 +77,7 @@ interface CandidateData {
   maxMarks?: number
   quickApprove?: boolean
   standardsMet?: { met: number; total: number }
+  category?: string
 }
 
 const StatusBadge = ({ 
@@ -317,7 +318,7 @@ const OCREvaluation = () => {
   }
 
   // Generate mock candidates for a workspace
-  const generateMockCandidates = (count: number): CandidateData[] => {
+  const generateMockCandidates = (count: number, folders?: UploadedFolder[]): CandidateData[] => {
     const centres = ["Delhi Centre", "Mumbai Centre", "Bangalore Centre", "Chennai Centre", "Kolkata Centre"]
     const addresses = [
       "123, Connaught Place, New Delhi - 110001",
@@ -343,6 +344,7 @@ const OCREvaluation = () => {
       evaluationMarks: Math.floor(Math.random() * 51) + 50,
       maxMarks: 100,
       standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+      category: folders && folders.length > 1 ? folders[index % folders.length]?.name : undefined,
     }))
   }
 
@@ -811,7 +813,7 @@ const OCREvaluation = () => {
                           setFileCount(workspace.fileCount)
                           setTotalFileSize(workspace.totalSize)
                           // Generate mock candidates for the workspace
-                          const mockCandidates = generateMockCandidates(workspace.candidateCount)
+                          const mockCandidates = generateMockCandidates(workspace.candidateCount, workspace.uploadedFolders)
                           setCandidates(mockCandidates)
                         }}
                         className="p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-teal-400 hover:bg-teal-50/50 transition-all group"
@@ -906,7 +908,7 @@ const OCREvaluation = () => {
                                 setFolderName(workspace.name)
                                 setFileCount(workspace.fileCount)
                                 setTotalFileSize(workspace.totalSize)
-                                const mockCandidates = generateMockCandidates(workspace.candidateCount)
+                                const mockCandidates = generateMockCandidates(workspace.candidateCount, workspace.uploadedFolders)
                                 setCandidates(mockCandidates)
                               }
                             }}
@@ -1271,6 +1273,9 @@ const OCREvaluation = () => {
                               </TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 w-12 sm:w-16 text-xs sm:text-sm text-left">Sl. No</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Candidate Name</TableHead>
+                              {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 && (
+                                <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Category</TableHead>
+                              )}
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
@@ -1280,7 +1285,7 @@ const OCREvaluation = () => {
                           <TableBody>
                             {filteredCandidates.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={7} className="text-center py-8 text-slate-500">
+                                <TableCell colSpan={selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 ? 8 : 7} className="text-center py-8 text-slate-500">
                                   No candidates found matching your filters
                                 </TableCell>
                               </TableRow>
@@ -1310,6 +1315,24 @@ const OCREvaluation = () => {
                                       {candidate.candidateName}
                                     </button>
                                   </TableCell>
+                                  {selectedWorkspace?.uploadedFolders && selectedWorkspace.uploadedFolders.length > 1 && (
+                                    <TableCell className="py-3 sm:py-4 text-left">
+                                      {candidate.category ? (
+                                        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${
+                                          selectedWorkspace.uploadedFolders.findIndex(f => f.name === candidate.category) % 3 === 0 
+                                            ? 'bg-amber-50 text-amber-700 border border-amber-200' 
+                                            : selectedWorkspace.uploadedFolders.findIndex(f => f.name === candidate.category) % 3 === 1 
+                                            ? 'bg-purple-50 text-purple-700 border border-purple-200' 
+                                            : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                        }`}>
+                                          <FolderOpen className="h-3 w-3" />
+                                          {candidate.category}
+                                        </span>
+                                      ) : (
+                                        <span className="text-slate-400 text-xs">—</span>
+                                      )}
+                                    </TableCell>
+                                  )}
                                   <TableCell className="py-3 sm:py-4 text-left">
                                     <div className="flex items-center gap-2">
                                       <StatusBadge 
@@ -1581,7 +1604,7 @@ const OCREvaluation = () => {
                   setTotalFileSize(newWorkspace.totalSize)
                   
                   // Generate mock candidates
-                  const mockCandidates = generateMockCandidates(newWorkspace.candidateCount)
+                  const mockCandidates = generateMockCandidates(newWorkspace.candidateCount, newWorkspace.uploadedFolders)
                   setCandidates(mockCandidates)
                   
                   setShowCreateWorkspaceDialog(false)
