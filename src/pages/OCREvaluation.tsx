@@ -817,53 +817,59 @@ const OCREvaluation = () => {
                           Back
                         </Button>
                       </div>
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-stretch gap-3 flex-wrap">
                         {/* Subject Dropdown */}
-                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
-                          <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-md">
-                            <BookOpen className="h-3 w-3 text-white" />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1.5 ml-1">Subject</span>
+                          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 transition-colors">
+                            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-lg shadow-sm">
+                              <BookOpen className="h-4 w-4 text-white" />
+                            </div>
+                            <select
+                              value={selectedSubject}
+                              onChange={(e) => setSelectedSubject(e.target.value)}
+                              className="h-8 px-1 pr-6 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[130px]"
+                              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center', backgroundSize: '1rem' }}
+                            >
+                              {subjects.map((subject) => (
+                                <option key={subject.value} value={subject.value}>
+                                  {subject.label}
+                                </option>
+                              ))}
+                            </select>
                           </div>
-                          <select
-                            value={selectedSubject}
-                            onChange={(e) => setSelectedSubject(e.target.value)}
-                            className="h-7 px-1 pr-5 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none"
-                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center', backgroundSize: '0.875rem' }}
-                          >
-                            {subjects.map((subject) => (
-                              <option key={subject.value} value={subject.value}>
-                                {subject.label}
-                              </option>
-                            ))}
-                          </select>
                         </div>
                         
                         {/* Workspace Dropdown */}
-                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 hover:border-teal-300 transition-colors">
-                          <div className="flex items-center justify-center w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-500 rounded-md">
-                            <FolderOpen className="h-3 w-3 text-white" />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1.5 ml-1">Workspace</span>
+                          <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-teal-300 transition-colors">
+                            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-500 rounded-lg shadow-sm">
+                              <FolderOpen className="h-4 w-4 text-white" />
+                            </div>
+                            <select
+                              value={selectedWorkspace.id}
+                              onChange={(e) => {
+                                const workspace = workspaces.find(w => w.id === e.target.value)
+                                if (workspace) {
+                                  setSelectedWorkspace(workspace)
+                                  setFolderName(workspace.name)
+                                  setFileCount(workspace.fileCount)
+                                  setTotalFileSize(workspace.totalSize)
+                                  const mockCandidates = generateMockCandidates(workspace.candidateCount)
+                                  setCandidates(mockCandidates)
+                                }
+                              }}
+                              className="h-8 px-1 pr-6 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[150px]"
+                              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center', backgroundSize: '1rem' }}
+                            >
+                              {workspaces.map((workspace) => (
+                                <option key={workspace.id} value={workspace.id}>
+                                  {workspace.name}
+                                </option>
+                              ))}
+                            </select>
                           </div>
-                          <select
-                            value={selectedWorkspace.id}
-                            onChange={(e) => {
-                              const workspace = workspaces.find(w => w.id === e.target.value)
-                              if (workspace) {
-                                setSelectedWorkspace(workspace)
-                                setFolderName(workspace.name)
-                                setFileCount(workspace.fileCount)
-                                setTotalFileSize(workspace.totalSize)
-                                const mockCandidates = generateMockCandidates(workspace.candidateCount)
-                                setCandidates(mockCandidates)
-                              }
-                            }}
-                            className="h-7 px-1 pr-5 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none"
-                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center', backgroundSize: '0.875rem' }}
-                          >
-                            {workspaces.map((workspace) => (
-                              <option key={workspace.id} value={workspace.id}>
-                                {workspace.name}
-                              </option>
-                            ))}
-                          </select>
                         </div>
                       </div>
                     </div>
