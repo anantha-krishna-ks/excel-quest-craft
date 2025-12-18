@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus, BookOpen } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
@@ -64,6 +65,7 @@ interface CandidateData {
   evaluationData?: EvaluationData
   evaluationMarks?: number
   maxMarks?: number
+  approvalRequired?: boolean
 }
 
 const StatusBadge = ({ 
@@ -286,6 +288,7 @@ const OCREvaluation = () => {
       evaluationData: generateMockEvaluationData(),
       evaluationMarks: Math.floor(Math.random() * 51) + 50,
       maxMarks: 100,
+      approvalRequired: false,
     }))
   }
 
@@ -343,6 +346,7 @@ const OCREvaluation = () => {
             evaluationData: generateMockEvaluationData(),
             evaluationMarks: Math.floor(Math.random() * 51) + 50,
             maxMarks: 100,
+            approvalRequired: false,
           }))
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
             id: `candidate-${index + 1}`,
@@ -359,6 +363,7 @@ const OCREvaluation = () => {
             evaluationData: generateMockEvaluationData(),
             evaluationMarks: Math.floor(Math.random() * 51) + 50,
             maxMarks: 100,
+            approvalRequired: false,
           }))
 
       // Store pending data and show confirmation dialog
@@ -416,6 +421,7 @@ const OCREvaluation = () => {
         evaluationData: generateMockEvaluationData(),
         evaluationMarks: Math.floor(Math.random() * 51) + 50,
         maxMarks: 100,
+        approvalRequired: false,
       }))
 
       // Store pending data and show confirmation dialog
@@ -466,6 +472,7 @@ const OCREvaluation = () => {
         evaluationData: generateMockEvaluationData(),
         evaluationMarks: Math.floor(Math.random() * 51) + 50,
         maxMarks: 100,
+        approvalRequired: false,
       }))
 
       // Store pending data and show confirmation dialog
@@ -657,6 +664,15 @@ const OCREvaluation = () => {
       setOcrReviewCandidate(null)
       setIsEditing(false)
     }
+  }
+
+  const handleToggleApprovalRequired = (candidateId: string, checked: boolean) => {
+    setCandidates(prev => prev.map(c => {
+      if (c.id === candidateId) {
+        return { ...c, approvalRequired: checked }
+      }
+      return c
+    }))
   }
 
   return (
@@ -1197,12 +1213,13 @@ const OCREvaluation = () => {
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap text-left">Segmentation Indexing</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">OCR</TableHead>
                               <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-left">Evaluation</TableHead>
+                              <TableHead className="font-semibold text-slate-700 py-3 sm:py-4 text-xs sm:text-sm text-center whitespace-nowrap">Approval Required</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {filteredCandidates.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-slate-500">
+                                <TableCell colSpan={7} className="text-center py-8 text-slate-500">
                                   No candidates found matching your filters
                                 </TableCell>
                               </TableRow>
@@ -1268,6 +1285,18 @@ const OCREvaluation = () => {
                                         onClick={() => setEvaluationReviewCandidate(candidate)}
                                       />
                                     )}
+                                  </TableCell>
+                                  <TableCell className="py-3 sm:py-4 text-center">
+                                    <div className="flex items-center justify-center gap-2">
+                                      <Switch
+                                        checked={candidate.approvalRequired ?? false}
+                                        onCheckedChange={(checked) => handleToggleApprovalRequired(candidate.id, checked)}
+                                        className="data-[state=checked]:bg-teal-600"
+                                      />
+                                      <span className={`text-xs font-medium ${candidate.approvalRequired ? 'text-teal-700' : 'text-slate-400'}`}>
+                                        {candidate.approvalRequired ? 'Yes' : 'No'}
+                                      </span>
+                                    </div>
                                   </TableCell>
                                 </TableRow>
                               ))
@@ -1594,20 +1623,22 @@ const OCREvaluation = () => {
                   />
                 </div>
               </div>
-              <Button
-                onClick={handleApprove}
-                size="sm"
-                disabled={phase2VisitedQuestions.size < mockQuestionsList.length}
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                title={phase2VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
-              >
-                {phase2VisitedQuestions.size < mockQuestionsList.length ? (
-                  <span className="flex items-center gap-1">
-                    <span className="sm:hidden">{phase2VisitedQuestions.size}/{mockQuestionsList.length}</span>
-                    <span className="hidden sm:inline">Approve</span>
-                  </span>
-                ) : 'Approve'}
-              </Button>
+              {ocrReviewCandidate?.approvalRequired && (
+                <Button
+                  onClick={handleApprove}
+                  size="sm"
+                  disabled={phase2VisitedQuestions.size < mockQuestionsList.length}
+                  className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
+                  title={phase2VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
+                >
+                  {phase2VisitedQuestions.size < mockQuestionsList.length ? (
+                    <span className="flex items-center gap-1">
+                      <span className="sm:hidden">{phase2VisitedQuestions.size}/{mockQuestionsList.length}</span>
+                      <span className="hidden sm:inline">Approve</span>
+                    </span>
+                  ) : 'Approve'}
+                </Button>
+              )}
               <button 
                 onClick={() => { 
                   setOcrReviewCandidate(null); 
@@ -1969,20 +2000,22 @@ const OCREvaluation = () => {
                   />
                 </div>
               </div>
-              <Button
-                onClick={handlePhase1Approve}
-                size="sm"
-                disabled={phase1VisitedQuestions.size < mockQuestionsList.length}
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
-                title={phase1VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
-              >
-                {phase1VisitedQuestions.size < mockQuestionsList.length ? (
-                  <span className="flex items-center gap-1">
-                    <span className="sm:hidden">{phase1VisitedQuestions.size}/{mockQuestionsList.length}</span>
-                    <span className="hidden sm:inline">Approve</span>
-                  </span>
-                ) : 'Approve'}
-              </Button>
+              {phase1ReviewCandidate?.approvalRequired && (
+                <Button
+                  onClick={handlePhase1Approve}
+                  size="sm"
+                  disabled={phase1VisitedQuestions.size < mockQuestionsList.length}
+                  className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:bg-slate-300 disabled:cursor-not-allowed"
+                  title={phase1VisitedQuestions.size < mockQuestionsList.length ? `Visit all ${mockQuestionsList.length} questions to approve` : 'Approve all questions'}
+                >
+                  {phase1VisitedQuestions.size < mockQuestionsList.length ? (
+                    <span className="flex items-center gap-1">
+                      <span className="sm:hidden">{phase1VisitedQuestions.size}/{mockQuestionsList.length}</span>
+                      <span className="hidden sm:inline">Approve</span>
+                    </span>
+                  ) : 'Approve'}
+                </Button>
+              )}
               <button 
                 onClick={() => { setPhase1ReviewCandidate(null); setAnswerSheets([]); setActiveQuestionIndex(0); setPhase1VisitedQuestions(new Set([0])); }}
                 className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
@@ -2392,15 +2425,17 @@ const OCREvaluation = () => {
                   />
                 </div>
               </div>
-              <Button
-                onClick={() => setShowReEvaluationDialog(true)}
-                size="sm"
-                variant="outline"
-                className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-amber-300 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 text-amber-700 font-medium"
-              >
-                <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                <span className="hidden sm:inline">Re-evaluate</span>
-              </Button>
+              {evaluationReviewCandidate?.approvalRequired && (
+                <Button
+                  onClick={() => setShowReEvaluationDialog(true)}
+                  size="sm"
+                  variant="outline"
+                  className="px-2 sm:px-3 md:px-6 h-7 sm:h-8 text-[10px] sm:text-xs md:text-sm border-amber-300 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 text-amber-700 font-medium"
+                >
+                  <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                  <span className="hidden sm:inline">Re-evaluate</span>
+                </Button>
+              )}
               <button 
                 onClick={() => { setEvaluationReviewCandidate(null); setEvalActiveQuestionIndex(0); setPhase3VisitedQuestions(new Set([0])); }}
                 className="p-1 sm:p-1.5 rounded-md hover:bg-slate-100 transition-colors"
