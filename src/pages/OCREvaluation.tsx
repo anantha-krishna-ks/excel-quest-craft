@@ -827,13 +827,13 @@ const OCREvaluation = () => {
                       </div>
                       <div className="flex items-center gap-4 flex-wrap">
                         {/* Subject Dropdown */}
-                        <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-200">
-                          <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Subject:</span>
+                        <div className="flex items-center bg-white rounded-lg border border-slate-200 overflow-hidden">
+                          <span className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-r border-slate-200 uppercase tracking-wide">Subject</span>
                           <select
                             value={selectedSubject}
                             onChange={(e) => setSelectedSubject(e.target.value)}
-                            className="h-8 px-2 pr-7 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[140px]"
-                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center', backgroundSize: '1rem' }}
+                            className="h-10 px-3 pr-8 text-sm font-medium text-slate-800 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[140px]"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center', backgroundSize: '1rem' }}
                           >
                             {subjects.map((subject) => (
                               <option key={subject.value} value={subject.value}>
@@ -844,8 +844,8 @@ const OCREvaluation = () => {
                         </div>
                         
                         {/* Workspace Dropdown */}
-                        <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-slate-200">
-                          <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Workspace:</span>
+                        <div className="flex items-center bg-white rounded-lg border border-slate-200 overflow-hidden">
+                          <span className="px-3 py-2.5 text-xs font-semibold text-slate-500 bg-slate-50 border-r border-slate-200 uppercase tracking-wide">Workspace</span>
                           <select
                             value={selectedWorkspace.id}
                             onChange={(e) => {
@@ -859,8 +859,8 @@ const OCREvaluation = () => {
                                 setCandidates(mockCandidates)
                               }
                             }}
-                            className="h-8 px-2 pr-7 text-sm font-medium text-slate-700 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[160px]"
-                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center', backgroundSize: '1rem' }}
+                            className="h-10 px-3 pr-8 text-sm font-medium text-slate-800 bg-transparent border-0 focus:ring-0 focus:outline-none cursor-pointer appearance-none min-w-[160px]"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center', backgroundSize: '1rem' }}
                           >
                             {workspaces.map((workspace) => (
                               <option key={workspace.id} value={workspace.id}>
