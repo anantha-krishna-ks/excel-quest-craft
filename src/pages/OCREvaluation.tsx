@@ -206,6 +206,11 @@ const OCREvaluation = () => {
   const [addedFilesInfo, setAddedFilesInfo] = useState<{ files: File[]; totalSize: number } | null>(null)
   // Evaluation score editing state
   const [editedEvalScore, setEditedEvalScore] = useState<string>("")
+  // Manual marking state
+  const [manualMarkingEnabled, setManualMarkingEnabled] = useState(false)
+  // Save confirmation dialog state
+  const [showSaveConfirmDialog, setShowSaveConfirmDialog] = useState(false)
+  const [pendingSaveScore, setPendingSaveScore] = useState<number | null>(null)
 
   const subjects = [
     { value: "broadcast-journalism", label: "Broadcast Journalism" },
@@ -2652,7 +2657,16 @@ const OCREvaluation = () => {
                                 <Award className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
                                 <h3 className="text-sm sm:text-base font-semibold text-slate-800">Evaluation Score</h3>
                               </div>
-                              <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="flex items-center gap-3 sm:gap-4">
+                                {/* Manual Marking Toggle */}
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/60 rounded-lg border border-teal-200">
+                                  <span className="text-xs font-medium text-slate-600">Manual Marking</span>
+                                  <Switch
+                                    checked={manualMarkingEnabled}
+                                    onCheckedChange={setManualMarkingEnabled}
+                                    className="data-[state=checked]:bg-teal-600"
+                                  />
+                                </div>
                                 <div className="flex items-baseline gap-1.5 sm:gap-2">
                                   <input
                                     type="text"
@@ -2670,7 +2684,12 @@ const OCREvaluation = () => {
                                         setEditedEvalScore(evalData.evaluationScore.toString());
                                       }
                                     }}
-                                    className="w-16 sm:w-20 md:w-24 text-3xl sm:text-4xl md:text-5xl font-bold text-teal-600 bg-transparent border-b-2 border-teal-300 focus:border-teal-500 focus:outline-none text-center"
+                                    disabled={!manualMarkingEnabled}
+                                    className={`w-16 sm:w-20 md:w-24 text-3xl sm:text-4xl md:text-5xl font-bold bg-transparent border-b-2 focus:outline-none text-center ${
+                                      manualMarkingEnabled 
+                                        ? 'text-teal-600 border-teal-300 focus:border-teal-500 cursor-text' 
+                                        : 'text-slate-400 border-slate-200 cursor-not-allowed'
+                                    }`}
                                   />
                                   <span className="text-lg sm:text-xl text-slate-400">/</span>
                                   <span className="text-xl sm:text-2xl font-medium text-slate-500">{activeQuestion?.maxScore}</span>
@@ -2682,33 +2701,14 @@ const OCREvaluation = () => {
                                     const maxScore = activeQuestion?.maxScore || 10;
                                     if (!isNaN(value) && value >= 0 && value <= maxScore) {
                                       const roundedValue = Math.round(value * 10) / 10;
-                                      // Update evaluationReviewCandidate state
-                                      setEvaluationReviewCandidate(prev => {
-                                        if (!prev || !prev.evaluationData) return prev;
-                                        return { 
-                                          ...prev, 
-                                          evaluationData: { ...prev.evaluationData, evaluationScore: roundedValue }
-                                        };
-                                      });
-                                      // Also update main candidates state to persist the score
-                                      setCandidates(prev => prev.map(c => {
-                                        if (c.id === evaluationReviewCandidate?.id && c.evaluationData) {
-                                          return { 
-                                            ...c, 
-                                            evaluationData: { ...c.evaluationData, evaluationScore: roundedValue },
-                                            evaluationMarks: roundedValue
-                                          };
-                                        }
-                                        return c;
-                                      }));
-                                      setEditedEvalScore("");
-                                      toast.success(`Evaluation score updated to ${roundedValue}`);
+                                      setPendingSaveScore(roundedValue);
+                                      setShowSaveConfirmDialog(true);
                                     } else {
                                       toast.error(`Please enter a value between 0 and ${maxScore}`);
                                     }
                                   }}
-                                  disabled={!editedEvalScore}
-                                  className="bg-teal-600 hover:bg-teal-700 text-white"
+                                  disabled={!editedEvalScore || !manualMarkingEnabled}
+                                  className="bg-teal-600 hover:bg-teal-700 text-white disabled:opacity-50"
                                 >
                                   <Save className="w-4 h-4 mr-1" />
                                   Save
@@ -2716,6 +2716,65 @@ const OCREvaluation = () => {
                               </div>
                             </div>
                           </div>
+
+                          {/* Save Confirmation Dialog */}
+                          <Dialog open={showSaveConfirmDialog} onOpenChange={setShowSaveConfirmDialog}>
+                            <DialogContent className="max-w-md">
+                              <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                  <Award className="w-5 h-5 text-teal-600" />
+                                  Confirm Score Update
+                                </DialogTitle>
+                                <DialogDescription>
+                                  Are you sure you want to update the evaluation score to <span className="font-semibold text-teal-600">{pendingSaveScore}</span> out of <span className="font-semibold">{activeQuestion?.maxScore}</span>?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter className="gap-2 sm:gap-0">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    setShowSaveConfirmDialog(false);
+                                    setPendingSaveScore(null);
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    if (pendingSaveScore !== null) {
+                                      // Update evaluationReviewCandidate state
+                                      setEvaluationReviewCandidate(prev => {
+                                        if (!prev || !prev.evaluationData) return prev;
+                                        return { 
+                                          ...prev, 
+                                          evaluationData: { ...prev.evaluationData, evaluationScore: pendingSaveScore }
+                                        };
+                                      });
+                                      // Also update main candidates state to persist the score
+                                      setCandidates(prev => prev.map(c => {
+                                        if (c.id === evaluationReviewCandidate?.id && c.evaluationData) {
+                                          return { 
+                                            ...c, 
+                                            evaluationData: { ...c.evaluationData, evaluationScore: pendingSaveScore },
+                                            evaluationMarks: pendingSaveScore
+                                          };
+                                        }
+                                        return c;
+                                      }));
+                                      setEditedEvalScore("");
+                                      setManualMarkingEnabled(false);
+                                      toast.success(`Evaluation score updated to ${pendingSaveScore}`);
+                                    }
+                                    setShowSaveConfirmDialog(false);
+                                    setPendingSaveScore(null);
+                                  }}
+                                  className="bg-teal-600 hover:bg-teal-700 text-white"
+                                >
+                                  Confirm
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
 
                           {/* Main Content - Single Column */}
                           <div className="space-y-4 sm:space-y-5">
