@@ -1039,7 +1039,7 @@ const OCREvaluation = () => {
                           className="border-dashed border-teal-300 text-teal-600 hover:bg-teal-50 hover:border-teal-400"
                         >
                           <Plus className="w-4 h-4 mr-1.5" />
-                          Add Missing Files
+                          Add Additional Files
                         </Button>
                       </div>
                     </div>
