@@ -2851,63 +2851,63 @@ const OCREvaluation = () => {
 
       {/* Added Files Success Dialog */}
       <Dialog open={showAddedFilesDialog} onOpenChange={setShowAddedFilesDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md mx-auto">
           <DialogHeader className="pb-4">
-            <div className="mx-auto w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mb-3">
-              <CheckCircle className="w-7 h-7 text-white" />
+            <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mb-3">
+              <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
-            <DialogTitle className="text-center text-xl">Files Added Successfully</DialogTitle>
-            <DialogDescription className="text-center text-slate-500">
+            <DialogTitle className="text-center text-lg sm:text-xl">Files Added Successfully</DialogTitle>
+            <DialogDescription className="text-center text-slate-500 text-sm">
               Your files have been added to the workspace
             </DialogDescription>
           </DialogHeader>
           
           {addedFilesInfo && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {/* Summary Stats */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-blue-600" />
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-slate-50 rounded-lg sm:rounded-xl">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Files Added</p>
-                    <p className="text-lg font-semibold text-slate-800">{addedFilesInfo.files.length}</p>
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-xs text-slate-500">Files Added</p>
+                    <p className="text-base sm:text-lg font-semibold text-slate-800">{addedFilesInfo.files.length}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <HardDrive className="w-5 h-5 text-purple-600" />
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-slate-50 rounded-lg sm:rounded-xl">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <HardDrive className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                   </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Total Size</p>
-                    <p className="text-lg font-semibold text-slate-800">{formatFileSize(addedFilesInfo.totalSize)}</p>
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-xs text-slate-500">Total Size</p>
+                    <p className="text-base sm:text-lg font-semibold text-slate-800 truncate">{formatFileSize(addedFilesInfo.totalSize)}</p>
                   </div>
                 </div>
               </div>
 
               {/* File List */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <div className="border border-slate-200 rounded-lg sm:rounded-xl overflow-hidden">
                 <div className="px-3 py-2 bg-slate-50 border-b border-slate-200">
-                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Added Files</span>
+                  <span className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Added Files</span>
                 </div>
-                <ScrollArea className="max-h-[180px]">
+                <ScrollArea className="max-h-[140px] sm:max-h-[180px]">
                   <div className="divide-y divide-slate-100">
                     {addedFilesInfo.files.map((file, index) => (
-                      <div key={index} className="flex items-center justify-between px-3 py-2.5">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      <div key={index} className="flex items-center justify-between px-2 sm:px-3 py-2 sm:py-2.5 gap-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                             file.name.endsWith('.pdf') ? 'bg-red-100' : 'bg-amber-100'
                           }`}>
                             {file.name.endsWith('.pdf') ? (
-                              <FileText className={`w-4 h-4 ${file.name.endsWith('.pdf') ? 'text-red-600' : 'text-amber-600'}`} />
+                              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
                             ) : (
-                              <Layers className="w-4 h-4 text-amber-600" />
+                              <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
                             )}
                           </div>
-                          <span className="text-sm text-slate-700 truncate">{file.name}</span>
+                          <span className="text-xs sm:text-sm text-slate-700 truncate">{file.name}</span>
                         </div>
-                        <span className="text-xs text-slate-400 ml-2 flex-shrink-0">{formatFileSize(file.size)}</span>
+                        <span className="text-[10px] sm:text-xs text-slate-400 flex-shrink-0">{formatFileSize(file.size)}</span>
                       </div>
                     ))}
                   </div>
@@ -2916,13 +2916,13 @@ const OCREvaluation = () => {
 
               {/* Workspace Info */}
               {selectedWorkspace && (
-                <div className="flex items-center justify-between p-3 bg-teal-50 rounded-xl border border-teal-100">
-                  <div className="flex items-center gap-2">
-                    <FolderOpen className="w-4 h-4 text-teal-600" />
-                    <span className="text-sm font-medium text-teal-700">{selectedWorkspace.name}</span>
+                <div className="flex items-center justify-between p-2 sm:p-3 bg-teal-50 rounded-lg sm:rounded-xl border border-teal-100 gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FolderOpen className="w-4 h-4 text-teal-600 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm font-medium text-teal-700 truncate">{selectedWorkspace.name}</span>
                   </div>
-                  <span className="text-xs text-teal-600">
-                    {selectedWorkspace.fileCount} total files
+                  <span className="text-[10px] sm:text-xs text-teal-600 flex-shrink-0">
+                    {selectedWorkspace.fileCount} files
                   </span>
                 </div>
               )}
