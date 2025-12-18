@@ -348,6 +348,7 @@ const OCREvaluation = () => {
         maxMarks: 100,
         standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
         category: folders && folders.length > 1 ? folders[index % folders.length]?.name : undefined,
+        quickApprove: statuses.quickApprove,
       }
     })
   }
@@ -409,6 +410,7 @@ const OCREvaluation = () => {
               evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
               maxMarks: 100,
               standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+              quickApprove: statuses.quickApprove,
             }
           })
         : Array.from({ length: Math.min(files.length, 125) }, (_, index) => {
@@ -429,6 +431,7 @@ const OCREvaluation = () => {
               evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
               maxMarks: 100,
               standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+              quickApprove: statuses.quickApprove,
             }
           })
 
@@ -490,6 +493,7 @@ const OCREvaluation = () => {
           evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
           maxMarks: 100,
           standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+          quickApprove: statuses.quickApprove,
         }
       })
 
@@ -544,6 +548,7 @@ const OCREvaluation = () => {
           evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
           maxMarks: 100,
           standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+          quickApprove: statuses.quickApprove,
         }
       })
 
@@ -579,39 +584,39 @@ const OCREvaluation = () => {
   }
 
   // Generate consistent phase statuses - phases must progress sequentially
-  const generateConsistentStatuses = (): { phase1: PhaseStatus; phase2: PhaseStatus; phase3: PhaseStatus; hasEvaluationMarks: boolean } => {
+  const generateConsistentStatuses = (): { phase1: PhaseStatus; phase2: PhaseStatus; phase3: PhaseStatus; hasEvaluationMarks: boolean; quickApprove: boolean } => {
     const random = Math.random()
     
     // 15% - All phases not started
     if (random < 0.15) {
-      return { phase1: "yet-to-segmentation", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+      return { phase1: "yet-to-segmentation", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false, quickApprove: false }
     }
     // 15% - Phase 1 in progress
     if (random < 0.30) {
-      return { phase1: "in-progress", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+      return { phase1: "in-progress", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false, quickApprove: false }
     }
     // 15% - Phase 1 completed, Phase 2 not started
     if (random < 0.45) {
-      return { phase1: "completed", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+      return { phase1: "completed", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false, quickApprove: false }
     }
     // 10% - Phase 1 completed, Phase 2 in progress
     if (random < 0.55) {
-      return { phase1: "completed", phase2: "in-progress", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+      return { phase1: "completed", phase2: "in-progress", phase3: "yet-to-evaluation", hasEvaluationMarks: false, quickApprove: false }
     }
     // 15% - Phase 1 & 2 completed, Phase 3 not started
     if (random < 0.70) {
-      return { phase1: "completed", phase2: "completed", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+      return { phase1: "completed", phase2: "completed", phase3: "yet-to-evaluation", hasEvaluationMarks: false, quickApprove: false }
     }
     // 10% - Phase 1 & 2 completed, Phase 3 in progress
     if (random < 0.80) {
-      return { phase1: "completed", phase2: "completed", phase3: "in-progress", hasEvaluationMarks: false }
+      return { phase1: "completed", phase2: "completed", phase3: "in-progress", hasEvaluationMarks: false, quickApprove: false }
     }
     // 10% - All phases completed with evaluation marks
     if (random < 0.90) {
-      return { phase1: "completed", phase2: "completed", phase3: "completed", hasEvaluationMarks: true }
+      return { phase1: "completed", phase2: "completed", phase3: "completed", hasEvaluationMarks: true, quickApprove: false }
     }
-    // 10% - All phases approved with evaluation marks
-    return { phase1: "approved", phase2: "approved", phase3: "approved", hasEvaluationMarks: true }
+    // 10% - All phases approved with evaluation marks - auto-enable quickApprove
+    return { phase1: "approved", phase2: "approved", phase3: "approved", hasEvaluationMarks: true, quickApprove: true }
   }
 
   // Helper to check if Quick Approve can be enabled - only when both phases are approved
