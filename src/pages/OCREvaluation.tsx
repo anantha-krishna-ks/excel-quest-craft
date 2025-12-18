@@ -38,6 +38,16 @@ interface EvaluationData {
 
 type PhaseStatus = "yet-to-segmentation" | "yet-to-ocr" | "yet-to-evaluation" | "in-progress" | "completed" | "pending" | "approved"
 
+interface Workspace {
+  id: string
+  name: string
+  createdAt: string
+  fileCount: number
+  totalSize: number
+  candidateCount: number
+  status: "active" | "completed" | "archived"
+}
+
 interface CandidateData {
   id: string
   candidateName: string
@@ -126,6 +136,18 @@ const StatusBadge = ({
 }
 
 const OCREvaluation = () => {
+  // Workspace states
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([
+    { id: "ws-1", name: "Broadcast Journalism - Batch 1", createdAt: "2024-01-15", fileCount: 45, totalSize: 125000000, candidateCount: 45, status: "active" },
+    { id: "ws-2", name: "Print Journalism - Midterm", createdAt: "2024-01-10", fileCount: 32, totalSize: 89000000, candidateCount: 32, status: "completed" },
+    { id: "ws-3", name: "Digital Media - Final Exam", createdAt: "2024-01-05", fileCount: 28, totalSize: 76000000, candidateCount: 28, status: "archived" },
+  ])
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(null)
+  const [showCreateWorkspaceDialog, setShowCreateWorkspaceDialog] = useState(false)
+  const [newWorkspaceName, setNewWorkspaceName] = useState("")
+  const [newWorkspaceFiles, setNewWorkspaceFiles] = useState<File[]>([])
+  const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false)
+
   const [isFolderUploading, setIsFolderUploading] = useState(false)
   const [isZipUploading, setIsZipUploading] = useState(false)
   const [isPdfUploading, setIsPdfUploading] = useState(false)
@@ -233,6 +255,35 @@ const OCREvaluation = () => {
       { pageNumber: 2, imageUrl: ocrAnswerSheet2 },
       { pageNumber: 3, imageUrl: ocrAnswerSheet3 },
     ]
+  }
+
+  // Generate mock candidates for a workspace
+  const generateMockCandidates = (count: number): CandidateData[] => {
+    const centres = ["Delhi Centre", "Mumbai Centre", "Bangalore Centre", "Chennai Centre", "Kolkata Centre"]
+    const addresses = [
+      "123, Connaught Place, New Delhi - 110001",
+      "456, Bandra West, Mumbai - 400050",
+      "789, MG Road, Bangalore - 560001",
+      "321, Anna Nagar, Chennai - 600040",
+      "654, Park Street, Kolkata - 700016"
+    ]
+    
+    return Array.from({ length: Math.min(count, 125) }, (_, index) => ({
+      id: `candidate-${index + 1}`,
+      candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
+      registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+      centreName: centres[index % centres.length],
+      centreAddress: addresses[index % addresses.length],
+      phase1: getRandomStatus(1),
+      phase2: getRandomStatus(2),
+      phase3: getRandomStatus(3),
+      segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+      ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+      segmentImages: generateMockSegmentImages(),
+      evaluationData: generateMockEvaluationData(),
+      evaluationMarks: Math.floor(Math.random() * 51) + 50,
+      maxMarks: 100,
+    }))
   }
 
   // Mock segment images (handwritten answer segments)
@@ -647,206 +698,131 @@ const OCREvaluation = () => {
       {/* Main Content */}
       <main className="p-4 sm:p-6">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
-          {/* Subject Selection */}
-          <Card className="border border-slate-200 bg-white">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 sm:p-2 bg-teal-100 text-teal-700 rounded-lg shrink-0">
-                    <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </div>
-                  <label className="text-sm sm:text-base font-medium text-slate-700">Select Subject</label>
-                </div>
-                <select
-                  value={selectedSubject}
-                  onChange={(e) => setSelectedSubject(e.target.value)}
-                  className="h-10 px-3 py-2 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[200px]"
-                >
-                  {subjects.map((subject) => (
-                    <option key={subject.value} value={subject.value}>
-                      {subject.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Upload Section */}
-          <Card className="border-2 border-teal-100 bg-teal-50">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center gap-2 sm:gap-3 mb-4">
-                <div className="p-1.5 sm:p-2 bg-teal-600 text-white rounded-lg shrink-0">
-                  <FolderOpen className="h-4 w-4 sm:h-5 sm:w-5" />
-                </div>
-                <h2 className="text-lg sm:text-2xl font-semibold text-teal-800">Upload Assessment Folder</h2>
-              </div>
-
-              {!hasUploaded ? (
-                <div className="space-y-4">
-                  <p className="text-xs sm:text-sm text-gray-600">
-                    Upload assessment files (supports ZIP files, individual PDFs, or a Folder)
-                  </p>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {/* Folder Upload */}
-                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
-                      <input
-                        type="file"
-                        id="folder-upload"
-                        // @ts-ignore - webkitdirectory is a valid attribute
-                        webkitdirectory=""
-                        multiple
-                        onChange={handleFolderUpload}
-                        className="hidden"
-                        disabled={isFolderUploading}
-                      />
-                      <label
-                        htmlFor="folder-upload"
-                        className="flex flex-col items-center cursor-pointer"
-                      >
-                        {isFolderUploading ? (
-                          <>
-                            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
-                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
-                          </>
-                        ) : (
-                          <>
-                            <FolderOpen className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2" />
-                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Upload Folder</span>
-                            <span className="text-xs text-gray-500 mt-1 text-center">Select folder</span>
-                          </>
-                        )}
-                      </label>
-                    </div>
-                    
-                    {/* ZIP Upload */}
-                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
-                      <input
-                        type="file"
-                        id="zip-upload"
-                        accept=".zip"
-                        onChange={handleZipUpload}
-                        className="hidden"
-                        disabled={isZipUploading}
-                      />
-                      <label
-                        htmlFor="zip-upload"
-                        className="flex flex-col items-center cursor-pointer"
-                      >
-                        {isZipUploading ? (
-                          <>
-                            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
-                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2" />
-                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Upload ZIP</span>
-                            <span className="text-xs text-gray-500 mt-1 text-center">.zip files</span>
-                          </>
-                        )}
-                      </label>
-                    </div>
-                    
-                    {/* PDF Upload */}
-                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 border-2 border-dashed border-teal-300 rounded-lg bg-white/50">
-                      <input
-                        type="file"
-                        id="pdf-upload"
-                        accept=".pdf"
-                        multiple
-                        onChange={handlePdfUpload}
-                        className="hidden"
-                        disabled={isPdfUploading}
-                      />
-                      <label
-                        htmlFor="pdf-upload"
-                        className="flex flex-col items-center cursor-pointer"
-                      >
-                        {isPdfUploading ? (
-                          <>
-                            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2 animate-spin" />
-                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Processing...</span>
-                          </>
-                        ) : (
-                          <>
-                            <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-teal-600 mb-2" />
-                            <span className="text-xs sm:text-sm font-medium text-teal-700 text-center">Upload PDFs</span>
-                            <span className="text-xs text-gray-500 mt-1 text-center">Multiple PDFs</span>
-                          </>
-                        )}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/70 rounded-lg p-3 sm:p-4 border border-teal-200">
+          {!selectedWorkspace ? (
+            <>
+              {/* Workspace List Section */}
+              <Card className="border border-slate-200 bg-white">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="p-1.5 sm:p-2 bg-teal-100 rounded-lg shrink-0">
-                        <FolderOpen className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
+                      <div className="p-2 bg-teal-100 text-teal-700 rounded-lg">
+                        <Layers className="h-5 w-5" />
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{folderName}</p>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-                          {/* <span>{candidates.length} papers</span> */}
-                          {/* <span className="text-gray-300">•</span> */}
-                          <span>{fileCount} files</span>
-                          <span className="text-gray-300">•</span>
-                          <span className="font-medium text-teal-600">{formatFileSize(totalFileSize)}</span>
+                      <div>
+                        <h2 className="text-lg font-semibold text-slate-800">Workspaces</h2>
+                        <p className="text-sm text-slate-500">Select or create a workspace to start evaluation</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => setShowCreateWorkspaceDialog(true)}
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                    >
+                      <FolderOpen className="w-4 h-4 mr-2" />
+                      Create New Workspace
+                    </Button>
+                  </div>
+
+                  {/* Workspace Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {workspaces.map((workspace) => (
+                      <div
+                        key={workspace.id}
+                        onClick={() => {
+                          setSelectedWorkspace(workspace)
+                          setHasUploaded(true)
+                          setFolderName(workspace.name)
+                          setFileCount(workspace.fileCount)
+                          setTotalFileSize(workspace.totalSize)
+                          // Generate mock candidates for the workspace
+                          const mockCandidates = generateMockCandidates(workspace.candidateCount)
+                          setCandidates(mockCandidates)
+                        }}
+                        className="p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-teal-400 hover:bg-teal-50/50 transition-all group"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="p-2 bg-teal-100 text-teal-600 rounded-lg group-hover:bg-teal-200">
+                            <FolderOpen className="h-5 w-5" />
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            workspace.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
+                            workspace.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                            'bg-slate-100 text-slate-600'
+                          }`}>
+                            {workspace.status.charAt(0).toUpperCase() + workspace.status.slice(1)}
+                          </span>
+                        </div>
+                        <h3 className="font-medium text-slate-800 mb-1 truncate">{workspace.name}</h3>
+                        <p className="text-xs text-slate-500 mb-3">Created: {workspace.createdAt}</p>
+                        <div className="flex items-center gap-3 text-xs text-slate-600">
+                          <span className="flex items-center gap-1">
+                            <FileText className="h-3.5 w-3.5" />
+                            {workspace.fileCount} files
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="h-3.5 w-3.5" />
+                            {workspace.candidateCount} candidates
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {workspaces.length === 0 && (
+                    <div className="text-center py-12">
+                      <FolderOpen className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                      <p className="text-slate-500">No workspaces yet. Create one to get started.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            <>
+              {/* Workspace Header - Show when workspace is selected */}
+              <Card className="border border-slate-200 bg-white">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedWorkspace(null)
+                          setHasUploaded(false)
+                          setCandidates([])
+                        }}
+                        className="text-slate-600"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-1" />
+                        Back
+                      </Button>
+                      <div className="h-6 w-px bg-slate-200" />
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-teal-100 text-teal-700 rounded-lg">
+                          <FolderOpen className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <h2 className="text-base font-semibold text-slate-800">{selectedWorkspace.name}</h2>
+                          <p className="text-xs text-slate-500">{selectedWorkspace.fileCount} files • {selectedWorkspace.candidateCount} candidates</p>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {/* Upload Missing PDFs */}
-                      <input
-                        type="file"
-                        id="missing-pdf-upload"
-                        accept=".pdf"
-                        multiple
-                        onChange={(e) => {
-                          const files = e.target.files
-                          if (files && files.length > 0) {
-                            const newSize = Array.from(files).reduce((acc, file) => acc + file.size, 0)
-                            setFileCount(prev => prev + files.length)
-                            setTotalFileSize(prev => prev + newSize)
-                            toast.success(`Added ${files.length} missing PDF(s) successfully!`)
-                          }
-                          e.target.value = ''
-                        }}
-                        className="hidden"
-                      />
-                      <label htmlFor="missing-pdf-upload">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800 shrink-0 cursor-pointer"
-                          asChild
-                        >
-                          <span>
-                            <Upload className="w-4 h-4 sm:mr-2" />
-                            <span className="hidden sm:inline">Upload Missing PDFs</span>
-                            <span className="sm:hidden">Add PDFs</span>
-                          </span>
-                        </Button>
-                      </label>
-                      <Button
-                        onClick={() => setShowReuploadConfirm(true)}
-                        variant="outline"
-                        size="sm"
-                        className="border-teal-300 text-teal-700 hover:bg-teal-50 hover:text-teal-800 shrink-0"
+                      <select
+                        value={selectedSubject}
+                        onChange={(e) => setSelectedSubject(e.target.value)}
+                        className="h-9 px-3 py-1.5 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none"
                       >
-                        {/* <RotateCcw className="w-4 h-4 sm:mr-2" /> */}
-                        <span className="hidden sm:inline">Cancle Upload</span>
-                        {/* <span className="sm:hidden"></span> */}
-                      </Button>
+                        {subjects.map((subject) => (
+                          <option key={subject.value} value={subject.value}>
+                            {subject.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
           {/* Status Count Widgets */}
           {hasUploaded && candidates.length > 0 && (
@@ -1184,8 +1160,201 @@ const OCREvaluation = () => {
               </CardContent>
             </Card>
           )}
+            </>
+          )}
         </div>
       </main>
+
+      {/* Create Workspace Dialog */}
+      <Dialog open={showCreateWorkspaceDialog} onOpenChange={setShowCreateWorkspaceDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-slate-800">
+              <FolderOpen className="w-5 h-5 text-teal-600" />
+              Create New Workspace
+            </DialogTitle>
+            <DialogDescription className="text-slate-500">
+              Enter a workspace name and upload assessment files to get started.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-5">
+            {/* Workspace Name */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Workspace Name <span className="text-red-500">*</span>
+              </label>
+              <Input
+                value={newWorkspaceName}
+                onChange={(e) => setNewWorkspaceName(e.target.value)}
+                placeholder="e.g., Broadcast Journalism - Batch 1"
+                className="h-10"
+              />
+            </div>
+
+            {/* File Upload */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Upload Files <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {/* Folder Upload */}
+                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
+                  <input
+                    type="file"
+                    id="workspace-folder-upload"
+                    // @ts-ignore
+                    webkitdirectory=""
+                    multiple
+                    onChange={(e) => {
+                      const files = e.target.files
+                      if (files && files.length > 0) {
+                        setNewWorkspaceFiles(Array.from(files))
+                        toast.success(`${files.length} files selected`)
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <label htmlFor="workspace-folder-upload" className="flex flex-col items-center cursor-pointer">
+                    <FolderOpen className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-xs font-medium text-slate-600">Folder</span>
+                  </label>
+                </div>
+
+                {/* ZIP Upload */}
+                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
+                  <input
+                    type="file"
+                    id="workspace-zip-upload"
+                    accept=".zip"
+                    onChange={(e) => {
+                      const files = e.target.files
+                      if (files && files.length > 0) {
+                        setNewWorkspaceFiles(Array.from(files))
+                        toast.success(`ZIP file selected`)
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <label htmlFor="workspace-zip-upload" className="flex flex-col items-center cursor-pointer">
+                    <Upload className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-xs font-medium text-slate-600">ZIP</span>
+                  </label>
+                </div>
+
+                {/* PDF Upload */}
+                <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-lg hover:border-teal-400 hover:bg-teal-50/30 transition-colors">
+                  <input
+                    type="file"
+                    id="workspace-pdf-upload"
+                    accept=".pdf"
+                    multiple
+                    onChange={(e) => {
+                      const files = e.target.files
+                      if (files && files.length > 0) {
+                        setNewWorkspaceFiles(Array.from(files))
+                        toast.success(`${files.length} PDF(s) selected`)
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <label htmlFor="workspace-pdf-upload" className="flex flex-col items-center cursor-pointer">
+                    <FileText className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-xs font-medium text-slate-600">PDFs</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Selected Files Info */}
+              {newWorkspaceFiles.length > 0 && (
+                <div className="flex items-center justify-between p-3 bg-teal-50 rounded-lg border border-teal-200">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-teal-600" />
+                    <span className="text-sm text-teal-700">{newWorkspaceFiles.length} file(s) selected</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setNewWorkspaceFiles([])}
+                    className="text-slate-500 hover:text-slate-700 h-7 px-2"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCreateWorkspaceDialog(false)
+                setNewWorkspaceName("")
+                setNewWorkspaceFiles([])
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!newWorkspaceName.trim()) {
+                  toast.error("Please enter a workspace name")
+                  return
+                }
+                if (newWorkspaceFiles.length === 0) {
+                  toast.error("Please upload files")
+                  return
+                }
+                
+                setIsCreatingWorkspace(true)
+                
+                // Simulate workspace creation
+                setTimeout(() => {
+                  const newWorkspace: Workspace = {
+                    id: `ws-${Date.now()}`,
+                    name: newWorkspaceName,
+                    createdAt: new Date().toISOString().split('T')[0],
+                    fileCount: newWorkspaceFiles.length,
+                    totalSize: newWorkspaceFiles.reduce((acc, f) => acc + f.size, 0),
+                    candidateCount: newWorkspaceFiles.length,
+                    status: "active"
+                  }
+                  
+                  setWorkspaces(prev => [newWorkspace, ...prev])
+                  setSelectedWorkspace(newWorkspace)
+                  setHasUploaded(true)
+                  setFolderName(newWorkspace.name)
+                  setFileCount(newWorkspace.fileCount)
+                  setTotalFileSize(newWorkspace.totalSize)
+                  
+                  // Generate mock candidates
+                  const mockCandidates = generateMockCandidates(newWorkspace.candidateCount)
+                  setCandidates(mockCandidates)
+                  
+                  setShowCreateWorkspaceDialog(false)
+                  setNewWorkspaceName("")
+                  setNewWorkspaceFiles([])
+                  setIsCreatingWorkspace(false)
+                  
+                  toast.success(`Workspace "${newWorkspace.name}" created successfully!`)
+                }, 1000)
+              }}
+              disabled={!newWorkspaceName.trim() || newWorkspaceFiles.length === 0 || isCreatingWorkspace}
+              className="bg-teal-600 hover:bg-teal-700 text-white"
+            >
+              {isCreatingWorkspace ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Workspace"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Preview Dialog */}
       <Dialog open={!!previewCandidate} onOpenChange={() => setPreviewCandidate(null)}>
