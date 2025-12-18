@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus, BookOpen, Save } from "lucide-react"
+import { ArrowLeft, ScanLine, Sparkles, Upload, FolderOpen, RotateCcw, Eye, CheckCircle, Check, Clock, AlertCircle, Loader2, User, Users, FileText, Building, MapPin, X, Edit2, ChevronLeft, ChevronRight, Image, Award, Target, ListChecks, AlertTriangle, MessageSquare, ZoomIn, ZoomOut, Maximize2, Search, Filter, Layers, Download, ChevronDown, HardDrive, Plus, BookOpen, Save, Info } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -2651,15 +2651,25 @@ const OCREvaluation = () => {
                                     const maxScore = activeQuestion?.maxScore || 10;
                                     if (!isNaN(value) && value >= 0 && value <= maxScore) {
                                       const roundedValue = Math.round(value * 10) / 10;
+                                      // Update evaluationReviewCandidate state
                                       setEvaluationReviewCandidate(prev => {
-                                        if (!prev) return prev;
-                                        const updatedData = { ...prev.evaluationData };
-                                        const questionKey = `q${activeQuestion?.id || 1}`;
-                                        if (updatedData[questionKey]) {
-                                          updatedData[questionKey] = { ...updatedData[questionKey], evaluationScore: roundedValue };
-                                        }
-                                        return { ...prev, evaluationData: updatedData };
+                                        if (!prev || !prev.evaluationData) return prev;
+                                        return { 
+                                          ...prev, 
+                                          evaluationData: { ...prev.evaluationData, evaluationScore: roundedValue }
+                                        };
                                       });
+                                      // Also update main candidates state to persist the score
+                                      setCandidates(prev => prev.map(c => {
+                                        if (c.id === evaluationReviewCandidate?.id && c.evaluationData) {
+                                          return { 
+                                            ...c, 
+                                            evaluationData: { ...c.evaluationData, evaluationScore: roundedValue },
+                                            evaluationMarks: roundedValue
+                                          };
+                                        }
+                                        return c;
+                                      }));
                                       setEditedEvalScore("");
                                       toast.success(`Evaluation score updated to ${roundedValue}`);
                                     } else {
@@ -2673,6 +2683,46 @@ const OCREvaluation = () => {
                                   Save
                                 </Button>
                               </div>
+                              {/* Info Button */}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-700">
+                                    <Info className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-72 p-3">
+                                  <div className="space-y-3">
+                                    <h4 className="font-semibold text-sm text-slate-800">Evaluation Details</h4>
+                                    <div className="space-y-2 text-xs">
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">Model Used:</span>
+                                        <span className="font-medium text-slate-700">GPT-4 Turbo</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">Confidence:</span>
+                                        <span className="font-medium text-emerald-600">92.4%</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">Processing Time:</span>
+                                        <span className="font-medium text-slate-700">1.8s</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">Rubric Match:</span>
+                                        <span className="font-medium text-slate-700">High</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">Last Updated:</span>
+                                        <span className="font-medium text-slate-700">{new Date().toLocaleDateString()}</span>
+                                      </div>
+                                    </div>
+                                    <div className="pt-2 border-t border-slate-100">
+                                      <p className="text-xs text-slate-500">
+                                        Evaluation performed using AI-assisted rubric matching with manual review capability.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
 
