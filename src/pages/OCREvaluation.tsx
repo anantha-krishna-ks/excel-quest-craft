@@ -713,13 +713,26 @@ const OCREvaluation = () => {
                         <p className="text-sm text-slate-500">Select or create a workspace to start evaluation</p>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => setShowCreateWorkspaceDialog(true)}
-                      className="bg-teal-600 hover:bg-teal-700 text-white"
-                    >
-                      <FolderOpen className="w-4 h-4 mr-2" />
-                      Create New Workspace
-                    </Button>
+                    <div className="flex items-center gap-3">
+                      <select
+                        value={selectedSubject}
+                        onChange={(e) => setSelectedSubject(e.target.value)}
+                        className="h-10 px-3 py-2 text-sm border border-slate-200 rounded-md bg-white focus:border-teal-400 focus:ring-1 focus:ring-teal-200 focus:outline-none min-w-[180px]"
+                      >
+                        {subjects.map((subject) => (
+                          <option key={subject.value} value={subject.value}>
+                            {subject.label}
+                          </option>
+                        ))}
+                      </select>
+                      <Button
+                        onClick={() => setShowCreateWorkspaceDialog(true)}
+                        className="bg-teal-600 hover:bg-teal-700 text-white"
+                      >
+                        <FolderOpen className="w-4 h-4 mr-2" />
+                        Create New Workspace
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Workspace Grid */}
