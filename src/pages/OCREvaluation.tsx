@@ -1373,18 +1373,8 @@ const OCREvaluation = () => {
                     onChange={(e) => {
                       const files = e.target.files
                       if (files && files.length > 0) {
-                        setNewWorkspaceFiles(prev => {
-                          const newFiles = Array.from(files)
-                          if (prev.length > 0) {
-                            // Append to existing files
-                            toast.success(`${newFiles.length} file(s) added`)
-                            return [...prev, ...newFiles]
-                          }
-                          toast.success(`${newFiles.length} file(s) selected`)
-                          return newFiles
-                        })
-                        // Reset input value to allow re-selecting same file
-                        e.target.value = ''
+                        setNewWorkspaceFiles(Array.from(files))
+                        toast.success(`${files.length} file(s) selected`)
                       }
                     }}
                     className="hidden"
@@ -1417,19 +1407,18 @@ const OCREvaluation = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-teal-50 rounded-xl border border-teal-200 overflow-hidden">
-                  {/* Header summary */}
-                  <div className="flex items-center justify-between p-3 bg-teal-100/50 border-b border-teal-200">
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-teal-600">
-                        <CheckCircle className="w-4 h-4 text-white" />
+                <div className="p-4 bg-teal-50 rounded-xl border border-teal-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-teal-100">
+                        <CheckCircle className="w-5 h-5 text-teal-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-teal-800">
-                          {newWorkspaceFiles.length} file{newWorkspaceFiles.length > 1 ? 's' : ''} selected
+                        <p className="text-sm font-medium text-teal-800">
+                          {newWorkspaceFiles.length} file(s) selected
                         </p>
                         <p className="text-xs text-teal-600">
-                          {formatFileSize(newWorkspaceFiles.reduce((acc, f) => acc + f.size, 0))} total
+                          {(newWorkspaceFiles.reduce((acc, f) => acc + f.size, 0) / (1024 * 1024)).toFixed(2)} MB total
                         </p>
                       </div>
                     </div>
@@ -1437,83 +1426,10 @@ const OCREvaluation = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => setNewWorkspaceFiles([])}
-                      className="text-teal-600 hover:text-teal-800 hover:bg-teal-200/50 h-8 px-3"
+                      className="text-teal-600 hover:text-teal-800 hover:bg-teal-100 h-8 px-3"
                     >
                       <X className="w-4 h-4 mr-1" />
-                      Clear All
-                    </Button>
-                  </div>
-                  
-                  {/* Files list */}
-                  <ScrollArea className="max-h-48">
-                    <div className="p-2 space-y-1">
-                      {newWorkspaceFiles.map((file, index) => {
-                        const isZip = file.name.toLowerCase().endsWith('.zip')
-                        const isPdf = file.name.toLowerCase().endsWith('.pdf')
-                        const isFolder = file.type === '' && !isZip && !isPdf
-                        
-                        return (
-                          <div 
-                            key={`${file.name}-${index}`}
-                            className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-teal-100 group"
-                          >
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className={`flex items-center justify-center w-9 h-9 rounded-lg shrink-0 ${
-                                isZip ? 'bg-amber-100' : isPdf ? 'bg-red-100' : 'bg-blue-100'
-                              }`}>
-                                {isZip ? (
-                                  <FolderOpen className="w-4.5 h-4.5 text-amber-600" />
-                                ) : isPdf ? (
-                                  <FileText className="w-4.5 h-4.5 text-red-600" />
-                                ) : (
-                                  <FolderOpen className="w-4.5 h-4.5 text-blue-600" />
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium text-slate-700 truncate" title={file.name}>
-                                  {file.name}
-                                </p>
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
-                                    isZip ? 'bg-amber-100 text-amber-700' : 
-                                    isPdf ? 'bg-red-100 text-red-700' : 
-                                    'bg-blue-100 text-blue-700'
-                                  }`}>
-                                    {isZip ? 'ZIP' : isPdf ? 'PDF' : 'FOLDER'}
-                                  </span>
-                                  <span className="text-xs text-slate-500">
-                                    {formatFileSize(file.size)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setNewWorkspaceFiles(prev => prev.filter((_, i) => i !== index))
-                                toast.info(`Removed ${file.name}`)
-                              }}
-                              className="h-7 w-7 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </ScrollArea>
-                  
-                  {/* Add more files button */}
-                  <div className="p-2 border-t border-teal-200 bg-teal-50/50">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => document.getElementById('workspace-unified-upload')?.click()}
-                      className="w-full h-8 text-teal-600 hover:text-teal-700 hover:bg-teal-100/50"
-                    >
-                      <Plus className="w-4 h-4 mr-1.5" />
-                      Add More Files
+                      Clear
                     </Button>
                   </div>
                 </div>
