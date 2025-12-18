@@ -329,24 +329,27 @@ const OCREvaluation = () => {
       "654, Park Street, Kolkata - 700016"
     ]
     
-    return Array.from({ length: Math.min(count, 125) }, (_, index) => ({
-      id: `candidate-${index + 1}`,
-      candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
-      registrationName: `REG${String(index + 1).padStart(6, '0')}`,
-      centreName: centres[index % centres.length],
-      centreAddress: addresses[index % addresses.length],
-      phase1: getRandomStatus(1),
-      phase2: getRandomStatus(2),
-      phase3: getRandomStatus(3),
-      segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
-      ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
-      segmentImages: generateMockSegmentImages(),
-      evaluationData: generateMockEvaluationData(),
-      evaluationMarks: Math.floor(Math.random() * 51) + 50,
-      maxMarks: 100,
-      standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
-      category: folders && folders.length > 1 ? folders[index % folders.length]?.name : undefined,
-    }))
+    return Array.from({ length: Math.min(count, 125) }, (_, index) => {
+      const statuses = generateConsistentStatuses()
+      return {
+        id: `candidate-${index + 1}`,
+        candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
+        registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+        centreName: centres[index % centres.length],
+        centreAddress: addresses[index % addresses.length],
+        phase1: statuses.phase1,
+        phase2: statuses.phase2,
+        phase3: statuses.phase3,
+        segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+        ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+        segmentImages: generateMockSegmentImages(),
+        evaluationData: generateMockEvaluationData(),
+        evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
+        maxMarks: 100,
+        standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+        category: folders && folders.length > 1 ? folders[index % folders.length]?.name : undefined,
+      }
+    })
   }
 
   // Mock segment images (handwritten answer segments)
@@ -388,40 +391,46 @@ const OCREvaluation = () => {
       ]
       
       const mockCandidates: CandidateData[] = candidateNames.size > 0 
-        ? Array.from(candidateNames).slice(0, 125).map((name, index) => ({
-            id: `candidate-${index + 1}`,
-            candidateName: name,
-            registrationName: `REG${String(index + 1).padStart(6, '0')}`,
-            centreName: centres[index % centres.length],
-            centreAddress: addresses[index % addresses.length],
-            phase1: getRandomStatus(1),
-            phase2: getRandomStatus(2),
-            phase3: getRandomStatus(3),
-            segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
-            ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
-            segmentImages: generateMockSegmentImages(),
-            evaluationData: generateMockEvaluationData(),
-            evaluationMarks: Math.floor(Math.random() * 51) + 50,
-            maxMarks: 100,
-            standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
-          }))
-        : Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
-            id: `candidate-${index + 1}`,
-            candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
-            registrationName: `REG${String(index + 1).padStart(6, '0')}`,
-            centreName: centres[index % centres.length],
-            centreAddress: addresses[index % addresses.length],
-            phase1: getRandomStatus(1),
-            phase2: getRandomStatus(2),
-            phase3: getRandomStatus(3),
-            segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
-            ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
-            segmentImages: generateMockSegmentImages(),
-            evaluationData: generateMockEvaluationData(),
-            evaluationMarks: Math.floor(Math.random() * 51) + 50,
-            maxMarks: 100,
-            standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
-          }))
+        ? Array.from(candidateNames).slice(0, 125).map((name, index) => {
+            const statuses = generateConsistentStatuses()
+            return {
+              id: `candidate-${index + 1}`,
+              candidateName: name,
+              registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+              centreName: centres[index % centres.length],
+              centreAddress: addresses[index % addresses.length],
+              phase1: statuses.phase1,
+              phase2: statuses.phase2,
+              phase3: statuses.phase3,
+              segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+              ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+              segmentImages: generateMockSegmentImages(),
+              evaluationData: generateMockEvaluationData(),
+              evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
+              maxMarks: 100,
+              standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+            }
+          })
+        : Array.from({ length: Math.min(files.length, 125) }, (_, index) => {
+            const statuses = generateConsistentStatuses()
+            return {
+              id: `candidate-${index + 1}`,
+              candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
+              registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+              centreName: centres[index % centres.length],
+              centreAddress: addresses[index % addresses.length],
+              phase1: statuses.phase1,
+              phase2: statuses.phase2,
+              phase3: statuses.phase3,
+              segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+              ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+              segmentImages: generateMockSegmentImages(),
+              evaluationData: generateMockEvaluationData(),
+              evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
+              maxMarks: 100,
+              standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+            }
+          })
 
       // Store pending data and show confirmation dialog
       setPendingUploadData({
@@ -463,23 +472,26 @@ const OCREvaluation = () => {
         "654, Park Street, Kolkata - 700016"
       ]
       
-      const mockCandidates: CandidateData[] = Array.from({ length: Math.min(50, 125) }, (_, index) => ({
-        id: `candidate-${index + 1}`,
-        candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
-        registrationName: `REG${String(index + 1).padStart(6, '0')}`,
-        centreName: centres[index % centres.length],
-        centreAddress: addresses[index % addresses.length],
-        phase1: getRandomStatus(1),
-        phase2: getRandomStatus(2),
-        phase3: getRandomStatus(3),
-        segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
-        ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
-        segmentImages: generateMockSegmentImages(),
-        evaluationData: generateMockEvaluationData(),
-        evaluationMarks: Math.floor(Math.random() * 51) + 50,
-        maxMarks: 100,
-        standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
-      }))
+      const mockCandidates: CandidateData[] = Array.from({ length: Math.min(50, 125) }, (_, index) => {
+        const statuses = generateConsistentStatuses()
+        return {
+          id: `candidate-${index + 1}`,
+          candidateName: `Candidate ${String(index + 1).padStart(3, '0')}`,
+          registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+          centreName: centres[index % centres.length],
+          centreAddress: addresses[index % addresses.length],
+          phase1: statuses.phase1,
+          phase2: statuses.phase2,
+          phase3: statuses.phase3,
+          segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+          ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+          segmentImages: generateMockSegmentImages(),
+          evaluationData: generateMockEvaluationData(),
+          evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
+          maxMarks: 100,
+          standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+        }
+      })
 
       // Store pending data and show confirmation dialog
       setPendingUploadData({
@@ -514,23 +526,26 @@ const OCREvaluation = () => {
         "654, Park Street, Kolkata - 700016"
       ]
       
-      const mockCandidates: CandidateData[] = Array.from({ length: Math.min(files.length, 125) }, (_, index) => ({
-        id: `candidate-${index + 1}`,
-        candidateName: `PDF Candidate ${String(index + 1).padStart(3, '0')}`,
-        registrationName: `REG${String(index + 1).padStart(6, '0')}`,
-        centreName: centres[index % centres.length],
-        centreAddress: addresses[index % addresses.length],
-        phase1: getRandomStatus(1),
-        phase2: getRandomStatus(2),
-        phase3: getRandomStatus(3),
-        segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
-        ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
-        segmentImages: generateMockSegmentImages(),
-        evaluationData: generateMockEvaluationData(),
-        evaluationMarks: Math.floor(Math.random() * 51) + 50,
-        maxMarks: 100,
-        standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
-      }))
+      const mockCandidates: CandidateData[] = Array.from({ length: Math.min(files.length, 125) }, (_, index) => {
+        const statuses = generateConsistentStatuses()
+        return {
+          id: `candidate-${index + 1}`,
+          candidateName: `PDF Candidate ${String(index + 1).padStart(3, '0')}`,
+          registrationName: `REG${String(index + 1).padStart(6, '0')}`,
+          centreName: centres[index % centres.length],
+          centreAddress: addresses[index % addresses.length],
+          phase1: statuses.phase1,
+          phase2: statuses.phase2,
+          phase3: statuses.phase3,
+          segmentData: `Section A: Question 1-10\nSection B: Question 11-20\nSection C: Question 21-30\nTotal Segments: 30\nDetected Boundaries: 28/30`,
+          ocrData: `Extracted Text Preview:\n\nQ1. What is the capital of India?\nA) Mumbai B) Delhi C) Chennai D) Kolkata\n\nQ2. Which river is longest in India?\nA) Ganga B) Yamuna C) Godavari D) Brahmaputra\n\nConfidence Score: 94.5%\nCharacter Recognition Rate: 98.2%`,
+          segmentImages: generateMockSegmentImages(),
+          evaluationData: generateMockEvaluationData(),
+          evaluationMarks: statuses.hasEvaluationMarks ? Math.floor(Math.random() * 51) + 50 : undefined,
+          maxMarks: 100,
+          standardsMet: { met: Math.floor(Math.random() * 3) + 8, total: 10 },
+        }
+      })
 
       // Store pending data and show confirmation dialog
       setPendingUploadData({
@@ -563,17 +578,46 @@ const OCREvaluation = () => {
     toast.info("Upload cancelled")
   }
 
-  const getRandomStatus = (phase: 1 | 2 | 3): PhaseStatus => {
-    const yetToStatus: PhaseStatus = phase === 1 ? "yet-to-segmentation" : phase === 2 ? "yet-to-ocr" : "yet-to-evaluation"
-    const statuses: PhaseStatus[] = [yetToStatus, "in-progress", "completed", "pending", "approved"]
-    const weights = [0.15, 0.2, 0.35, 0.15, 0.15]
+  // Generate consistent phase statuses - phases must progress sequentially
+  const generateConsistentStatuses = (): { phase1: PhaseStatus; phase2: PhaseStatus; phase3: PhaseStatus; hasEvaluationMarks: boolean } => {
     const random = Math.random()
-    let cumulative = 0
-    for (let i = 0; i < weights.length; i++) {
-      cumulative += weights[i]
-      if (random < cumulative) return statuses[i]
+    
+    // 15% - All phases not started
+    if (random < 0.15) {
+      return { phase1: "yet-to-segmentation", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
     }
-    return "pending"
+    // 15% - Phase 1 in progress
+    if (random < 0.30) {
+      return { phase1: "in-progress", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+    }
+    // 15% - Phase 1 completed, Phase 2 not started
+    if (random < 0.45) {
+      return { phase1: "completed", phase2: "yet-to-ocr", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+    }
+    // 10% - Phase 1 completed, Phase 2 in progress
+    if (random < 0.55) {
+      return { phase1: "completed", phase2: "in-progress", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+    }
+    // 15% - Phase 1 & 2 completed, Phase 3 not started
+    if (random < 0.70) {
+      return { phase1: "completed", phase2: "completed", phase3: "yet-to-evaluation", hasEvaluationMarks: false }
+    }
+    // 10% - Phase 1 & 2 completed, Phase 3 in progress
+    if (random < 0.80) {
+      return { phase1: "completed", phase2: "completed", phase3: "in-progress", hasEvaluationMarks: false }
+    }
+    // 10% - All phases completed with evaluation marks
+    if (random < 0.90) {
+      return { phase1: "completed", phase2: "completed", phase3: "completed", hasEvaluationMarks: true }
+    }
+    // 10% - All phases approved with evaluation marks
+    return { phase1: "approved", phase2: "approved", phase3: "approved", hasEvaluationMarks: true }
+  }
+
+  // Helper to check if Quick Approve can be enabled
+  const canEnableQuickApprove = (candidate: CandidateData): boolean => {
+    return (candidate.phase1 === "completed" || candidate.phase1 === "approved") && 
+           (candidate.phase2 === "completed" || candidate.phase2 === "approved")
   }
 
   const handleReuploadConfirm = () => {
@@ -1173,15 +1217,45 @@ const OCREvaluation = () => {
                     setSelectedCandidates(newSelected)
                   }
 
-                  // Handle download
+                  // Handle download - creates and downloads CSV file
                   const handleDownload = (type: "selected" | "all") => {
                     const toDownload = type === "selected" ? selectedDownloadable : downloadableCandidates
                     if (toDownload.length === 0) {
                       toast.error("No approved candidates available for download")
                       return
                     }
-                    toast.success(`Downloading ${toDownload.length} candidate${toDownload.length > 1 ? 's' : ''} data`)
-                    // In a real implementation, this would trigger actual file download
+                    
+                    // Create CSV content
+                    const headers = ["Sl No", "Candidate Name", "Registration Name", "Centre Name", "Segmentation Status", "OCR Status", "Evaluation Status", "Evaluation Score", "Max Marks"]
+                    const csvRows = [headers.join(",")]
+                    
+                    toDownload.forEach((candidate, index) => {
+                      const row = [
+                        index + 1,
+                        `"${candidate.candidateName}"`,
+                        `"${candidate.registrationName}"`,
+                        `"${candidate.centreName}"`,
+                        candidate.phase1,
+                        candidate.phase2,
+                        candidate.phase3,
+                        candidate.evaluationMarks ?? "N/A",
+                        candidate.maxMarks ?? 100
+                      ]
+                      csvRows.push(row.join(","))
+                    })
+                    
+                    const csvContent = csvRows.join("\n")
+                    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+                    const url = URL.createObjectURL(blob)
+                    const link = document.createElement("a")
+                    link.setAttribute("href", url)
+                    link.setAttribute("download", `evaluation_results_${new Date().toISOString().split('T')[0]}.csv`)
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                    URL.revokeObjectURL(url)
+                    
+                    toast.success(`Downloaded ${toDownload.length} candidate${toDownload.length > 1 ? 's' : ''} data`)
                   }
 
                   const allSelected = filteredCandidates.length > 0 && 
@@ -1407,7 +1481,8 @@ const OCREvaluation = () => {
                                                     c.id === candidate.id ? { ...c, quickApprove: checked } : c
                                                   ))
                                                 }}
-                                                className="data-[state=checked]:bg-teal-600"
+                                                disabled={!canEnableQuickApprove(candidate)}
+                                                className="data-[state=checked]:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed"
                                               />
                                             </TableCell>
                                           </TableRow>
@@ -1495,7 +1570,8 @@ const OCREvaluation = () => {
                                           c.id === candidate.id ? { ...c, quickApprove: checked } : c
                                         ))
                                       }}
-                                      className="data-[state=checked]:bg-teal-600"
+                                      disabled={!canEnableQuickApprove(candidate)}
+                                      className="data-[state=checked]:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                   </TableCell>
                                 </TableRow>
