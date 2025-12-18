@@ -2402,6 +2402,47 @@ const OCREvaluation = () => {
               <span className="truncate">Evaluation Review - {evaluationReviewCandidate?.candidateName}</span>
             </DialogTitle>
             <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 shrink-0">
+              {/* Info Button */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 sm:h-8 px-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100">
+                    <Info className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1 text-xs">Info</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-72 p-3">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm text-slate-800">Evaluation Details</h4>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Model Used:</span>
+                        <span className="font-medium text-slate-700">GPT-4 Turbo</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Confidence:</span>
+                        <span className="font-medium text-emerald-600">92.4%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Processing Time:</span>
+                        <span className="font-medium text-slate-700">1.8s</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Rubric Match:</span>
+                        <span className="font-medium text-slate-700">High</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Last Updated:</span>
+                        <span className="font-medium text-slate-700">{new Date().toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-slate-100">
+                      <p className="text-xs text-slate-500">
+                        Evaluation performed using AI-assisted rubric matching with manual review capability.
+                      </p>
+                    </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {/* Total Marks Display */}
               <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-lg">
                 <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
@@ -2683,46 +2724,6 @@ const OCREvaluation = () => {
                                   Save
                                 </Button>
                               </div>
-                              {/* Info Button */}
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-700">
-                                    <Info className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-72 p-3">
-                                  <div className="space-y-3">
-                                    <h4 className="font-semibold text-sm text-slate-800">Evaluation Details</h4>
-                                    <div className="space-y-2 text-xs">
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">Model Used:</span>
-                                        <span className="font-medium text-slate-700">GPT-4 Turbo</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">Confidence:</span>
-                                        <span className="font-medium text-emerald-600">92.4%</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">Processing Time:</span>
-                                        <span className="font-medium text-slate-700">1.8s</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">Rubric Match:</span>
-                                        <span className="font-medium text-slate-700">High</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">Last Updated:</span>
-                                        <span className="font-medium text-slate-700">{new Date().toLocaleDateString()}</span>
-                                      </div>
-                                    </div>
-                                    <div className="pt-2 border-t border-slate-100">
-                                      <p className="text-xs text-slate-500">
-                                        Evaluation performed using AI-assisted rubric matching with manual review capability.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
                             </div>
                           </div>
 
