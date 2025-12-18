@@ -1378,7 +1378,7 @@ const OCREvaluation = () => {
                                               />
                                             </TableCell>
                                             <TableCell className="py-3 sm:py-4 text-left">
-                                              {candidate.phase2 === "approved" && candidate.evaluationMarks !== undefined ? (
+                                              {candidate.evaluationMarks !== undefined ? (
                                                 <button
                                                   onClick={() => setEvaluationReviewCandidate(candidate)}
                                                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
@@ -1389,7 +1389,6 @@ const OCREvaluation = () => {
                                                       : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
                                                   }`}
                                                 >
-                                                  <CheckCircle className="w-3.5 h-3.5" />
                                                   {candidate.evaluationMarks}/{candidate.maxMarks || 100}
                                                 </button>
                                               ) : (
@@ -1467,7 +1466,7 @@ const OCREvaluation = () => {
                                     />
                                   </TableCell>
                                   <TableCell className="py-3 sm:py-4 text-left">
-                                    {candidate.phase2 === "approved" && candidate.evaluationMarks !== undefined ? (
+                                    {candidate.evaluationMarks !== undefined ? (
                                       <button
                                         onClick={() => setEvaluationReviewCandidate(candidate)}
                                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
@@ -1478,7 +1477,6 @@ const OCREvaluation = () => {
                                             : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
                                         }`}
                                       >
-                                        <CheckCircle className="w-3.5 h-3.5" />
                                         {candidate.evaluationMarks}/{candidate.maxMarks || 100}
                                       </button>
                                     ) : (
