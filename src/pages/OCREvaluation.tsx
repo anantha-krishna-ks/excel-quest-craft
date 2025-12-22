@@ -1641,20 +1641,83 @@ const OCREvaluation = () => {
                     e.preventDefault()
                     e.currentTarget.classList.remove('border-teal-400', 'bg-teal-50/50')
                   }}
-                  onDrop={(e) => {
+                  onDrop={async (e) => {
                     e.preventDefault()
                     e.currentTarget.classList.remove('border-teal-400', 'bg-teal-50/50')
-                    const files = e.dataTransfer.files
-                    if (files && files.length > 0) {
-                      setNewWorkspaceFiles(Array.from(files))
-                      toast.success(`${files.length} file(s) added`)
+                    
+                    const items = e.dataTransfer.items
+                    const allFiles: File[] = []
+                    
+                    // Handle DataTransferItemList for folder support
+                    if (items && items.length > 0) {
+                      const processEntry = async (entry: FileSystemEntry): Promise<void> => {
+                        if (entry.isFile) {
+                          const fileEntry = entry as FileSystemFileEntry
+                          return new Promise((resolve) => {
+                            fileEntry.file((file) => {
+                              if (file.name.endsWith('.pdf') || file.name.endsWith('.zip')) {
+                                allFiles.push(file)
+                              }
+                              resolve()
+                            })
+                          })
+                        } else if (entry.isDirectory) {
+                          const dirEntry = entry as FileSystemDirectoryEntry
+                          const reader = dirEntry.createReader()
+                          return new Promise((resolve) => {
+                            const readEntries = () => {
+                              reader.readEntries(async (entries) => {
+                                if (entries.length === 0) {
+                                  resolve()
+                                } else {
+                                  for (const subEntry of entries) {
+                                    await processEntry(subEntry)
+                                  }
+                                  readEntries()
+                                }
+                              })
+                            }
+                            readEntries()
+                          })
+                        }
+                      }
+                      
+                      const promises: Promise<void>[] = []
+                      for (let i = 0; i < items.length; i++) {
+                        const entry = items[i].webkitGetAsEntry()
+                        if (entry) {
+                          promises.push(processEntry(entry))
+                        }
+                      }
+                      await Promise.all(promises)
+                      
+                      if (allFiles.length > 0) {
+                        setNewWorkspaceFiles(allFiles)
+                        toast.success(`${allFiles.length} file(s) added`)
+                      } else {
+                        toast.error('No PDF or ZIP files found')
+                      }
+                    } else {
+                      // Fallback for regular file drops
+                      const files = e.dataTransfer.files
+                      if (files && files.length > 0) {
+                        const validFiles = Array.from(files).filter(f => 
+                          f.name.endsWith('.pdf') || f.name.endsWith('.zip')
+                        )
+                        if (validFiles.length > 0) {
+                          setNewWorkspaceFiles(validFiles)
+                          toast.success(`${validFiles.length} file(s) added`)
+                        } else {
+                          toast.error('No PDF or ZIP files found')
+                        }
+                      }
                     }
                   }}
-                  onClick={() => document.getElementById('workspace-unified-upload')?.click()}
                 >
+                  {/* Hidden input for PDF/ZIP files */}
                   <input
                     type="file"
-                    id="workspace-unified-upload"
+                    id="workspace-file-upload"
                     multiple
                     accept=".pdf,.zip"
                     onChange={(e) => {
@@ -1667,30 +1730,69 @@ const OCREvaluation = () => {
                     className="hidden"
                   />
                   
+                  {/* Hidden input for folder upload */}
+                  <input
+                    type="file"
+                    id="workspace-folder-upload"
+                    // @ts-ignore - webkitdirectory is not in types but works in browsers
+                    webkitdirectory=""
+                    directory=""
+                    multiple
+                    onChange={(e) => {
+                      const files = e.target.files
+                      if (files && files.length > 0) {
+                        const pdfFiles = Array.from(files).filter(f => 
+                          f.name.endsWith('.pdf') || f.name.endsWith('.zip')
+                        )
+                        if (pdfFiles.length > 0) {
+                          setNewWorkspaceFiles(pdfFiles)
+                          toast.success(`${pdfFiles.length} PDF/ZIP file(s) found in folder`)
+                        } else {
+                          toast.error('No PDF or ZIP files found in folder')
+                        }
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  
                   <div className="flex items-center justify-center w-14 h-14 rounded-full bg-teal-100 mb-4 group-hover:bg-teal-200 transition-colors">
                     <Upload className="w-7 h-7 text-teal-600" />
                   </div>
                   
                   <p className="text-sm font-medium text-slate-700 mb-1">
-                    Drop files here or click to browse
+                    Drop files or folders here
                   </p>
-                  <p className="text-xs text-slate-500 text-center">
-                    Supports PDF files, ZIP archives, or folders
+                  <p className="text-xs text-slate-500 text-center mb-4">
+                    Supports PDF files, ZIP archives, or folders containing PDFs
                   </p>
                   
-                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-200 w-full justify-center">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <FileText className="w-4 h-4" />
-                      <span>PDF</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <FolderOpen className="w-4 h-4" />
-                      <span>ZIP</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <FolderOpen className="w-4 h-4" />
-                      <span>Folder</span>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        document.getElementById('workspace-file-upload')?.click()
+                      }}
+                      className="h-8 px-3 text-xs border-teal-300 text-teal-700 hover:bg-teal-50"
+                    >
+                      <FileText className="w-3.5 h-3.5 mr-1.5" />
+                      PDF / ZIP Files
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        document.getElementById('workspace-folder-upload')?.click()
+                      }}
+                      className="h-8 px-3 text-xs border-teal-300 text-teal-700 hover:bg-teal-50"
+                    >
+                      <FolderOpen className="w-3.5 h-3.5 mr-1.5" />
+                      Upload Folder
+                    </Button>
                   </div>
                 </div>
               ) : (
