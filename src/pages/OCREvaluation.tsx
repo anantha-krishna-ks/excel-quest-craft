@@ -1775,7 +1775,7 @@ const OCREvaluation = () => {
                         e.stopPropagation()
                         document.getElementById('workspace-file-upload')?.click()
                       }}
-                      className="h-8 px-3 text-xs border-teal-300 text-teal-700 hover:bg-teal-50"
+                      className="h-8 px-3 text-xs bg-white border-teal-400 text-teal-700 hover:bg-teal-500 hover:text-white hover:border-teal-500 hover:shadow-md transition-all duration-200"
                     >
                       <FileText className="w-3.5 h-3.5 mr-1.5" />
                       PDF / ZIP Files
@@ -1788,7 +1788,7 @@ const OCREvaluation = () => {
                         e.stopPropagation()
                         document.getElementById('workspace-folder-upload')?.click()
                       }}
-                      className="h-8 px-3 text-xs border-teal-300 text-teal-700 hover:bg-teal-50"
+                      className="h-8 px-3 text-xs bg-white border-teal-400 text-teal-700 hover:bg-teal-500 hover:text-white hover:border-teal-500 hover:shadow-md transition-all duration-200"
                     >
                       <FolderOpen className="w-3.5 h-3.5 mr-1.5" />
                       Upload Folder
