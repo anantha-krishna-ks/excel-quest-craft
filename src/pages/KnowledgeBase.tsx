@@ -1035,151 +1035,173 @@ const KnowledgeBase = () => {
               </>
             ) : (
               <>
-                {/* Program / Customer Selection */}
-                <div className="flex items-center gap-2">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm">
-                    <span className="text-gray-500">Customer:</span>
-                    <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
-                      <SelectTrigger className="border-none shadow-none h-auto p-0 min-w-[80px] font-semibold text-gray-900 focus:ring-0">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white z-50">
-                        <SelectItem value="ACCA">ACCA</SelectItem>
-                        <SelectItem value="Customer2">Customer 2</SelectItem>
-                        <SelectItem value="Customer3">Customer 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {/* Existing List View */}
+          {/* Customer Selection Card */}
+          <Card className="border-2 border-purple-100 bg-gradient-to-br from-purple-50 to-purple-100">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-600 text-white rounded-lg">
+                  <Search className="h-5 w-5" />
                 </div>
+                <h2 className="text-xl font-semibold text-purple-800">Select Customer</h2>
+              </div>
+              
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-purple-400 z-10" />
+                <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
+                  <SelectTrigger className="w-full pl-10 bg-white border-purple-200 focus:border-purple-400 focus:ring-purple-400/20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="ACCA">ACCA</SelectItem>
+                    <SelectItem value="Customer2">Customer 2</SelectItem>
+                    <SelectItem value="Customer3">Customer 3</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
 
-                {/* Knowledge Bases Card */}
-                <Card className="border border-gray-200 bg-white shadow-sm">
-                  <CardContent className="p-6 space-y-6">
-                    {/* Header row */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-1 h-7 bg-blue-600 rounded-full" />
-                        <h2 className="text-xl font-bold text-gray-900">Knowledge Bases</h2>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          onClick={() => setIsCreating(true)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-5"
-                        >
-                          <Plus className="w-4 h-4 mr-1.5" />
-                          Create Knowledge Base
-                        </Button>
-                        <Button 
-                          onClick={() => setIsCreatingStudyLO(true)}
-                          variant="outline"
-                          className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-full px-5"
-                        >
-                          <Plus className="w-4 h-4 mr-1.5" />
-                          Create Study LO
-                        </Button>
-                      </div>
-                    </div>
+          {/* Knowledge Bases Card */}
+          <Card className="border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100">
+            <CardContent className="p-6 space-y-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-600 text-white rounded-lg">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-blue-800">Knowledge Bases</h2>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button 
+                    onClick={() => setIsCreating(true)}
+                    className="px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create New Knowledge Base
+                  </Button>
+                  <Button 
+                    onClick={() => setIsCreatingStudyLO(true)}
+                    className="px-6 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Study LO
+                  </Button>
+                </div>
+              </div>
 
-                    {/* Search and Filter */}
-                    <div className="flex gap-3">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
-                        <Input
-                          placeholder="Search knowledge bases..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10 bg-white border-gray-200 focus:border-blue-400 rounded-lg"
-                        />
-                      </div>
-                      <Select value={typeFilter} onValueChange={setTypeFilter}>
-                        <SelectTrigger className="w-40 bg-white border-gray-200 rounded-lg">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white z-50">
-                          <SelectItem value="All">All Types</SelectItem>
-                          <SelectItem value="Book Level">Book Level</SelectItem>
-                          <SelectItem value="Chapter Level">Chapter Level</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+              {/* Search and Filter */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-400 z-10" />
+                  <Input
+                    placeholder="Search knowledge bases..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                  />
+                </div>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="w-full sm:w-40 bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400/20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    <SelectItem value="All">All Types</SelectItem>
+                    <SelectItem value="Book Level">Book Level</SelectItem>
+                    <SelectItem value="Chapter Level">Chapter Level</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                    {/* Table */}
-                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                      <div className="overflow-x-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="bg-gray-50 border-b border-gray-200 hover:bg-gray-50">
-                              <TableHead className="font-semibold text-gray-700 py-4">Knowledge Base Name</TableHead>
-                              <TableHead className="font-semibold text-gray-700 py-4 text-right">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredKnowledgeBases.length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={2} className="text-center py-12 text-gray-500">
-                                  <div className="flex flex-col items-center gap-2">
-                                    <FileText className="h-12 w-12 text-gray-300" />
-                                    <p className="font-medium">No knowledge bases found</p>
-                                    <p className="text-sm">Try adjusting your search or filters</p>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              filteredKnowledgeBases.map((kb) => (
-                                <TableRow key={kb.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-100 last:border-b-0">
-                                  <TableCell className="py-5">
-                                    <div className="flex items-center gap-3">
-                                      <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FileText className="w-4 h-4 text-blue-500" />
-                                      </div>
-                                      <span className="font-medium text-gray-900">{kb.name}</span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="py-5">
-                                    <div className="flex items-center justify-end gap-1">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-9 w-9 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                                        onClick={() => navigate(`/knowledge-base/edit/${kb.id}`)}
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-9 w-9 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                                        onClick={() => {
-                                          setSelectedKBForChat({ id: kb.id, name: kb.name, bookName: kb.bookName });
-                                          setIsChatMode(true);
-                                          setChatMessages([]);
-                                        }}
-                                      >
-                                        <MessageSquare className="h-4 w-4" />
-                                      </Button>
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-9 w-9 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                        onClick={() => {
-                                          setKbToDelete({ id: kb.id, name: kb.name, bookName: kb.bookName });
-                                          setDeleteDialogOpen(true);
-                                        }}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              {/* Table */}
+              <div className="bg-white rounded-lg border-2 border-blue-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-blue-50 border-b-2 border-blue-200 hover:bg-blue-50">
+                        <TableHead className="font-semibold text-blue-900 py-4">Knowledge Base Name</TableHead>
+                        <TableHead className="font-semibold text-blue-900 py-4">Book Name</TableHead>
+                        <TableHead className="font-semibold text-blue-900 py-4">Type</TableHead>
+                        <TableHead className="font-semibold text-blue-900 py-4">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredKnowledgeBases.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center py-12 text-gray-500">
+                            <div className="flex flex-col items-center gap-2">
+                              <FileText className="h-12 w-12 text-gray-300" />
+                              <p className="font-medium">No knowledge bases found</p>
+                              <p className="text-sm">Try adjusting your search or filters</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        filteredKnowledgeBases.map((kb) => (
+                          <TableRow key={kb.id} className="hover:bg-blue-50/50 transition-colors border-b border-blue-100 last:border-b-0">
+                            <TableCell className="font-medium text-gray-900 py-4">{kb.name}</TableCell>
+                            <TableCell className="text-gray-700 py-4">{kb.bookName}</TableCell>
+                            <TableCell className="py-4">
+                              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                {kb.type}
+                              </span>
+                            </TableCell>
+                            <TableCell className="py-4">
+                              <div className="flex items-center gap-1">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-9 w-9 hover:bg-blue-100 transition-colors"
+                                  onClick={() => navigate(`/knowledge-base/edit/${kb.id}`)}
+                                >
+                                  <Edit className="h-4 w-4 text-blue-600" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-9 w-9 hover:bg-purple-100 transition-colors"
+                                  onClick={() => {
+                                    setSelectedKBForGuidelines({ id: kb.id, name: kb.name });
+                                    setIsViewingGuidelines(true);
+                                  }}
+                                >
+                                  <ScrollText className="h-4 w-4 text-purple-600" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-9 w-9 hover:bg-teal-100 transition-colors"
+                                  onClick={() => {
+                                    setSelectedKBForChat({ id: kb.id, name: kb.name, bookName: kb.bookName });
+                                    setIsChatMode(true);
+                                    setChatMessages([]);
+                                  }}
+                                >
+                                  <MessageSquare className="h-4 w-4 text-teal-600" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-9 w-9 hover:bg-red-100 transition-colors"
+                                  onClick={() => {
+                                    setKbToDelete({ id: kb.id, name: kb.name, bookName: kb.bookName });
+                                    setDeleteDialogOpen(true);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-600" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
               </>
             )}
           </div>
